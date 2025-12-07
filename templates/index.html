@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Web App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #f4f4f4;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>ML Web Application</h1>
+    <div class="container">
+        <h2>Server Status: <span style="color: green;">✅ Running</span></h2>
+        
+        <h3>Test API Connection:</h3>
+        <button onclick="testAPI()">Test API Endpoint</button>
+        
+        <div class="result" id="apiResult"></div>
+        
+        <hr>
+        
+        <h3>Future ML Prediction Form:</h3>
+        <div id="predictionForm">
+            <p>Sample form for future ML predictions</p>
+            <input type="number" id="feature1" placeholder="Feature 1" value="0.5" step="0.1">
+            <input type="number" id="feature2" placeholder="Feature 2" value="0.3" step="0.1">
+            <button onclick="makePrediction()">Make Prediction (Placeholder)</button>
+        </div>
+        
+        <div class="result" id="predictionResult"></div>
+    </div>
+    
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('apiResult');
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        test: 'data',
+                        features: [1, 2, 3]
+                    })
+                });
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <strong>Response:</strong><br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>Error:</strong> ${error}`;
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        function makePrediction() {
+            const resultDiv = document.getElementById('predictionResult');
+            const feature1 = document.getElementById('feature1').value;
+            const feature2 = document.getElementById('feature2').value;
+            
+            resultDiv.innerHTML = `
+                <strong>Note:</strong> ML model not yet integrated<br>
+                <strong>Input features:</strong> ${feature1}, ${feature2}<br>
+                <em>To add your model:</em><br>
+                1. Place your model.pkl and scaler.pkl in the 'models' folder<br>
+                2. Uncomment and modify the predict_ml() function in app.py<br>
+                3. Update this form to call the correct endpoint
+            `;
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
