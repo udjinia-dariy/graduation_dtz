@@ -1,27 +1,240 @@
+<!-- Replace the "Future ML Prediction Form" section with this: -->
+<h3>Thyroid Disease Recurrence Prediction</h3>
+<div id="predictionForm">
+    <div class="form-section">
+        <h4>Patient Demographics:</h4>
+        <div class="input-group">
+            <label>Age at Onset:</label>
+            <input type="number" id="age_onset" placeholder="Age" value="45" min="0" max="120" step="1"> </div> <div class="input-group"> <label>Heredity (1=Yes, 0=No):</label> <input type="number" id="heredity" placeholder="0 or 1" value="0" min="0" max="1" step="1">
+        </div>
+        <div class="input-group">
+            <label>Smoking Status (1=Yes, 0=No):</label>
+            <input type="number" id="smoking_status" placeholder="0 or 1" value="0" min="0" max="1" step="1">
+        </div>
+        <div class="input-group">
+            <label>Sex (1=Male, 0=Female):</label>
+            <input type="number" id="sex" placeholder="0 or 1" value="0" min="0" max="1" step="1">
+        </div>
+    </div>
+    
+    <div class="form-section">
+        <h4>Initial Ultrasound (US1):</h4>
+        <div class="input-group">
+            <label>Thyroid Volume (ml):</label>
+            <input type="number" id="us1_thyroid_volume" placeholder="Volume" value="20.5" min="0" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>Number of Nodules:</label>
+            <input type="number" id="us1_nodules" placeholder="Count" value="0" min="0" step="1">
+        </div>
+        <div class="input-group">
+            <label>Nodule Size (cm):</label>
+            <input type="number" id="us1_nodules_cm" placeholder="Size in cm" value="0.0" min="0" step="0.1">
+        </div>
+    </div>
+    
+    <div class="form-section">
+        <h4>Initial Blood Tests:</h4>
+        <div class="input-group">
+            <label>TSH Level 1:</label>
+            <input type="number" id="tsh_1" placeholder="TSH value" value="2.5" min="0" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>FT4 Level 1:</label>
+            <input type="number" id="ft4_1" placeholder="FT4 value" value="15.0" min="0" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>FT3 Level 1:</label>
+            <input type="number" id="ft3_1" placeholder="FT3 value" value="5.0" min="0" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>FT3/FT4 Ratio:</label>
+            <input type="number" id="ft3_to_ft4_ratio" placeholder="Ratio" value="0.33" min="0" step="0.01">
+        </div>
+    </div>
+    
+    <div class="form-section">
+        <h4>Clinical Symptoms:</h4>
+        <div class="input-group">
+            <label>Exophthalmos (1=Yes, 0=No):</label>
+            <input type="number" id="exophthalmos" placeholder="0 or 1" value="0" min="0" max="1" step="1">
+        </div>
+        <div class="input-group">
+            <label>Thyrotoxic Cardiomyopathy (1=Yes, 0=No):</label>
+            <input type="number" id="thyrotoxic_cardiomyopathy" placeholder="0 or 1" value="0" min="0" max="1" step="1">
+        </div>
+    </div>
+    
+    <div class="form-section">
+        <h4>Treatment & Follow-up:</h4>
+        <div class="input-group">
+            <label>Treatment Type (Code 0-3):</label>
+            <input type="number" id="treatment_type" placeholder="0-3" value="1" min="0" max="3" step="1">
+        </div>
+        <div class="input-group">
+            <label>TSH Level 3 (Follow-up):</label>
+            <input type="number" id="tsh_3" placeholder="TSH value" value="1.8" min="0" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>US3 Thyroid Volume (ml):</label>
+            <input type="number" id="us3_thyroid_volume" placeholder="Volume" value="15.0" min="0" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>US3 Nodules Count:</label>
+            <input type="number" id="us3_nodules" placeholder="Count" value="0" min="0" step="1">
+        </div>
+        <div class="input-group">
+            <label>US3 Nodule Size (cm):</label>
+            <input type="number" id="us3_nodules_cm" placeholder="Size in cm" value="0.0" min="0" step="0.1">
+        </div>
+    </div>
+    
+    <button onclick="predictRecurrence()" class="predict-btn">Predict Recurrence Risk</button>
+</div>
 
-wget -qO- https://github.com/zen-browser/desktop/releases/download/1.17.12b/zen.linux-x86_64.tar.xz  | sudo tar xj -C /opt
+<div class="result" id="predictionResult"></div>
 
-sudo ln -s /opt/zen/zen /usr/bin/zen
+<style>
+.form-section {
+    background-color: white;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border-left: 4px solid #4CAF50;
+}
+.input-group {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+}
+.input-group label {
+    width: 250px;
+    font-weight: bold;
+    color: #333;
+}
+.input-group input {
+    width: 200px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.predict-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+.predict-btn:hover {
+    background-color: #45a049;
+}
+</style>
 
+<script>
+async function predictRecurrence() {
+    const resultDiv = document.getElementById('predictionResult');
+    resultDiv.innerHTML = '<div style="color: blue;">⏳ Processing prediction...</div>';
+    resultDiv.style.display = 'block';
+    
+    try {
+        // Collect all 18 features
+        const data = {
+            age_onset: parseFloat(document.getElementById('age_onset').value) || 0,
+            heredity: parseInt(document.getElementById('heredity').value) || 0,
+            smoking_status: parseInt(document.getElementById('smoking_status').value) || 0,
+            sex: parseInt(document.getElementById('sex').value) || 0,
+            us1_thyroid_volume: parseFloat(document.getElementById('us1_thyroid_volume').value) || 0.0,
+            us1_nodules: parseInt(document.getElementById('us1_nodules').value) || 0,
+            us1_nodules_cm: parseFloat(document.getElementById('us1_nodules_cm').value) || 0.0,
+            tsh_1: parseFloat(document.getElementById('tsh_1').value) || 0.0,
+            ft4_1: parseFloat(document.getElementById('ft4_1').value) || 0.0,
+            ft3_1: parseFloat(document.getElementById('ft3_1').value) || 0.0,
+            ft3_to_ft4_ratio: parseFloat(document.getElementById('ft3_to_ft4_ratio').value) || 0.0,
+            exophthalmos: parseInt(document.getElementById('exophthalmos').value) || 0,
+            thyrotoxic_cardiomyopathy: parseInt(document.getElementById('thyrotoxic_cardiomyopathy').value) || 0,
+            treatment_type: parseInt(document.getElementById('treatment_type').value) || 0,
+            tsh_3: parseFloat(document.getElementById('tsh_3').value) || 0.0,
+            us3_thyroid_volume: parseFloat(document.getElementById('us3_thyroid_volume').value) || 0.0,
+            us3_nodules: parseInt(document.getElementById('us3_nodules').value) || 0,
+            us3_nodules_cm: parseFloat(document.getElementById('us3_nodules_cm').value) || 0.0
+        };
+        
+        const response = await fetch('/api/predict_recurrence', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            const prediction = result.prediction;
+            const probability = (result.probability * 100).toFixed(1);
+            
+            let resultHTML = `
+                <h3>Prediction Results:</h3>
+                <div class="${prediction === 1 ? 'high-risk' : 'low-risk'}">
+                    <strong>Recurrence Prediction:</strong> 
+                    <span style="font-size: 24px; font-weight: bold; color: ${prediction === 1 ? '#d32f2f' : '#388e3c'}">
+                        ${prediction === 1 ? 'HIGH RISK ⚠️' : 'LOW RISK ✅'}
+                    </span><br>
+                    <strong>Risk Probability:</strong> ${probability}%<br>
+                    <strong>Interpretation:</strong> ${result.interpretation}<br>
+                </div>
+                
+                <h4>Input Summary:</h4>
+                <table border="1" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="padding: 8px; background-color: #f2f2f2;">Feature</th>
+                        <th style="padding: 8px; background-color: #f2f2f2;">Value</th>
+                    </tr>
+            `;
+            
+            // Add feature rows
+            const featureNames = [
+                'Age at Onset', 'Heredity', 'Smoking Status', 'Sex',
+                'US1 Thyroid Volume', 'US1 Nodules', 'US1 Nodule Size',
+                'TSH Level 1', 'FT4 Level 1', 'FT3 Level 1', 'FT3/FT4 Ratio',
+                'Exophthalmos', 'Thyrotoxic Cardiomyopathy', 'Treatment Type',
+                'TSH Level 3', 'US3 Thyroid Volume', 'US3 Nodules', 'US3 Nodule Size'
+            ];
+            
+            Object.keys(data).forEach((key, index) => {
+                resultHTML += `
+                    <tr>
+                        <td style="padding: 6px;">${featureNames[index]}</td>
+                        <td style="padding: 6px; text-align: center;">${data[key]}</td>
+                    </tr>
+                `;
+            });
+            
+            resultHTML += `</table>`;
+            
+            resultDiv.innerHTML = resultHTML;
+            
+        } else {
+            resultDiv.innerHTML = `<div style="color: red;">❌ Error: ${result.message}</div>`;
+        }
+        
+    } catch (error) {
+        resultDiv.innerHTML = `<div style="color: red;">❌ Network Error: ${error}</div>`;
+    }
+}
 
-sudo mkdir -p /usr/local/share/applications
-sudo nvim /usr/local/share/applications/zen.desktop
+// Optional: Add auto-calculation for FT3/FT4 ratio
+function updateRatio() {
+    const ft3 = parseFloat(document.getElementById('ft3_1').value) || 0;
+    const ft4 = parseFloat(document.getElementById('ft4_1').value) || 1; // Avoid division by zero
+    const ratio = ft4 > 0 ? (ft3 / ft4).toFixed(2) : 0;
+    document.getElementById('ft3_to_ft4_ratio').value = ratio;
+}
 
-put this in zen.desktop:
-```
-    [Desktop Entry]
-    Version=1.0
-    Name=Zen Browser
-    Comment=Experience tranquillity while browsing the web without people tracking you!
-    GenericName=Web Browser
-    Keywords=Internet;WWW;Browser;Web;Explorer
-    Exec=zen
-    Terminal=false
-    X-MultipleArgs=false
-    Type=Application
-    Icon=/opt/zen/browser/chrome/icons/default/default128.png
-    Categories=GNOME;GTK;Network;WebBrowser;
-    MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;x-scheme-handler/chrome;video/webm;application/x-xpinstall;
-    StartupNotify=true
-
-```
+// Add event listeners for auto-calculation
+document.getElementById('ft3_1').addEventListener('input', updateRatio);
+document.getElementById('ft4_1').addEventListener('input', updateRatio);
+</script>

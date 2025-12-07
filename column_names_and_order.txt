@@ -1,0 +1,44 @@
+0   age_onset                  185 non-null    float64
+1   heredity                   185 non-null    int64  
+2   smoking_status             185 non-null    int64  
+3   sex                        185 non-null    int64  
+4   us1_thyroid_volume         185 non-null    float64
+5   us1_nodules                185 non-null    int64  
+6   us1_nodules_cm             185 non-null    float64
+7   tsh_1                      185 non-null    float64
+8   ft4_1                      185 non-null    float64
+9   ft3_1                      185 non-null    float64
+10  ft3_to_ft4_ratio           185 non-null    float64
+11  exophthalmos               185 non-null    int64  
+12  thyrotoxic_cardiomyopathy  185 non-null    int64  
+13  treatment_type             185 non-null    int64  
+14  tsh_3                      185 non-null    float64
+15  us3_thyroid_volume         185 non-null    float64
+16  us3_nodules                185 non-null    int64  
+17  us3_nodules_cm             185 non-null    float64
+18  recurrence                 185 non-null    int64  
+
+```py
+# Для отображения на графиках
+feature_labels = {
+    "age_onset": "Возраст начала заболевания",
+    "heredity": "Наследственность",
+    "smoking_status": "Табакокурение",
+    "sex": "Пол",
+    "us1_thyroid_volume": "Начальный объем щитовидной железы",
+    "us1_nodules": "Наличие узлов (начальное)",
+    "us1_nodules_cm": "Размер узлов в см (начальное)",
+    "tsh_1": "Начальный ТТГ",
+    "ft4_1": "Начальный свободный Т4",
+    "ft3_1": "Начальный свободный Т3",
+    "ft3_to_ft4_ratio": "Соотношение св.Т3/св.Т4",
+    "exophthalmos": "Экзофтальм",
+    "treatment_type": "Тип лекарственного лечения",
+    "tsh_3": "ТТГ (через 1.5 года / перед отменой)",
+    "us3_thyroid_volume": "Объем щитовидной ж-зы (через 1.5 года / перед отменой)",
+    "us3_nodules": "Наличие узлов (через 1.5 года / перед отменой)",
+    "us3_nodules_cm": "Размер узлов в см (через 1.5 года / перед отменой)",
+    "thyrotoxic_cardiomyopathy": "Тиреотоксическая кардиомиопатия",
+    "recurrence": "Рецидив"
+}
+```
