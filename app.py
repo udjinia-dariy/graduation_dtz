@@ -138,11 +138,17 @@ def predict_ml():
     # Convert to numpy array for prediction
     features_array = features_df.values
 
+    # Провалидировать что это не хуйня
+    features_array = features_df.values.reshape(1, -1)  # Explicit reshape
+
     # Make prediction
     prediction = model.predict(features_array)
+    probability = model.predict_proba(features_array)
+    print("SOME SHITT:", prediction, probability)
 
     return jsonify({
         'prediction': prediction.tolist(),
+        'probability': probability.tolist()[0][1],
         'status': 'success'
     })
 
