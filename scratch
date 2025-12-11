@@ -1,240 +1,100 @@
-<!-- Replace the "Future ML Prediction Form" section with this: -->
-<h3>Thyroid Disease Recurrence Prediction</h3>
-<div id="predictionForm">
-    <div class="form-section">
-        <h4>Patient Demographics:</h4>
-        <div class="input-group">
-            <label>Age at Onset:</label>
-            <input type="number" id="age_onset" placeholder="Age" value="45" min="0" max="120" step="1"> </div> <div class="input-group"> <label>Heredity (1=Yes, 0=No):</label> <input type="number" id="heredity" placeholder="0 or 1" value="0" min="0" max="1" step="1">
-        </div>
-        <div class="input-group">
-            <label>Smoking Status (1=Yes, 0=No):</label>
-            <input type="number" id="smoking_status" placeholder="0 or 1" value="0" min="0" max="1" step="1">
-        </div>
-        <div class="input-group">
-            <label>Sex (1=Male, 0=Female):</label>
-            <input type="number" id="sex" placeholder="0 or 1" value="0" min="0" max="1" step="1">
-        </div>
-    </div>
-    
-    <div class="form-section">
-        <h4>Initial Ultrasound (US1):</h4>
-        <div class="input-group">
-            <label>Thyroid Volume (ml):</label>
-            <input type="number" id="us1_thyroid_volume" placeholder="Volume" value="20.5" min="0" step="0.1">
-        </div>
-        <div class="input-group">
-            <label>Number of Nodules:</label>
-            <input type="number" id="us1_nodules" placeholder="Count" value="0" min="0" step="1">
-        </div>
-        <div class="input-group">
-            <label>Nodule Size (cm):</label>
-            <input type="number" id="us1_nodules_cm" placeholder="Size in cm" value="0.0" min="0" step="0.1">
-        </div>
-    </div>
-    
-    <div class="form-section">
-        <h4>Initial Blood Tests:</h4>
-        <div class="input-group">
-            <label>TSH Level 1:</label>
-            <input type="number" id="tsh_1" placeholder="TSH value" value="2.5" min="0" step="0.1">
-        </div>
-        <div class="input-group">
-            <label>FT4 Level 1:</label>
-            <input type="number" id="ft4_1" placeholder="FT4 value" value="15.0" min="0" step="0.1">
-        </div>
-        <div class="input-group">
-            <label>FT3 Level 1:</label>
-            <input type="number" id="ft3_1" placeholder="FT3 value" value="5.0" min="0" step="0.1">
-        </div>
-        <div class="input-group">
-            <label>FT3/FT4 Ratio:</label>
-            <input type="number" id="ft3_to_ft4_ratio" placeholder="Ratio" value="0.33" min="0" step="0.01">
-        </div>
-    </div>
-    
-    <div class="form-section">
-        <h4>Clinical Symptoms:</h4>
-        <div class="input-group">
-            <label>Exophthalmos (1=Yes, 0=No):</label>
-            <input type="number" id="exophthalmos" placeholder="0 or 1" value="0" min="0" max="1" step="1">
-        </div>
-        <div class="input-group">
-            <label>Thyrotoxic Cardiomyopathy (1=Yes, 0=No):</label>
-            <input type="number" id="thyrotoxic_cardiomyopathy" placeholder="0 or 1" value="0" min="0" max="1" step="1">
-        </div>
-    </div>
-    
-    <div class="form-section">
-        <h4>Treatment & Follow-up:</h4>
-        <div class="input-group">
-            <label>Treatment Type (Code 0-3):</label>
-            <input type="number" id="treatment_type" placeholder="0-3" value="1" min="0" max="3" step="1">
-        </div>
-        <div class="input-group">
-            <label>TSH Level 3 (Follow-up):</label>
-            <input type="number" id="tsh_3" placeholder="TSH value" value="1.8" min="0" step="0.1">
-        </div>
-        <div class="input-group">
-            <label>US3 Thyroid Volume (ml):</label>
-            <input type="number" id="us3_thyroid_volume" placeholder="Volume" value="15.0" min="0" step="0.1">
-        </div>
-        <div class="input-group">
-            <label>US3 Nodules Count:</label>
-            <input type="number" id="us3_nodules" placeholder="Count" value="0" min="0" step="1">
-        </div>
-        <div class="input-group">
-            <label>US3 Nodule Size (cm):</label>
-            <input type="number" id="us3_nodules_cm" placeholder="Size in cm" value="0.0" min="0" step="0.1">
-        </div>
-    </div>
-    
-    <button onclick="predictRecurrence()" class="predict-btn">Predict Recurrence Risk</button>
-</div>
+i have such code for predictioning via models:
+```py
+def prepare_features(data):
+    features = [
+        data.get('age_onset', -1),
+        data.get('heredity', -1),
+        data.get('smoking_status', -1),
+        data.get('sex', -1),
+        data.get('us1_thyroid_volume', -1),
+        data.get('us1_nodules', -1),
+        data.get('us1_nodules_cm', -1),
+        data.get('tsh_1', -1),
+        data.get('ft4_1', -1),
+        data.get('ft3_1', -1),
+        data.get('ft3_to_ft4_ratio', -1),
+        data.get('exophthalmos', -1),
+        data.get('thyrotoxic_cardiomyopathy', -1),
+        data.get('treatment_type', -1),
+        data.get('tsh_3', -1),
+        data.get('us3_thyroid_volume', -1),
+        data.get('us3_nodules', -1),
+        data.get('us3_nodules_cm', -1)
+    ]
 
-<div class="result" id="predictionResult"></div>
+    # Define categorical and numerical columns
+    categorical_cols = [
+        "heredity",
+        "smoking_status", 
+        "sex",
+        "us1_nodules",
+        "exophthalmos",
+        "thyrotoxic_cardiomyopathy",
+        "treatment_type", 
+        "us3_nodules"
+    ]
 
-<style>
-.form-section {
-    background-color: white;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 5px;
-    border-left: 4px solid #4CAF50;
-}
-.input-group {
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-}
-.input-group label {
-    width: 250px;
-    font-weight: bold;
-    color: #333;
-}
-.input-group input {
-    width: 200px;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-.predict-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 20px;
-}
-.predict-btn:hover {
-    background-color: #45a049;
-}
-</style>
+    # Create a list of all feature names in the correct order
+    all_feature_names = [
+        'age_onset', 'heredity', 'smoking_status', 'sex',
+        'us1_thyroid_volume', 'us1_nodules', 'us1_nodules_cm',
+        'tsh_1', 'ft4_1', 'ft3_1', 'ft3_to_ft4_ratio',
+        'exophthalmos', 'thyrotoxic_cardiomyopathy', 'treatment_type',
+        'tsh_3', 'us3_thyroid_volume', 'us3_nodules', 'us3_nodules_cm'
+    ]
 
-<script>
-async function predictRecurrence() {
-    const resultDiv = document.getElementById('predictionResult');
-    resultDiv.innerHTML = '<div style="color: blue;">⏳ Processing prediction...</div>';
-    resultDiv.style.display = 'block';
+    # Create DataFrame with proper column names
+    features_df = pd.DataFrame([features], columns=all_feature_names)
+
+    # Identify numerical columns (all columns not in categorical_cols)
+    num_cols = [col for col in all_feature_names if col not in categorical_cols]
+
+    print(f"Categorical columns: {categorical_cols}")
+    print(f"Numerical columns: {num_cols}")
+    print(f"DataFrame shape: {features_df.shape}")
+
+    # Convert to numpy array for prediction
+    if scaler is not None:
+        # Scale only numerical columns
+        features_df[num_cols] = scaler.transform(features_df[num_cols])
+        print(f"Scaled numerical columns: {num_cols}")
+
+    # Convert to numpy array for prediction
+    return features_df.values
+
+
+@app.route('/api/predict_ml', methods=['POST'])
+def predict_ml():
+    # Load model (do this once, could be at startup)
+    model, scaler = load_ml_model()
     
-    try {
-        // Collect all 18 features
-        const data = {
-            age_onset: parseFloat(document.getElementById('age_onset').value) || 0,
-            heredity: parseInt(document.getElementById('heredity').value) || 0,
-            smoking_status: parseInt(document.getElementById('smoking_status').value) || 0,
-            sex: parseInt(document.getElementById('sex').value) || 0,
-            us1_thyroid_volume: parseFloat(document.getElementById('us1_thyroid_volume').value) || 0.0,
-            us1_nodules: parseInt(document.getElementById('us1_nodules').value) || 0,
-            us1_nodules_cm: parseFloat(document.getElementById('us1_nodules_cm').value) || 0.0,
-            tsh_1: parseFloat(document.getElementById('tsh_1').value) || 0.0,
-            ft4_1: parseFloat(document.getElementById('ft4_1').value) || 0.0,
-            ft3_1: parseFloat(document.getElementById('ft3_1').value) || 0.0,
-            ft3_to_ft4_ratio: parseFloat(document.getElementById('ft3_to_ft4_ratio').value) || 0.0,
-            exophthalmos: parseInt(document.getElementById('exophthalmos').value) || 0,
-            thyrotoxic_cardiomyopathy: parseInt(document.getElementById('thyrotoxic_cardiomyopathy').value) || 0,
-            treatment_type: parseInt(document.getElementById('treatment_type').value) || 0,
-            tsh_3: parseFloat(document.getElementById('tsh_3').value) || 0.0,
-            us3_thyroid_volume: parseFloat(document.getElementById('us3_thyroid_volume').value) || 0.0,
-            us3_nodules: parseInt(document.getElementById('us3_nodules').value) || 0,
-            us3_nodules_cm: parseFloat(document.getElementById('us3_nodules_cm').value) || 0.0
-        };
-        
-        const response = await fetch('/api/predict_recurrence', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        
-        const result = await response.json();
-        
-        if (result.status === 'success') {
-            const prediction = result.prediction;
-            const probability = (result.probability * 100).toFixed(1);
-            
-            let resultHTML = `
-                <h3>Prediction Results:</h3>
-                <div class="${prediction === 1 ? 'high-risk' : 'low-risk'}">
-                    <strong>Recurrence Prediction:</strong> 
-                    <span style="font-size: 24px; font-weight: bold; color: ${prediction === 1 ? '#d32f2f' : '#388e3c'}">
-                        ${prediction === 1 ? 'HIGH RISK ⚠️' : 'LOW RISK ✅'}
-                    </span><br>
-                    <strong>Risk Probability:</strong> ${probability}%<br>
-                    <strong>Interpretation:</strong> ${result.interpretation}<br>
-                </div>
-                
-                <h4>Input Summary:</h4>
-                <table border="1" style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        <th style="padding: 8px; background-color: #f2f2f2;">Feature</th>
-                        <th style="padding: 8px; background-color: #f2f2f2;">Value</th>
-                    </tr>
-            `;
-            
-            // Add feature rows
-            const featureNames = [
-                'Age at Onset', 'Heredity', 'Smoking Status', 'Sex',
-                'US1 Thyroid Volume', 'US1 Nodules', 'US1 Nodule Size',
-                'TSH Level 1', 'FT4 Level 1', 'FT3 Level 1', 'FT3/FT4 Ratio',
-                'Exophthalmos', 'Thyrotoxic Cardiomyopathy', 'Treatment Type',
-                'TSH Level 3', 'US3 Thyroid Volume', 'US3 Nodules', 'US3 Nodule Size'
-            ];
-            
-            Object.keys(data).forEach((key, index) => {
-                resultHTML += `
-                    <tr>
-                        <td style="padding: 6px;">${featureNames[index]}</td>
-                        <td style="padding: 6px; text-align: center;">${data[key]}</td>
-                    </tr>
-                `;
-            });
-            
-            resultHTML += `</table>`;
-            
-            resultDiv.innerHTML = resultHTML;
-            
-        } else {
-            resultDiv.innerHTML = `<div style="color: red;">❌ Error: ${result.message}</div>`;
-        }
-        
-    } catch (error) {
-        resultDiv.innerHTML = `<div style="color: red;">❌ Network Error: ${error}</div>`;
-    }
-}
+    if not model:
+        return jsonify({'error': 'Model not loaded'}), 500
+    
+    # Get and process data
+    data = request.json
 
-// Optional: Add auto-calculation for FT3/FT4 ratio
-function updateRatio() {
-    const ft3 = parseFloat(document.getElementById('ft3_1').value) || 0;
-    const ft4 = parseFloat(document.getElementById('ft4_1').value) || 1; // Avoid division by zero
-    const ratio = ft4 > 0 ? (ft3 / ft4).toFixed(2) : 0;
-    document.getElementById('ft3_to_ft4_ratio').value = ratio;
-}
+    features_array = prepare_features(data);
 
-// Add event listeners for auto-calculation
-document.getElementById('ft3_1').addEventListener('input', updateRatio);
-document.getElementById('ft4_1').addEventListener('input', updateRatio);
-</script>
+    # Make prediction
+    prediction = model.predict(features_array)
+    probability = model.predict_proba(features_array)
+    print("Prediction result:", prediction, probability)
+
+    return jsonify({
+        'prediction': prediction.tolist()[0],
+        'probability': probability.tolist()[0][1],
+        'status': 'success'
+    })
+```
+write function to test prediction (call prepare_features itself and code from predict_ml function) with given data:
+```
+
+1) 24	0	1	1	43	1	1	0,002	54,3	23,1	0,43	1	1	0	1,1	54	1	1	1	0.868606
+2) 18	0	2	0	56	0	0	0,002	81	43	0,53	1	1	1	0,001	141,2	0	2	0	0.043283
+3) 53			0	31,1	0	0					0	0	0	0,01	33,1	0		1	0.805339
+4) 48			0	34,2	0	0								1,1				1	0.906588
+5) 30	1	0	0	17	0	0	0,01				0	0		0,1	54	0		0	0.027123
+
+```
+where columns relates to features in same order and last two columns is prediction and probability[1] respectavly
