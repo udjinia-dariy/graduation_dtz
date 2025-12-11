@@ -66,6 +66,9 @@ def load_ml_model(model_path='models/xgboost_model.pkl', scaler_path='models/sca
 
 # Example of how to use the model (commented out for now)
 
+# def test_prediction():
+
+
 @app.route('/api/predict_ml', methods=['POST'])
 def predict_ml():
     # Load model (do this once, could be at startup)
@@ -78,24 +81,24 @@ def predict_ml():
     data = request.json
 
     features = [
-        data.get('age_onset', 0),
-        data.get('heredity', 0),
-        data.get('smoking_status', 0),
-        data.get('sex', 0),
-        data.get('us1_thyroid_volume', 0.0),
-        data.get('us1_nodules', 0),
-        data.get('us1_nodules_cm', 0.0),
-        data.get('tsh_1', 0.0),
-        data.get('ft4_1', 0.0),
-        data.get('ft3_1', 0.0),
-        data.get('ft3_to_ft4_ratio', 0.0),
-        data.get('exophthalmos', 0),
-        data.get('thyrotoxic_cardiomyopathy', 0),
-        data.get('treatment_type', 0),
-        data.get('tsh_3', 0.0),
-        data.get('us3_thyroid_volume', 0.0),
-        data.get('us3_nodules', 0),
-        data.get('us3_nodules_cm', 0.0)
+        data.get('age_onset', -1),
+        data.get('heredity', -1),
+        data.get('smoking_status', -1),
+        data.get('sex', -1),
+        data.get('us1_thyroid_volume', -1),
+        data.get('us1_nodules', -1),
+        data.get('us1_nodules_cm', -1),
+        data.get('tsh_1', -1),
+        data.get('ft4_1', -1),
+        data.get('ft3_1', -1),
+        data.get('ft3_to_ft4_ratio', -1),
+        data.get('exophthalmos', -1),
+        data.get('thyrotoxic_cardiomyopathy', -1),
+        data.get('treatment_type', -1),
+        data.get('tsh_3', -1),
+        data.get('us3_thyroid_volume', -1),
+        data.get('us3_nodules', -1),
+        data.get('us3_nodules_cm', -1)
     ]
 
     # Define categorical and numerical columns
@@ -138,16 +141,13 @@ def predict_ml():
     # Convert to numpy array for prediction
     features_array = features_df.values
 
-    # Провалидировать что это не хуйня
-    features_array = features_df.values.reshape(1, -1)  # Explicit reshape
-
     # Make prediction
     prediction = model.predict(features_array)
     probability = model.predict_proba(features_array)
     print("SOME SHITT:", prediction, probability)
 
     return jsonify({
-        'prediction': prediction.tolist(),
+        'prediction': prediction.tolist()[0],
         'probability': probability.tolist()[0][1],
         'status': 'success'
     })

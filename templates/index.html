@@ -18,7 +18,7 @@
             border-radius: 10px;
             margin-top: 20px;
         }
-        input, button {
+        input, button, select {
             padding: 10px;
             margin: 5px;
             font-size: 16px;
@@ -29,6 +29,51 @@
             background-color: #e8f5e9;
             border-radius: 5px;
             display: none;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: inline-block;
+            width: 250px;
+            margin-right: 10px;
+        }
+        .input-group input, .input-group select {
+            width: 200px;
+        }
+        .unknown-option {
+            color: #666;
+            font-style: italic;
+        }
+        .form-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .predict-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .predict-btn:hover {
+            background-color: #45a049;
+        }
+        .high-risk {
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .low-risk {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
         }
     </style>
 </head>
@@ -44,33 +89,41 @@
         
         <hr>
         
-        <!-- <h3>Future ML Prediction Form:</h3> -->
-        <!-- <div id="predictionForm"> -->
-        <!--     <p>Sample form for future ML predictions</p> -->
-        <!--     <input type="number" id="feature1" placeholder="Feature 1" value="0.5" step="0.1"> -->
-        <!--     <input type="number" id="feature2" placeholder="Feature 2" value="0.3" step="0.1"> -->
-        <!--     <button onclick="makePrediction()">Make Prediction (Placeholder)</button> -->
-        <!-- </div> -->
-
         <h3>Thyroid Disease Recurrence Prediction</h3>
         <div id="predictionForm">
             <div class="form-section">
                 <h4>Patient Demographics:</h4>
                 <div class="input-group">
                     <label>Age at Onset:</label>
-                    <input type="number" id="age_onset" placeholder="Age" value="48" min="0" max="120" step="1">
+                    <input type="number" id="age_onset" placeholder="Age" min="0" max="120" step="1">
+                    <select id="age_onset_unknown" onchange="toggleUnknown('age_onset', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
-                    <label>Heredity (1=Yes, 0=No):</label>
-                    <input type="number" id="heredity" placeholder="0 or 1" value="1" min="0" max="1" step="1">
+                    <label>Heredity:</label>
+                    <select id="heredity">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                        <option value="-1" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
-                    <label>Smoking Status (1=Yes, 0=No):</label>
-                    <input type="number" id="smoking_status" placeholder="0 or 1" value="1" min="0" max="1" step="1">
+                    <label>Smoking Status:</label>
+                    <select id="smoking_status">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                        <option value="-1" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
-                    <label>Sex (1=Male, 0=Female):</label>
-                    <input type="number" id="sex" placeholder="0 or 1" value="0" min="0" max="1" step="1">
+                    <label>Sex:</label>
+                    <select id="sex">
+                        <option value="1">Male</option>
+                        <option value="0">Female</option>
+                        <option value="-1" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
             </div>
             
@@ -78,15 +131,27 @@
                 <h4>Initial Ultrasound (US1):</h4>
                 <div class="input-group">
                     <label>Thyroid Volume (ml):</label>
-                    <input type="number" id="us1_thyroid_volume" placeholder="Volume" value="34.2" min="0" step="0.1">
+                    <input type="number" id="us1_thyroid_volume" placeholder="Volume" min="0" step="0.1">
+                    <select id="us1_thyroid_volume_unknown" onchange="toggleUnknown('us1_thyroid_volume', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
                     <label>Number of Nodules:</label>
-                    <input type="number" id="us1_nodules" placeholder="Count" value="0" min="0" step="1">
+                    <input type="number" id="us1_nodules" placeholder="Count" min="0" step="1">
+                    <select id="us1_nodules_unknown" onchange="toggleUnknown('us1_nodules', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
                     <label>Nodule Size (cm):</label>
-                    <input type="number" id="us1_nodules_cm" placeholder="Size in cm" value="0.0" min="0" step="0.1">
+                    <input type="number" id="us1_nodules_cm" placeholder="Size in cm" min="0" step="0.1">
+                    <select id="us1_nodules_cm_unknown" onchange="toggleUnknown('us1_nodules_cm', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
             </div>
             
@@ -94,67 +159,129 @@
                 <h4>Initial Blood Tests:</h4>
                 <div class="input-group">
                     <label>TSH Level 1:</label>
-                    <input type="number" id="tsh_1" placeholder="TSH value" value="2.5" min="0" step="0.1">
+                    <input type="number" id="tsh_1" placeholder="TSH value" min="0" step="0.1">
+                    <select id="tsh_1_unknown" onchange="toggleUnknown('tsh_1', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
                     <label>FT4 Level 1:</label>
-                    <input type="number" id="ft4_1" placeholder="FT4 value" value="15.0" min="0" step="0.1">
+                    <input type="number" id="ft4_1" placeholder="FT4 value" min="0" step="0.1">
+                    <select id="ft4_1_unknown" onchange="toggleUnknown('ft4_1', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
                     <label>FT3 Level 1:</label>
-                    <input type="number" id="ft3_1" placeholder="FT3 value" value="5.0" min="0" step="0.1">
+                    <input type="number" id="ft3_1" placeholder="FT3 value" min="0" step="0.1">
+                    <select id="ft3_1_unknown" onchange="toggleUnknown('ft3_1', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
                     <label>FT3/FT4 Ratio:</label>
-                    <input type="number" id="ft3_to_ft4_ratio" placeholder="Ratio" value="0.33" min="0" step="0.01">
+                    <input type="number" id="ft3_to_ft4_ratio" placeholder="Ratio" min="0" step="0.01">
+                    <select id="ft3_to_ft4_ratio_unknown" onchange="toggleUnknown('ft3_to_ft4_ratio', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
             </div>
             
             <div class="form-section">
                 <h4>Clinical Symptoms:</h4>
                 <div class="input-group">
-                    <label>Exophthalmos (1=Yes, 0=No):</label>
-                    <input type="number" id="exophthalmos" placeholder="0 or 1" value="0" min="0" max="1" step="1">
+                    <label>Exophthalmos:</label>
+                    <select id="exophthalmos">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                        <option value="-1" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
-                    <label>Thyrotoxic Cardiomyopathy (1=Yes, 0=No):</label>
-                    <input type="number" id="thyrotoxic_cardiomyopathy" placeholder="0 or 1" value="0" min="0" max="1" step="1">
+                    <label>Thyrotoxic Cardiomyopathy:</label>
+                    <select id="thyrotoxic_cardiomyopathy">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                        <option value="-1" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
             </div>
             
             <div class="form-section">
                 <h4>Treatment & Follow-up:</h4>
                 <div class="input-group">
-                    <label>Treatment Type (Code 0-3):</label>
-                    <input type="number" id="treatment_type" placeholder="0-3" value="1" min="0" max="3" step="1">
+                    <label>Treatment Type:</label>
+                    <select id="treatment_type">
+                        <option value="0">Type 0</option>
+                        <option value="1">Type 1</option>
+                        <option value="2">Type 2</option>
+                        <option value="3">Type 3</option>
+                        <option value="-1" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
                     <label>TSH Level 3 (Follow-up):</label>
-                    <input type="number" id="tsh_3" placeholder="TSH value" value="1.1" min="0" step="0.1">
+                    <input type="number" id="tsh_3" placeholder="TSH value" min="0" step="0.1">
+                    <select id="tsh_3_unknown" onchange="toggleUnknown('tsh_3', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
                     <label>US3 Thyroid Volume (ml):</label>
-                    <input type="number" id="us3_thyroid_volume" placeholder="Volume" value="15.0" min="0" step="0.1">
+                    <input type="number" id="us3_thyroid_volume" placeholder="Volume" min="0" step="0.1">
+                    <select id="us3_thyroid_volume_unknown" onchange="toggleUnknown('us3_thyroid_volume', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
                     <label>US3 Nodules Count:</label>
-                    <input type="number" id="us3_nodules" placeholder="Count" value="0" min="0" step="1">
+                    <input type="number" id="us3_nodules" placeholder="Count" min="0" step="1">
+                    <select id="us3_nodules_unknown" onchange="toggleUnknown('us3_nodules', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
                 <div class="input-group">
                     <label>US3 Nodule Size (cm):</label>
-                    <input type="number" id="us3_nodules_cm" placeholder="Size in cm" value="0.0" min="0" step="0.1">
+                    <input type="number" id="us3_nodules_cm" placeholder="Size in cm" min="0" step="0.1">
+                    <select id="us3_nodules_cm_unknown" onchange="toggleUnknown('us3_nodules_cm', this)">
+                        <option value="known">Known</option>
+                        <option value="unknown" class="unknown-option">Unknown</option>
+                    </select>
                 </div>
             </div>
             
             <button onclick="predictRecurrence()" class="predict-btn">Predict Recurrence Risk</button>
         </div>
 
-<div class="result" id="predictionResult"></div>
-
         <div class="result" id="predictionResult"></div>
     </div>
 
     <script>
+        // Function to toggle input field disabled state based on unknown selection
+        function toggleUnknown(fieldId, selectElement) {
+            const inputField = document.getElementById(fieldId);
+            if (selectElement.value === 'unknown') {
+                inputField.disabled = true;
+                inputField.value = '';
+                inputField.style.backgroundColor = '#f5f5f5';
+                inputField.style.color = '#999';
+            } else {
+                inputField.disabled = false;
+                inputField.style.backgroundColor = '';
+                inputField.style.color = '';
+            }
+            // Auto-update ratio if FT3 or FT4 changes
+            if (fieldId === 'ft3_1' || fieldId === 'ft4_1') {
+                updateRatio();
+            }
+        }
 
         async function predictRecurrence() {
             const resultDiv = document.getElementById('predictionResult');
@@ -162,29 +289,59 @@
             resultDiv.style.display = 'block';
 
             try {
-                // Collect all 18 features
-                const data = {
-                    age_onset: parseFloat(document.getElementById('age_onset').value) || 0,
-                    heredity: parseInt(document.getElementById('heredity').value) || 0,
-                    smoking_status: parseInt(document.getElementById('smoking_status').value) || 0,
-                    sex: parseInt(document.getElementById('sex').value) || 0,
-                    us1_thyroid_volume: parseFloat(document.getElementById('us1_thyroid_volume').value) || 0.0,
-                    us1_nodules: parseInt(document.getElementById('us1_nodules').value) || 0,
-                    us1_nodules_cm: parseFloat(document.getElementById('us1_nodules_cm').value) || 0.0,
-                    tsh_1: parseFloat(document.getElementById('tsh_1').value) || 0.0,
-                    ft4_1: parseFloat(document.getElementById('ft4_1').value) || 0.0,
-                    ft3_1: parseFloat(document.getElementById('ft3_1').value) || 0.0,
-                    ft3_to_ft4_ratio: parseFloat(document.getElementById('ft3_to_ft4_ratio').value) || 0.0,
-                    exophthalmos: parseInt(document.getElementById('exophthalmos').value) || 0,
-                    thyrotoxic_cardiomyopathy: parseInt(document.getElementById('thyrotoxic_cardiomyopathy').value) || 0,
-                    treatment_type: parseInt(document.getElementById('treatment_type').value) || 0,
-                    tsh_3: parseFloat(document.getElementById('tsh_3').value) || 0.0,
-                    us3_thyroid_volume: parseFloat(document.getElementById('us3_thyroid_volume').value) || 0.0,
-                    us3_nodules: parseInt(document.getElementById('us3_nodules').value) || 0,
-                    us3_nodules_cm: parseFloat(document.getElementById('us3_nodules_cm').value) || 0.0
+                // Collect all 18 features with proper null handling
+                const data = {};
+                
+                // Helper function to get value with null handling
+                const getValue = (fieldId, unknownSelectId = null) => {
+                    if (unknownSelectId) {
+                        const select = document.getElementById(unknownSelectId);
+                        if (select && select.value === 'unknown') {
+                            return null; // Send null for unknown values
+                        }
+                    }
+                    
+                    const element = document.getElementById(fieldId);
+                    if (!element) return null;
+                    
+                    const value = element.value;
+                    if (value === '' || value === undefined) return null;
+                    
+                    // For select elements with -1 option
+                    if (element.tagName === 'SELECT' && value === '-1') {
+                        return null;
+                    }
+                    
+                    // Parse based on input type
+                    if (element.type === 'number') {
+                        const num = parseFloat(value);
+                        return isNaN(num) ? null : num;
+                    }
+                    
+                    return value;
                 };
 
-                console.log(data);
+                // Collect all data with null for unknown
+                data.age_onset = getValue('age_onset', 'age_onset_unknown');
+                data.heredity = getValue('heredity');
+                data.smoking_status = getValue('smoking_status');
+                data.sex = getValue('sex');
+                data.us1_thyroid_volume = getValue('us1_thyroid_volume', 'us1_thyroid_volume_unknown');
+                data.us1_nodules = getValue('us1_nodules', 'us1_nodules_unknown');
+                data.us1_nodules_cm = getValue('us1_nodules_cm', 'us1_nodules_cm_unknown');
+                data.tsh_1 = getValue('tsh_1', 'tsh_1_unknown');
+                data.ft4_1 = getValue('ft4_1', 'ft4_1_unknown');
+                data.ft3_1 = getValue('ft3_1', 'ft3_1_unknown');
+                data.ft3_to_ft4_ratio = getValue('ft3_to_ft4_ratio', 'ft3_to_ft4_ratio_unknown');
+                data.exophthalmos = getValue('exophthalmos');
+                data.thyrotoxic_cardiomyopathy = getValue('thyrotoxic_cardiomyopathy');
+                data.treatment_type = getValue('treatment_type');
+                data.tsh_3 = getValue('tsh_3', 'tsh_3_unknown');
+                data.us3_thyroid_volume = getValue('us3_thyroid_volume', 'us3_thyroid_volume_unknown');
+                data.us3_nodules = getValue('us3_nodules', 'us3_nodules_unknown');
+                data.us3_nodules_cm = getValue('us3_nodules_cm', 'us3_nodules_cm_unknown');
+
+                console.log('Sending data:', data);
                 
                 const response = await fetch('/api/predict_ml', {
                     method: 'POST',
@@ -199,7 +356,9 @@
                 if (result.status === 'success') {
                     const prediction = result.prediction;
                     const probability = (result.probability * 100).toFixed(1);
-                    
+
+                    console.log(result);
+
                     let resultHTML = `
                         <h3>Prediction Results:</h3>
                         <div class="${prediction === 1 ? 'high-risk' : 'low-risk'}">
@@ -216,6 +375,7 @@
                             <tr>
                                 <th style="padding: 8px; background-color: #f2f2f2;">Feature</th>
                                 <th style="padding: 8px; background-color: #f2f2f2;">Value</th>
+                                <th style="padding: 8px; background-color: #f2f2f2;">Status</th>
                             </tr>
                     `;
                     
@@ -228,11 +388,20 @@
                         'TSH Level 3', 'US3 Thyroid Volume', 'US3 Nodules', 'US3 Nodule Size'
                     ];
                     
-                    Object.keys(data).forEach((key, index) => {
+                    const featureKeys = Object.keys(data);
+                    featureKeys.forEach((key, index) => {
+                        const value = data[key];
+                        const displayValue = value === null ? '<em style="color: #666;">Unknown</em>' : value;
+                        const status = value === null ? 'Unknown' : 'Provided';
+                        const statusColor = value === null ? '#666' : '#388e3c';
+                        
                         resultHTML += `
                             <tr>
                                 <td style="padding: 6px;">${featureNames[index]}</td>
-                                <td style="padding: 6px; text-align: center;">${data[key]}</td>
+                                <td style="padding: 6px; text-align: center;">${displayValue}</td>
+                                <td style="padding: 6px; text-align: center; color: ${statusColor}">
+                                    ${status}
+                                </td>
                             </tr>
                         `;
                     });
@@ -246,21 +415,56 @@
                 }
                 
             } catch (error) {
-                resultDiv.innerHTML = `<div style="color: red;">❌ Network Error: ${error}</div>`;
+                resultDiv.innerHTML = `<div style="color: red;">❌ Network Error: ${error.message}</div>`;
             }
         }
 
-        // Optional: Add auto-calculation for FT3/FT4 ratio
+        // Auto-calculation for FT3/FT4 ratio
         function updateRatio() {
             const ft3 = parseFloat(document.getElementById('ft3_1').value) || 0;
-            const ft4 = parseFloat(document.getElementById('ft4_1').value) || 1; // Avoid division by zero
-            const ratio = ft4 > 0 ? (ft3 / ft4).toFixed(2) : 0;
-            document.getElementById('ft3_to_ft4_ratio').value = ratio;
+            const ft4 = parseFloat(document.getElementById('ft4_1').value) || 1;
+            const ft3Unknown = document.getElementById('ft3_1_unknown');
+            const ft4Unknown = document.getElementById('ft4_1_unknown');
+            
+            // Only calculate if both values are known
+            if (ft3Unknown && ft3Unknown.value === 'known' && 
+                ft4Unknown && ft4Unknown.value === 'known' && 
+                ft4 > 0) {
+                const ratio = (ft3 / ft4).toFixed(2);
+                document.getElementById('ft3_to_ft4_ratio').value = ratio;
+                // Mark ratio as known
+                const ratioUnknown = document.getElementById('ft3_to_ft4_ratio_unknown');
+                if (ratioUnknown) {
+                    ratioUnknown.value = 'known';
+                    toggleUnknown('ft3_to_ft4_ratio', ratioUnknown);
+                }
+            }
         }
 
-        // Add event listeners for auto-calculation
-        document.getElementById('ft3_1').addEventListener('input', updateRatio);
-        document.getElementById('ft4_1').addEventListener('input', updateRatio);
+        // Initialize event listeners
+        function initializeListeners() {
+            // Add event listeners for auto-calculation
+            document.getElementById('ft3_1').addEventListener('input', updateRatio);
+            document.getElementById('ft4_1').addEventListener('input', updateRatio);
+            
+            // Initialize all unknown selectors
+            const unknownSelectors = [
+                'age_onset_unknown', 'us1_thyroid_volume_unknown', 'us1_nodules_unknown',
+                'us1_nodules_cm_unknown', 'tsh_1_unknown', 'ft4_1_unknown', 'ft3_1_unknown',
+                'ft3_to_ft4_ratio_unknown', 'tsh_3_unknown', 'us3_thyroid_volume_unknown',
+                'us3_nodules_unknown', 'us3_nodules_cm_unknown'
+            ];
+            
+            unknownSelectors.forEach(selector => {
+                const select = document.getElementById(selector);
+                if (select) {
+                    toggleUnknown(selector.replace('_unknown', ''), select);
+                }
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeListeners);
 
         async function testAPI() {
             const resultDiv = document.getElementById('apiResult');
@@ -282,25 +486,9 @@
                 `;
                 resultDiv.style.display = 'block';
             } catch (error) {
-                resultDiv.innerHTML = `<strong>Error:</strong> ${error}`;
+                resultDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
                 resultDiv.style.display = 'block';
             }
-        }
-
-        function makePrediction() {
-            const resultDiv = document.getElementById('predictionResult');
-            const feature1 = document.getElementById('feature1').value;
-            const feature2 = document.getElementById('feature2').value;
-
-            resultDiv.innerHTML = `
-                <strong>Note:</strong> ML model not yet integrated<br>
-                <strong>Input features:</strong> ${feature1}, ${feature2}<br>
-                <em>To add your model:</em><br>
-                1. Place your model.pkl and scaler.pkl in the 'models' folder<br>
-                2. Uncomment and modify the predict_ml() function in app.py<br>
-                3. Update this form to call the correct endpoint
-            `;
-            resultDiv.style.display = 'block';
         }
     </script>
 </body>
