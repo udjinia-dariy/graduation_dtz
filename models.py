@@ -23,8 +23,6 @@ def load_ml_model(model_path, scaler_path):
         print(f"Error loading model: {str(e)}")
         return None, None
 
-# Example of how to use the model (commented out for now)
-
 def extract_features(data):
     features = [
         data.get('age_onset', -1),
