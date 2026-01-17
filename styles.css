@@ -458,3 +458,64 @@ h2 i {
         gap: 10px;
     }
 }
+
+/* Age input container */
+.age-input-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.age-input-container input {
+    flex: 1;
+}
+
+.btn-age-today {
+    padding: 8px 15px;
+    background-color: #f0f7ff;
+    color: #1a6dbb;
+    border: 1px solid #1a6dbb;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.btn-age-today:hover {
+    background-color: #e1efff;
+    transform: translateY(-1px);
+}
+
+/* Appointment specific styles */
+.appointment-age-section {
+    border-bottom: 2px dashed #eaeaea;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+/* Update unknown checkbox styling for appointments */
+.appointment-section .form-group.disabled input,
+.appointment-section .form-group.disabled select,
+.appointment-section .form-group.disabled textarea,
+.appointment-section .form-group.disabled .radio-option input {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Mobile responsiveness for age input container */
+@media (max-width: 768px) {
+    .age-input-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-age-today {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -107,80 +107,65 @@
                 </button>
                 
                 <form id="patientForm">
-                    <div class="form-section">
-                        <div class="section-title" data-section="demographics">
-                            <span><i class="fas fa-user"></i> Demographics & History</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="form-section-content" id="demographicsSection">
-                            <div class="form-group" data-field="age_onset">
-                                <label for="age_onset">Age at disease onset (years)</label>
-                                <input type="number" id="age_onset" name="age_onset" min="0" max="120" value="35">
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="age_onset_unknown" class="unknown-input">
-                                    <label for="age_onset_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="heredity">
-                                <label>Family history</label>
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="heredity_no" name="heredity" value="0" checked>
-                                        <label for="heredity_no">No</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="heredity_yes" name="heredity" value="1">
-                                        <label for="heredity_yes">Yes</label>
-                                    </div>
-                                </div>
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="heredity_unknown" class="unknown-input">
-                                    <label for="heredity_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="smoking_status">
-                                <label>Smoking status</label>
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="smoking_no" name="smoking_status" value="0" checked>
-                                        <label for="smoking_no">No</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="smoking_yes" name="smoking_status" value="2">
-                                        <label for="smoking_yes">Yes</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="smoking_history" name="smoking_status" value="3">
-                                        <label for="smoking_history">History</label>
-                                    </div>
-                                </div>
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="smoking_status_unknown" class="unknown-input">
-                                    <label for="smoking_status_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="sex">
-                                <label>Sex</label>
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="sex_female" name="sex" value="0" checked>
-                                        <label for="sex_female">Female</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="sex_male" name="sex" value="1">
-                                        <label for="sex_male">Male</label>
-                                    </div>
-                                </div>
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="sex_unknown" class="unknown-input">
-                                    <label for="sex_unknown">Unknown</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
+                  <div class="form-section">
+                      <div class="section-title" data-section="demographics">
+                          <span><i class="fas fa-user"></i> Permanent Patient Information</span>
+                          <i class="fas fa-chevron-down"></i>
+                      </div>
+                      <div class="form-section-content" id="demographicsSection">
+                          <!-- Date of Birth added -->
+                          <div class="form-group" data-field="date_of_birth">
+                              <label for="date_of_birth">Date of Birth</label>
+                              <input type="date" id="date_of_birth" name="date_of_birth" value="1981-05-15">
+                              <div class="unknown-checkbox">
+                                  <input type="checkbox" id="date_of_birth_unknown" class="unknown-input">
+                                  <label for="date_of_birth_unknown">Unknown</label>
+                              </div>
+                          </div>
+                          
+                          <!-- Age at onset removed from permanent section - will be in appointments -->
+                          
+                          <div class="form-group" data-field="heredity">
+                              <label>Family history (heredity)</label>
+                              <div class="radio-group">
+                                  <div class="radio-option">
+                                      <input type="radio" id="heredity_no" name="heredity" value="0" checked>
+                                      <label for="heredity_no">No</label>
+                                  </div>
+                                  <div class="radio-option">
+                                      <input type="radio" id="heredity_yes" name="heredity" value="1">
+                                      <label for="heredity_yes">Yes</label>
+                                  </div>
+                              </div>
+                              <div class="unknown-checkbox">
+                                  <input type="checkbox" id="heredity_unknown" class="unknown-input">
+                                  <label for="heredity_unknown">Unknown</label>
+                              </div>
+                          </div>
+                          
+                          <!-- Smoking status removed from permanent section - will be in appointments -->
+                          
+                          <div class="form-group" data-field="sex">
+                              <label>Sex</label>
+                              <div class="radio-group">
+                                  <div class="radio-option">
+                                      <input type="radio" id="sex_female" name="sex" value="0" checked>
+                                      <label for="sex_female">Female</label>
+                                  </div>
+                                  <div class="radio-option">
+                                      <input type="radio" id="sex_male" name="sex" value="1">
+                                      <label for="sex_male">Male</label>
+                                  </div>
+                              </div>
+                              <div class="unknown-checkbox">
+                                  <input type="checkbox" id="sex_unknown" class="unknown-input">
+                                  <label for="sex_unknown">Unknown</label>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
                     
                     <div class="form-section">
                         <div class="section-title" data-section="initialExamination">
