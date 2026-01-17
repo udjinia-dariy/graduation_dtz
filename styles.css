@@ -519,3 +519,98 @@ h2 i {
         justify-content: center;
     }
 }
+
+/* Field group styling */
+.input-with-unit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-with-unit input {
+    flex: 1;
+}
+
+.field-unit {
+    color: #666;
+    font-size: 0.9em;
+    white-space: nowrap;
+    min-width: 40px;
+}
+
+/* Compact appointment styling */
+.appointment-section .form-group {
+    margin-bottom: 12px;
+    padding: 10px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #eaeaea;
+}
+
+.appointment-section .form-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.appointment-section .radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.appointment-section .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+}
+
+.appointment-section .unknown-checkbox {
+    margin-top: 8px;
+    font-size: 0.85rem;
+}
+
+/* Group fields by category */
+.appointment-biochemical,
+.appointment-ultrasound,
+.appointment-clinical,
+.appointment-treatment {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.appointment-biochemical {
+    border-left-color: #3498db;
+}
+
+.appointment-ultrasound {
+    border-left-color: #2ecc71;
+}
+
+.appointment-clinical {
+    border-left-color: #e74c3c;
+}
+
+.appointment-treatment {
+    border-left-color: #f39c12;
+}
+
+.appointment-section h4 {
+    margin: 0 0 15px 0;
+    color: #444;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.appointment-section h4 i {
+    font-size: 0.9em;
+}
