@@ -3,13 +3,18 @@ from prelude import *
 
 # data prepare part
 
-ALL_FEATURE_NAMES = [
+INITIAL_FEASTURES_NAME = [
         'age_onset', 'heredity', 'smoking_status', 'sex',
         'us1_thyroid_volume', 'us1_nodules', 'us1_nodules_cm',
         'tsh_1', 'ft4_1', 'ft3_1', 'ft3_to_ft4_ratio',
-        'exophthalmos', 'thyrotoxic_cardiomyopathy', 'treatment_type',
-        'tsh_3', 'us3_thyroid_volume', 'us3_nodules', 'us3_nodules_cm'
+        'exophthalmos', 'thyrotoxic_cardiomyopathy'
 ]
+
+READMISSION_FEATURE_NAMES = [
+        'treatment_type', 'tsh_3', 'us3_thyroid_volume', 'us3_nodules', 'us3_nodules_cm'
+]
+
+ALL_FEATURE_NAMES = INITIAL_FEASTURES_NAME + READMISSION_FEATURE_NAMES
 
 # Define categorical and numerical columns
 CATEGORICAL_COLS = [

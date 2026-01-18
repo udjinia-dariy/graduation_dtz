@@ -34,6 +34,7 @@ if __name__ == '__main__':
 
     GlobalInfoObj.add_model('xgboost_model', 'scaler')
     GlobalInfoObj.add_model('random_forest_model', 'scaler')
+    # GlobalInfoObj.add_model('initial_data_random_forest_model', 'initial_data_scaler')
 
     # Run the server
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -3,401 +3,1644 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thyroid Illness Management System</title>
+    <title>Thyroid Disease Patient Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #1abc9c;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .sidebar {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            height: fit-content;
+        }
+
+        .content {
+            flex: 3;
+            min-width: 700px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--accent-color);
+        }
+
+        .patient-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .patient-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        .patient-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .patient-item.active {
+            background-color: #e8f4fc;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .patient-id {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .patient-age {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background-color: #16a085;
+        }
+
+        .btn-block {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .form-col {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .label-hint {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: normal;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .results-container {
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 30px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .risk-level {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .risk-low {
+            color: #27ae60;
+        }
+
+        .risk-medium {
+            color: #f39c12;
+        }
+
+        .risk-high {
+            color: #e74c3c;
+        }
+
+        .unknown-checkbox {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .unknown-checkbox label {
+            margin-bottom: 0;
+            font-weight: normal;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .tab-container {
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: var(--secondary-color);
+            border-bottom: 3px solid var(--secondary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .patient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .patient-name {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+        }
+
+        .patient-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-new {
+            background-color: #ffeaa7;
+            color: #e17055;
+        }
+
+        .status-followup {
+            background-color: #a29bfe;
+            color: white;
+        }
+
+        .status-completed {
+            background-color: #55efc4;
+            color: #00b894;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: var(--danger-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        /* API Status Indicator */
+        .api-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .api-status.connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .api-status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+
+        @media (max-width: 1100px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar, .content {
+                min-width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-stethoscope"></i>
-                    <div>
-                        <h1>Thyroid Illness Management System</h1>
-                        <p>For doctors to track and predict thyroid disease progression</p>
-                    </div>
+            <div class="logo">
+                <i class="fas fa-stethoscope"></i>
+                <div>
+                    <h1>Thyroid Disease Patient Management</h1>
+                    <p>For medical professionals only</p>
                 </div>
-                <div class="user-info">
-                    <i class="fas fa-user-md"></i>
-                    <span>Dr. Alexandra Volkov</span>
-                </div>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-md"></i> Doctor Dashboard
+                <div class="api-status" id="apiStatus">Checking API...</div>
             </div>
         </header>
-        
-        <div class="main-content">
-            <div class="sidebar">
-                <h2><i class="fas fa-users"></i> Patient List</h2>
-                <div class="patient-selector">
-                    <label for="patientSelect"><i class="fas fa-search"></i> Select Patient</label>
-                    <select id="patientSelect">
-                        <option value="new">+ Add New Patient</option>
-                        <option value="patient1">#001 - Maria Ivanova (Age: 42)</option>
-                        <option value="patient2">#002 - Dmitry Sokolov (Age: 56)</option>
-                        <option value="patient3">#003 - Elena Petrova (Age: 38)</option>
-                        <option value="patient4">#004 - Sergei Kuznetsov (Age: 61)</option>
-                        <option value="patient5">#005 - Olga Smirnova (Age: 47)</option>
-                    </select>
-                </div>
-                
-                <div class="patient-list">
-                    <div class="patient-item active" data-id="patient1">
-                        <div>
-                            <div class="patient-id">#001 - Maria Ivanova</div>
-                            <div class="patient-age">Age: 42 | Diagnosis: Graves' disease</div>
-                        </div>
-                        <div class="patient-risk risk-medium">Medium Risk</div>
-                    </div>
-                    <div class="patient-item" data-id="patient2">
-                        <div>
-                            <div class="patient-id">#002 - Dmitry Sokolov</div>
-                            <div class="patient-age">Age: 56 | Diagnosis: Toxic nodular goiter</div>
-                        </div>
-                        <div class="patient-risk risk-high">High Risk</div>
-                    </div>
-                    <div class="patient-item" data-id="patient3">
-                        <div>
-                            <div class="patient-id">#003 - Elena Petrova</div>
-                            <div class="patient-age">Age: 38 | Diagnosis: Hashimoto's thyroiditis</div>
-                        </div>
-                        <div class="patient-risk risk-low">Low Risk</div>
-                    </div>
-                    <div class="patient-item" data-id="patient4">
-                        <div>
-                            <div class="patient-id">#004 - Sergei Kuznetsov</div>
-                            <div class="patient-age">Age: 61 | Diagnosis: Graves' disease</div>
-                        </div>
-                        <div class="patient-risk risk-high">High Risk</div>
-                    </div>
-                    <div class="patient-item" data-id="patient5">
-                        <div>
-                            <div class="patient-id">#005 - Olga Smirnova</div>
-                            <div class="patient-age">Age: 47 | Diagnosis: Subacute thyroiditis</div>
-                        </div>
-                        <div class="patient-risk risk-medium">Medium Risk</div>
-                    </div>
-                </div>
-                
-                <button class="btn btn-calculate" id="calculateBtn">
-                    <i class="fas fa-calculator"></i> Calculate Illness Risk
-                </button>
-                
-                <div class="result-widget" id="resultWidget">
-                    <h3><i class="fas fa-chart-line"></i> Risk Assessment Result</h3>
-                    <div class="risk-level" id="riskLevel">Medium Risk</div>
-                    <p id="riskDescription">Based on the patient data, there is a moderate risk of thyroid disease recurrence.</p>
-                    
-                    <div class="result-details">
-                        <p>Recurrence Probability: <span id="recurrenceProbability">42%</span></p>
-                        <p>Key Risk Factors: <span id="keyFactors">Smoking history, Elevated TSH</span></p>
-                        <p>Recommendation: <span id="recommendation">Continue monitoring every 6 months</span></p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="content">
-                <h2><i class="fas fa-edit"></i> Patient Data Form</h2>
-                
-                <div id="appointmentsContainer">
-                    <!-- Appointment sections will be dynamically added here -->
-                </div>
-                
-                <button class="btn btn-success add-appointment-btn" id="addAppointmentBtn">
-                    <i class="fas fa-plus"></i> Add New Appointment
-                </button>
-                
-                <form id="patientForm">
-                    
-                  <div class="form-section">
-                      <div class="section-title" data-section="demographics">
-                          <span><i class="fas fa-user"></i> Permanent Patient Information</span>
-                          <i class="fas fa-chevron-down"></i>
-                      </div>
-                      <div class="form-section-content" id="demographicsSection">
-                          <!-- Date of Birth added -->
-                          <div class="form-group" data-field="date_of_birth">
-                              <label for="date_of_birth">Date of Birth</label>
-                              <input type="date" id="date_of_birth" name="date_of_birth" value="1981-05-15">
-                              <div class="unknown-checkbox">
-                                  <input type="checkbox" id="date_of_birth_unknown" class="unknown-input">
-                                  <label for="date_of_birth_unknown">Unknown</label>
-                              </div>
-                          </div>
-                          
-                          <!-- Age at onset removed from permanent section - will be in appointments -->
-                          
-                          <div class="form-group" data-field="heredity">
-                              <label>Family history (heredity)</label>
-                              <div class="radio-group">
-                                  <div class="radio-option">
-                                      <input type="radio" id="heredity_no" name="heredity" value="0" checked>
-                                      <label for="heredity_no">No</label>
-                                  </div>
-                                  <div class="radio-option">
-                                      <input type="radio" id="heredity_yes" name="heredity" value="1">
-                                      <label for="heredity_yes">Yes</label>
-                                  </div>
-                              </div>
-                              <div class="unknown-checkbox">
-                                  <input type="checkbox" id="heredity_unknown" class="unknown-input">
-                                  <label for="heredity_unknown">Unknown</label>
-                              </div>
-                          </div>
-                          
-                          <!-- Smoking status removed from permanent section - will be in appointments -->
-                          
-                          <div class="form-group" data-field="sex">
-                              <label>Sex</label>
-                              <div class="radio-group">
-                                  <div class="radio-option">
-                                      <input type="radio" id="sex_female" name="sex" value="0" checked>
-                                      <label for="sex_female">Female</label>
-                                  </div>
-                                  <div class="radio-option">
-                                      <input type="radio" id="sex_male" name="sex" value="1">
-                                      <label for="sex_male">Male</label>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
 
-                    
-                    <div class="form-section">
-                        <div class="section-title" data-section="initialExamination">
-                            <span><i class="fas fa-file-medical"></i> Initial Examination</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="form-section-content" id="initialExaminationSection">
-                            <div class="form-group" data-field="us1_thyroid_volume">
-                                <label for="us1_thyroid_volume">Initial thyroid volume (cm³)</label>
-                                <input type="number" id="us1_thyroid_volume" name="us1_thyroid_volume" step="0.1" min="0" value="25.5">
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="us1_thyroid_volume_unknown" class="unknown-input">
-                                    <label for="us1_thyroid_volume_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="us1_nodules">
-                                <label>Presence of nodules (initial)</label>
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="us1_nodules_no" name="us1_nodules" value="0" checked>
-                                        <label for="us1_nodules_no">No</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="us1_nodules_yes" name="us1_nodules" value="1">
-                                        <label for="us1_nodules_yes">Yes</label>
-                                    </div>
-                                </div>
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="us1_nodules_unknown" class="unknown-input">
-                                    <label for="us1_nodules_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="us1_nodules_cm">
-                                <label for="us1_nodules_cm">Size of nodules in cm (initial)</label>
-                                <input type="number" id="us1_nodules_cm" name="us1_nodules_cm" step="0.1" min="0" value="0">
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="us1_nodules_cm_unknown" class="unknown-input">
-                                    <label for="us1_nodules_cm_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="tsh_1">
-                                <label for="tsh_1">Initial TSH (mIU/L)</label>
-                                <input type="number" id="tsh_1" name="tsh_1" step="0.01" min="0" value="0.05">
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="tsh_1_unknown" class="unknown-input">
-                                    <label for="tsh_1_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="ft4_1">
-                                <label for="ft4_1">Initial free T4 (pmol/L)</label>
-                                <input type="number" id="ft4_1" name="ft4_1" step="0.1" min="0" value="32.5">
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="ft4_1_unknown" class="unknown-input">
-                                    <label for="ft4_1_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="ft3_1">
-                                <label for="ft3_1">Initial free T3 (pmol/L)</label>
-                                <input type="number" id="ft3_1" name="ft3_1" step="0.1" min="0" value="12.8">
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="ft3_1_unknown" class="unknown-input">
-                                    <label for="ft3_1_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="ft3_to_ft4_ratio">
-                                <label for="ft3_to_ft4_ratio">Free T3/Free T4 ratio (initial)</label>
-                                <input type="number" id="ft3_to_ft4_ratio" name="ft3_to_ft4_ratio" step="0.01" min="0" value="0.39">
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="ft3_to_ft4_ratio_unknown" class="unknown-input">
-                                    <label for="ft3_to_ft4_ratio_unknown">Unknown</label>
-                                </div>
-                            </div>
-                        </div>
+        <div class="server-status">
+            <div id="serverStatus">Checking server status...</div>
+            <button class="btn btn-primary" onclick="testAPI()" style="padding: 5px 10px; font-size: 0.9rem;">
+                <i class="fas fa-plug"></i> Test API
+            </button>
+        </div>
+
+        <div class="main-content">
+            <!-- Sidebar with patient list -->
+            <div class="sidebar">
+                <h2 class="section-title">
+                    <i class="fas fa-users"></i> Patients
+                </h2>
+                <div class="patient-list" id="patientList">
+                    <!-- Patient list will be populated by JavaScript -->
+                </div>
+                <button class="btn btn-accent btn-block" id="addPatientBtn">
+                    <i class="fas fa-user-plus"></i> Add New Patient
+                </button>
+            </div>
+
+            <!-- Main content area -->
+            <div class="content">
+                <div class="patient-header" id="patientHeader">
+                    <div>
+                        <h2 class="patient-name" id="patientName">Select a patient or add new</h2>
+                        <div class="patient-status" id="patientStatus">No patient selected</div>
                     </div>
-                    
-                    <div class="form-section">
-                        <div class="section-title" data-section="clinicalFeatures">
-                            <span><i class="fas fa-heartbeat"></i> Clinical Features</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="form-section-content" id="clinicalFeaturesSection">
-                            <div class="form-group" data-field="exophthalmos">
-                                <label>Exophthalmos</label>
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="exophthalmos_no" name="exophthalmos" value="0" checked>
-                                        <label for="exophthalmos_no">No</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="exophthalmos_yes" name="exophthalmos" value="1">
-                                        <label for="exophthalmos_yes">Yes</label>
-                                    </div>
-                                </div>
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="exophthalmos_unknown" class="unknown-input">
-                                    <label for="exophthalmos_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="thyrotoxic_cardiomyopathy">
-                                <label>Thyrotoxic cardiomyopathy</label>
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="thyrotoxic_cardiomyopathy_no" name="thyrotoxic_cardiomyopathy" value="0" checked>
-                                        <label for="thyrotoxic_cardiomyopathy_no">No</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="thyrotoxic_cardiomyopathy_yes" name="thyrotoxic_cardiomyopathy" value="1">
-                                        <label for="thyrotoxic_cardiomyopathy_yes">Yes</label>
-                                    </div>
-                                </div>
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="thyrotoxic_cardiomyopathy_unknown" class="unknown-input">
-                                    <label for="thyrotoxic_cardiomyopathy_unknown">Unknown</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <div class="section-title" data-section="treatmentFollowup">
-                            <span><i class="fas fa-pills"></i> Treatment & Follow-up</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="form-section-content" id="treatmentFollowupSection">
-                            <div class="form-group" data-field="treatment_type">
-                                <label>Medication type</label>
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="treatment_thyroxine" name="treatment_type" value="0">
-                                        <label for="treatment_thyroxine">Thyroxine</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="treatment_mercasolil" name="treatment_type" value="1" checked>
-                                        <label for="treatment_mercasolil">Mercasolil</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="treatment_combination" name="treatment_type" value="2">
-                                        <label for="treatment_combination">Combination</label>
-                                    </div>
-                                </div>
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="treatment_type_unknown" class="unknown-input">
-                                    <label for="treatment_type_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="tsh_3">
-                                <label for="tsh_3">TSH after 1.5 years / before discontinuation (mIU/L)</label>
-                                <input type="number" id="tsh_3" name="tsh_3" step="0.01" min="0" value="1.8">
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="tsh_3_unknown" class="unknown-input">
-                                    <label for="tsh_3_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="us3_thyroid_volume">
-                                <label for="us3_thyroid_volume">Thyroid volume after 1.5 years / before discontinuation (cm³)</label>
-                                <input type="number" id="us3_thyroid_volume" name="us3_thyroid_volume" step="0.1" min="0" value="18.2">
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="us3_thyroid_volume_unknown" class="unknown-input">
-                                    <label for="us3_thyroid_volume_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="us3_nodules">
-                                <label>Presence of nodules (after 1.5 years / before discontinuation)</label>
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="us3_nodules_no" name="us3_nodules" value="0" checked>
-                                        <label for="us3_nodules_no">No</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="us3_nodules_yes" name="us3_nodules" value="1">
-                                        <label for="us3_nodules_yes">Yes</label>
-                                    </div>
-                                </div>
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="us3_nodules_unknown" class="unknown-input">
-                                    <label for="us3_nodules_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="us3_nodules_cm">
-                                <label for="us3_nodules_cm">Size of nodules in cm (after 1.5 years / before discontinuation)</label>
-                                <input type="number" id="us3_nodules_cm" name="us3_nodules_cm" step="0.1" min="0" value="0">
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="us3_nodules_cm_unknown" class="unknown-input">
-                                    <label for="us3_nodules_cm_unknown">Unknown</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group" data-field="recurrence">
-                                <label>Recurrence</label>
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="recurrence_no" name="recurrence" value="0" checked>
-                                        <label for="recurrence_no">No</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="recurrence_yes" name="recurrence" value="1">
-                                        <label for="recurrence_yes">Yes</label>
-                                    </div>
-                                </div>
-                                <div class="unknown-checkbox">
-                                    <input type="checkbox" id="recurrence_unknown" class="unknown-input">
-                                    <label for="recurrence_unknown">Unknown</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Save Patient Data
-                        </button>
-                        <button type="button" class="btn btn-secondary" id="clearFormBtn">
-                            <i class="fas fa-redo"></i> Clear Form
+                    <div id="patientActions" style="display: none;">
+                        <button class="btn btn-primary" id="addReadmissionBtn">
+                            <i class="fas fa-calendar-plus"></i> Add Follow-up Data (1.5 years)
                         </button>
                     </div>
-                </form>
+                </div>
+
+                <div class="tab-container">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="initial">Initial Appointment</div>
+                        <div class="tab" data-tab="readmission">Follow-up Data</div>
+                        <div class="tab" data-tab="results">Recurrence Risk</div>
+                    </div>
+
+                    <!-- Initial Appointment Tab -->
+                    <div class="tab-content active" id="initial-tab">
+                        <form id="initialForm">
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-user-circle"></i> Basic Information
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="age_onset" class="required-field">Age at disease onset</label>
+                                        <input type="number" id="age_onset" name="age_onset" min="0" max="120" required>
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="age_onset_unknown" name="age_onset_unknown">
+                                            <label for="age_onset_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="sex" class="required-field">Sex</label>
+                                        <select id="sex" name="sex" required>
+                                            <option value="">Select sex</option>
+                                            <option value="0">Female</option>
+                                            <option value="1">Male</option>
+                                            <option value="-1">Unknown</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-dna"></i> Heredity & Lifestyle
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="heredity">Family history of thyroid disease</label>
+                                        <select id="heredity" name="heredity">
+                                            <option value="">Select option</option>
+                                            <option value="0">No</option>
+                                            <option value="1">Yes</option>
+                                            <option value="-1">Unknown</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="smoking_status">Smoking status</label>
+                                        <select id="smoking_status" name="smoking_status">
+                                            <option value="">Select option</option>
+                                            <option value="0">Non-smoker</option>
+                                            <option value="1">Current smoker</option>
+                                            <option value="-1">Unknown</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-procedures"></i> Initial Examination
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="us1_thyroid_volume">Initial thyroid volume (cm³)</label>
+                                        <input type="number" id="us1_thyroid_volume" name="us1_thyroid_volume" step="0.1" min="0">
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="us1_thyroid_volume_unknown" name="us1_thyroid_volume_unknown">
+                                            <label for="us1_thyroid_volume_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="us1_nodules">Initial number of nodules</label>
+                                        <input type="number" id="us1_nodules" name="us1_nodules" min="0" step="1">
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="us1_nodules_unknown" name="us1_nodules_unknown">
+                                            <label for="us1_nodules_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="us1_nodules_cm">Initial nodule size (cm)</label>
+                                        <input type="number" id="us1_nodules_cm" name="us1_nodules_cm" step="0.1" min="0">
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="us1_nodules_cm_unknown" name="us1_nodules_cm_unknown">
+                                            <label for="us1_nodules_cm_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="exophthalmos">Exophthalmos</label>
+                                        <select id="exophthalmos" name="exophthalmos">
+                                            <option value="">Select option</option>
+                                            <option value="0">No</option>
+                                            <option value="1">Yes</option>
+                                            <option value="-1">Unknown</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-vial"></i> Initial Lab Results
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="tsh_1">Initial TSH</label>
+                                        <input type="number" id="tsh_1" name="tsh_1" step="0.01" min="0">
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="tsh_1_unknown" name="tsh_1_unknown">
+                                            <label for="tsh_1_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="ft4_1">Initial free T4</label>
+                                        <input type="number" id="ft4_1" name="ft4_1" step="0.01" min="0">
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="ft4_1_unknown" name="ft4_1_unknown">
+                                            <label for="ft4_1_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="ft3_1">Initial free T3</label>
+                                        <input type="number" id="ft3_1" name="ft3_1" step="0.01" min="0">
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="ft3_1_unknown" name="ft3_1_unknown">
+                                            <label for="ft3_1_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="ft3_to_ft4_ratio">Initial free T3/T4 ratio</label>
+                                        <input type="number" id="ft3_to_ft4_ratio" name="ft3_to_ft4_ratio" step="0.01" min="0">
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="ft3_to_ft4_ratio_unknown" name="ft3_to_ft4_ratio_unknown">
+                                            <label for="ft3_to_ft4_ratio_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button type="button" class="btn btn-primary" id="saveInitialBtn">
+                                    <i class="fas fa-save"></i> Save Initial Data
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Follow-up Tab -->
+                    <div class="tab-content" id="readmission-tab">
+                        <form id="readmissionForm">
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-heartbeat"></i> Clinical Status After 1.5 Years
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="thyrotoxic_cardiomyopathy">Thyrotoxic cardiomyopathy</label>
+                                        <select id="thyrotoxic_cardiomyopathy" name="thyrotoxic_cardiomyopathy">
+                                            <option value="">Select option</option>
+                                            <option value="0">No</option>
+                                            <option value="1">Yes</option>
+                                            <option value="-1">Unknown</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="treatment_type">Treatment type</label>
+                                        <select id="treatment_type" name="treatment_type">
+                                            <option value="">Select option</option>
+                                            <option value="0">Type 0</option>
+                                            <option value="1">Type 1</option>
+                                            <option value="2">Type 2</option>
+                                            <option value="3">Type 3</option>
+                                            <option value="-1">Unknown</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-stethoscope"></i> Follow-up Examination
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="tsh_3">TSH after 1.5 years / before discontinuation</label>
+                                        <input type="number" id="tsh_3" name="tsh_3" step="0.01" min="0">
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="tsh_3_unknown" name="tsh_3_unknown">
+                                            <label for="tsh_3_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="us3_thyroid_volume">Thyroid volume after 1.5 years (cm³)</label>
+                                        <input type="number" id="us3_thyroid_volume" name="us3_thyroid_volume" step="0.1" min="0">
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="us3_thyroid_volume_unknown" name="us3_thyroid_volume_unknown">
+                                            <label for="us3_thyroid_volume_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="us3_nodules">Number of nodules after 1.5 years</label>
+                                        <input type="number" id="us3_nodules" name="us3_nodules" min="0" step="1">
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="us3_nodules_unknown" name="us3_nodules_unknown">
+                                            <label for="us3_nodules_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="us3_nodules_cm">Nodule size after 1.5 years (cm)</label>
+                                        <input type="number" id="us3_nodules_cm" name="us3_nodules_cm" step="0.1" min="0">
+                                        <div class="unknown-checkbox">
+                                            <input type="checkbox" id="us3_nodules_cm_unknown" name="us3_nodules_cm_unknown">
+                                            <label for="us3_nodules_cm_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button type="button" class="btn btn-primary" id="saveReadmissionBtn">
+                                    <i class="fas fa-save"></i> Save Follow-up Data
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Results Tab -->
+                    <div class="tab-content" id="results-tab">
+                        <div class="results-container">
+                            <h3 class="section-title">
+                                <i class="fas fa-chart-line"></i> Recurrence Risk Assessment
+                            </h3>
+                            <p>This assessment calculates the risk of disease recurrence based on patient data collected during initial and follow-up visits.</p>
+                            
+                            <div id="calculationResults">
+                                <div class="empty-state">
+                                    <i class="fas fa-calculator"></i>
+                                    <h3>No calculation performed yet</h3>
+                                    <p>Fill in patient data and click "Calculate Recurrence Risk" to see results.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-accent" id="calculateRiskBtn">
+                                    <i class="fas fa-calculator"></i> Calculate Recurrence Risk
+                                </button>
+                                <button class="btn btn-primary" id="viewRawDataBtn" style="display: none;">
+                                    <i class="fas fa-code"></i> View Raw Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <div class="footer">
-            <p>Thyroid Illness Management System v1.0 | For medical use only | Data is encrypted and HIPAA compliant</p>
-            <p>© 2023 Endocrinology Clinic. All rights reserved.</p>
-        </div>
+
+        <footer>
+            <p>Thyroid Disease Patient Management System &copy; 2023 | Connected to ML Backend API</p>
+        </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // State management
+        let patients = [];
+        let currentPatientId = null;
+        let isNewPatient = false;
+
+        // DOM elements
+        const patientList = document.getElementById('patientList');
+        const patientName = document.getElementById('patientName');
+        const patientStatus = document.getElementById('patientStatus');
+        const patientActions = document.getElementById('patientActions');
+        const addPatientBtn = document.getElementById('addPatientBtn');
+        const addReadmissionBtn = document.getElementById('addReadmissionBtn');
+        const saveInitialBtn = document.getElementById('saveInitialBtn');
+        const saveReadmissionBtn = document.getElementById('saveReadmissionBtn');
+        const calculateRiskBtn = document.getElementById('calculateRiskBtn');
+        const viewRawDataBtn = document.getElementById('viewRawDataBtn');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const apiStatus = document.getElementById('apiStatus');
+        const serverStatus = document.getElementById('serverStatus');
+        
+        // Form elements
+        const initialForm = document.getElementById('initialForm');
+        const readmissionForm = document.getElementById('readmissionForm');
+
+        // API Configuration
+        const API_BASE_URL = window.location.origin; // Same origin as the frontend
+        const PREDICT_ENDPOINT = '/api/predict_ml';
+        const TEST_ENDPOINT = '/api/predict';
+
+        // Initialize the application
+        async function initApp() {
+            showMessage('Loading application...', 'info');
+            
+            // Check API connection
+            await checkAPIStatus();
+            
+            // Load patients from localStorage (or could be from backend)
+            loadPatientsFromStorage();
+            
+            setupEventListeners();
+            
+            // Auto-update ratio when FT3 or FT4 changes
+            document.getElementById('ft3_1').addEventListener('input', updateRatio);
+            document.getElementById('ft4_1').addEventListener('input', updateRatio);
+            
+            // Initialize all unknown checkboxes
+            initializeUnknownCheckboxes();
+            
+            showMessage('Application ready', 'success');
+        }
+
+        // Check API connection status
+        async function checkAPIStatus() {
+            try {
+                apiStatus.textContent = 'Connecting...';
+                apiStatus.className = 'api-status';
+                
+                const response = await fetch(TEST_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ test: 'connection' })
+                });
+                
+                if (response.ok) {
+                    apiStatus.textContent = 'API Connected';
+                    apiStatus.className = 'api-status connected';
+                    serverStatus.innerHTML = '<span style="color: green;">✅ ML Backend Server: Running</span>';
+                } else {
+                    apiStatus.textContent = 'API Error';
+                    apiStatus.className = 'api-status disconnected';
+                    serverStatus.innerHTML = '<span style="color: red;">❌ ML Backend Server: Error</span>';
+                }
+            } catch (error) {
+                apiStatus.textContent = 'API Offline';
+                apiStatus.className = 'api-status disconnected';
+                serverStatus.innerHTML = '<span style="color: orange;">⚠️ ML Backend Server: Offline</span>';
+                console.error('API connection error:', error);
+            }
+        }
+
+        // Test API endpoint
+        async function testAPI() {
+            try {
+                serverStatus.innerHTML = '<div class="spinner"></div> Testing API...';
+                
+                const response = await fetch(TEST_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ test: 'data', features: [1, 2, 3] })
+                });
+                
+                const data = await response.json();
+                showMessage(`API Test Successful: ${data.message || 'Connected'}`, 'success');
+                serverStatus.innerHTML = '<span style="color: green;">✅ ML Backend Server: Running</span>';
+                
+            } catch (error) {
+                showMessage(`API Test Failed: ${error.message}`, 'error');
+                serverStatus.innerHTML = '<span style="color: red;">❌ ML Backend Server: Connection Failed</span>';
+            }
+        }
+
+        // Load patients from localStorage
+        function loadPatientsFromStorage() {
+            const storedPatients = localStorage.getItem('thyroidPatients');
+            if (storedPatients) {
+                patients = JSON.parse(storedPatients);
+            } else {
+                // Initialize with sample data
+                patients = [
+                    {
+                        id: 1,
+                        name: "John Smith",
+                        age: 45,
+                        age_onset: 42,
+                        sex: "1",
+                        heredity: "1",
+                        smoking_status: "1",
+                        us1_thyroid_volume: 25.5,
+                        us1_nodules: 2,
+                        us1_nodules_cm: 1.2,
+                        tsh_1: 0.05,
+                        ft4_1: 32.5,
+                        ft3_1: 8.2,
+                        ft3_to_ft4_ratio: 0.25,
+                        exophthalmos: "1",
+                        thyrotoxic_cardiomyopathy: "0",
+                        treatment_type: "1",
+                        tsh_3: 1.8,
+                        us3_thyroid_volume: 18.3,
+                        us3_nodules: 1,
+                        us3_nodules_cm: 0.8,
+                        status: "followup",
+                        has_followup: true,
+                        last_updated: new Date().toISOString()
+                    },
+                    {
+                        id: 2,
+                        name: "Maria Garcia",
+                        age: 38,
+                        age_onset: 36,
+                        sex: "0",
+                        heredity: "0",
+                        smoking_status: "0",
+                        us1_thyroid_volume: 18.7,
+                        us1_nodules: 0,
+                        us1_nodules_cm: null,
+                        tsh_1: 0.02,
+                        ft4_1: 28.9,
+                        ft3_1: 7.5,
+                        ft3_to_ft4_ratio: 0.26,
+                        exophthalmos: "0",
+                        thyrotoxic_cardiomyopathy: null,
+                        treatment_type: null,
+                        tsh_3: null,
+                        us3_thyroid_volume: null,
+                        us3_nodules: null,
+                        us3_nodules_cm: null,
+                        status: "new",
+                        has_followup: false,
+                        last_updated: new Date().toISOString()
+                    }
+                ];
+                savePatientsToStorage();
+            }
+            
+            renderPatientList();
+            
+            // Select first patient by default
+            if (patients.length > 0) {
+                selectPatient(patients[0].id);
+            }
+        }
+
+        // Save patients to localStorage
+        function savePatientsToStorage() {
+            localStorage.setItem('thyroidPatients', JSON.stringify(patients));
+        }
+
+        // Render patient list
+        function renderPatientList() {
+            patientList.innerHTML = '';
+            
+            if (patients.length === 0) {
+                patientList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <p>No patients found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            patients.forEach(patient => {
+                const patientItem = document.createElement('div');
+                patientItem.className = `patient-item ${currentPatientId === patient.id ? 'active' : ''}`;
+                patientItem.dataset.id = patient.id;
+                
+                let statusText = '';
+                let statusClass = '';
+                
+                switch(patient.status) {
+                    case 'new':
+                        statusText = 'Initial visit';
+                        statusClass = 'status-new';
+                        break;
+                    case 'followup':
+                        statusText = 'Follow-up';
+                        statusClass = 'status-followup';
+                        break;
+                    case 'completed':
+                        statusText = 'Completed';
+                        statusClass = 'status-completed';
+                        break;
+                }
+                
+                patientItem.innerHTML = `
+                    <div class="patient-id">${patient.name}</div>
+                    <div class="patient-age">Age: ${patient.age || 'Unknown'}, Onset: ${patient.age_onset || 'Unknown'}</div>
+                    <div class="${statusClass}" style="margin-top: 5px; font-size: 0.8rem;">${statusText}</div>
+                `;
+                
+                patientList.appendChild(patientItem);
+            });
+            
+            // Add click event listeners to patient items
+            document.querySelectorAll('.patient-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    selectPatient(parseInt(item.dataset.id));
+                });
+            });
+        }
+
+        // Select a patient
+        function selectPatient(patientId) {
+            currentPatientId = patientId;
+            isNewPatient = false;
+            
+            const patient = patients.find(p => p.id === patientId);
+            if (!patient) return;
+            
+            // Update patient header
+            patientName.textContent = patient.name;
+            patientStatus.textContent = getStatusText(patient.status);
+            patientStatus.className = `patient-status ${getStatusClass(patient.status)}`;
+            
+            // Show/hide actions
+            patientActions.style.display = patient.has_followup ? 'none' : 'block';
+            
+            // Populate initial form
+            populateForm(initialForm, patient);
+            
+            // Populate follow-up form if data exists
+            if (patient.has_followup) {
+                populateForm(readmissionForm, patient);
+                // Enable follow-up tab
+                document.querySelector('.tab[data-tab="readmission"]').classList.add('active');
+                document.getElementById('readmission-tab').classList.add('active');
+            } else {
+                // Disable follow-up tab
+                document.querySelector('.tab[data-tab="readmission"]').classList.remove('active');
+                document.getElementById('readmission-tab').classList.remove('active');
+                // Switch to initial tab
+                switchTab('initial');
+            }
+            
+            // Update patient list UI
+            renderPatientList();
+            
+            // Clear results tab
+            document.getElementById('calculationResults').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-calculator"></i>
+                    <h3>No calculation performed yet</h3>
+                    <p>Fill in patient data and click "Calculate Recurrence Risk" to see results.</p>
+                </div>
+            `;
+            
+            viewRawDataBtn.style.display = 'none';
+        }
+
+        // Populate form with patient data
+        function populateForm(form, patient) {
+            const formElements = form.elements;
+            
+            for (let element of formElements) {
+                if (element.name && patient[element.name] !== undefined) {
+                    if (element.type === 'checkbox') {
+                        // Handle unknown checkboxes
+                        const fieldName = element.name.replace('_unknown', '');
+                        element.checked = patient[fieldName] === null || patient[fieldName] === undefined;
+                        
+                        // If field is unknown, disable the corresponding input
+                        if (element.checked) {
+                            const inputField = form.querySelector(`[name="${fieldName}"]`);
+                            if (inputField) {
+                                inputField.disabled = true;
+                                inputField.style.backgroundColor = '#f5f5f5';
+                            }
+                        }
+                    } else {
+                        element.value = patient[element.name] || '';
+                    }
+                }
+            }
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            // Update tab UI
+            tabs.forEach(tab => {
+                if (tab.dataset.tab === tabName) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Update tab content
+            tabContents.forEach(content => {
+                if (content.id === `${tabName}-tab`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+
+        // Get status text
+        function getStatusText(status) {
+            switch(status) {
+                case 'new': return 'Initial visit';
+                case 'followup': return 'Follow-up in progress';
+                case 'completed': return 'Treatment completed';
+                default: return 'Unknown status';
+            }
+        }
+
+        // Get status class
+        function getStatusClass(status) {
+            switch(status) {
+                case 'new': return 'status-new';
+                case 'followup': return 'status-followup';
+                case 'completed': return 'status-completed';
+                default: return '';
+            }
+        }
+
+        // Create a new patient
+        function createNewPatient() {
+            const newId = patients.length > 0 ? Math.max(...patients.map(p => p.id)) + 1 : 1;
+            
+            const newPatient = {
+                id: newId,
+                name: `Patient ${newId}`,
+                age: null,
+                age_onset: null,
+                sex: null,
+                heredity: null,
+                smoking_status: null,
+                us1_thyroid_volume: null,
+                us1_nodules: null,
+                us1_nodules_cm: null,
+                tsh_1: null,
+                ft4_1: null,
+                ft3_1: null,
+                ft3_to_ft4_ratio: null,
+                exophthalmos: null,
+                thyrotoxic_cardiomyopathy: null,
+                treatment_type: null,
+                tsh_3: null,
+                us3_thyroid_volume: null,
+                us3_nodules: null,
+                us3_nodules_cm: null,
+                status: 'new',
+                has_followup: false,
+                last_updated: new Date().toISOString()
+            };
+            
+            patients.push(newPatient);
+            currentPatientId = newId;
+            isNewPatient = true;
+            
+            // Update UI
+            patientName.textContent = 'New Patient';
+            patientStatus.textContent = 'Initial visit (new)';
+            patientStatus.className = 'patient-status status-new';
+            patientActions.style.display = 'none';
+            
+            // Clear forms
+            initialForm.reset();
+            readmissionForm.reset();
+            
+            // Switch to initial tab
+            switchTab('initial');
+            
+            // Render updated patient list
+            renderPatientList();
+            
+            // Focus on first field
+            document.getElementById('age_onset').focus();
+            
+            // Initialize unknown checkboxes for new form
+            initializeUnknownCheckboxes();
+            
+            showMessage('New patient created. Please fill in the initial data.', 'info');
+        }
+
+        // Save initial patient data
+        function saveInitialData() {
+            if (!currentPatientId) {
+                showMessage('Please create or select a patient first', 'error');
+                return;
+            }
+            
+            const patientIndex = patients.findIndex(p => p.id === currentPatientId);
+            if (patientIndex === -1) return;
+            
+            const formData = getFormData(initialForm);
+            const patient = patients[patientIndex];
+            
+            // Update patient data from form
+            Object.keys(formData).forEach(key => {
+                if (key.endsWith('_unknown')) {
+                    // This is handled separately
+                } else {
+                    patient[key] = formData[key];
+                }
+            });
+            
+            // Calculate age if not set
+            if (!patient.age && patient.age_onset) {
+                patient.age = parseInt(patient.age_onset) + 3; // Approximate current age
+            }
+            
+            // Update patient name if it's a new patient
+            if (isNewPatient) {
+                const sex = patient.sex === '0' ? 'Female' : patient.sex === '1' ? 'Male' : 'Unknown';
+                patient.name = `Patient ${patient.id} (${sex}, ${patient.age_onset || '?'} y.o. onset)`;
+                isNewPatient = false;
+            }
+            
+            // Update status
+            patient.status = 'new';
+            patient.last_updated = new Date().toISOString();
+            
+            // Save to storage
+            savePatientsToStorage();
+            
+            // Show success message
+            showMessage('Initial patient data saved successfully!', 'success');
+            
+            // Update UI
+            renderPatientList();
+        }
+
+        // Save follow-up data
+        function saveReadmissionData() {
+            if (!currentPatientId) {
+                showMessage('Please select a patient first', 'error');
+                return;
+            }
+            
+            const patientIndex = patients.findIndex(p => p.id === currentPatientId);
+            if (patientIndex === -1) return;
+            
+            const formData = getFormData(readmissionForm);
+            const patient = patients[patientIndex];
+            
+            // Update patient data from form
+            Object.keys(formData).forEach(key => {
+                if (key.endsWith('_unknown')) {
+                    // This is handled separately
+                } else {
+                    patient[key] = formData[key];
+                }
+            });
+            
+            // Update patient status
+            patient.has_followup = true;
+            patient.status = 'followup';
+            patient.last_updated = new Date().toISOString();
+            
+            // Enable follow-up tab
+            document.querySelector('.tab[data-tab="readmission"]').classList.add('active');
+            
+            // Hide add follow-up button
+            patientActions.style.display = 'none';
+            
+            // Save to storage
+            savePatientsToStorage();
+            
+            // Show success message
+            showMessage('Follow-up data saved successfully!', 'success');
+            
+            // Update UI
+            renderPatientList();
+            switchTab('readmission');
+        }
+
+        // Calculate recurrence risk using ML backend
+        async function calculateRecurrenceRisk() {
+            if (!currentPatientId) {
+                showMessage('Please select a patient first', 'error');
+                return;
+            }
+            
+            const patient = patients.find(p => p.id === currentPatientId);
+            if (!patient) return;
+            
+            // Check if we have enough data
+            const requiredFields = ['age_onset', 'sex'];
+            const missingFields = requiredFields.filter(field => 
+                !patient[field] && patient[field] !== 0
+            );
+            
+            if (missingFields.length > 0) {
+                showMessage(`Missing required data: ${missingFields.join(', ')}`, 'error');
+                return;
+            }
+            
+            // Prepare data for API
+            const apiData = {};
+            
+            // Helper function to get value with null handling
+            const getValue = (fieldName) => {
+                const value = patient[fieldName];
+                if (value === '' || value === undefined) return null;
+                
+                // For select elements with -1 option
+                if (typeof value === 'string' && value === '-1') {
+                    return null;
+                }
+                
+                // Parse based on type
+                if (typeof value === 'string' && !isNaN(value)) {
+                    const num = parseFloat(value);
+                    return isNaN(num) ? null : num;
+                }
+                
+                return value;
+            };
+            
+            // Map patient data to API expected format
+            const fieldMapping = {
+                'age_onset': 'age_onset',
+                'heredity': 'heredity',
+                'smoking_status': 'smoking_status',
+                'sex': 'sex',
+                'us1_thyroid_volume': 'us1_thyroid_volume',
+                'us1_nodules': 'us1_nodules',
+                'us1_nodules_cm': 'us1_nodules_cm',
+                'tsh_1': 'tsh_1',
+                'ft4_1': 'ft4_1',
+                'ft3_1': 'ft3_1',
+                'ft3_to_ft4_ratio': 'ft3_to_ft4_ratio',
+                'exophthalmos': 'exophthalmos',
+                'thyrotoxic_cardiomyopathy': 'thyrotoxic_cardiomyopathy',
+                'treatment_type': 'treatment_type',
+                'tsh_3': 'tsh_3',
+                'us3_thyroid_volume': 'us3_thyroid_volume',
+                'us3_nodules': 'us3_nodules',
+                'us3_nodules_cm': 'us3_nodules_cm'
+            };
+            
+            Object.keys(fieldMapping).forEach(patientField => {
+                apiData[fieldMapping[patientField]] = getValue(patientField);
+            });
+            
+            console.log('Sending data to API:', apiData);
+            
+            // Show loading state
+            const resultsDiv = document.getElementById('calculationResults');
+            resultsDiv.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 10px;">Calculating recurrence risk with ML model...</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(PREDICT_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(apiData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const prediction = result.prediction;
+                    const probability = (result.probability * 100).toFixed(1);
+                    
+                    // Display results
+                    resultsDiv.innerHTML = `
+                        <h4>ML Model Prediction Results:</h4>
+                        <div style="background-color: ${prediction === 1 ? '#ffebee' : '#e8f5e9'}; 
+                                    padding: 20px; border-radius: 5px; margin: 15px 0;">
+                            <div style="font-size: 24px; font-weight: bold; 
+                                        color: ${prediction === 1 ? '#d32f2f' : '#388e3c'}; margin-bottom: 10px;">
+                                ${prediction === 1 ? 'HIGH RECURRENCE RISK ⚠️' : 'LOW RECURRENCE RISK ✅'}
+                            </div>
+                            <div style="font-size: 18px; margin-bottom: 10px;">
+                                <strong>Probability:</strong> ${probability}%
+                            </div>
+                            <div><strong>Interpretation:</strong> ${result.interpretation || 'Based on ML model analysis'}</div>
+                        </div>
+                        
+                        <h4>Input Summary:</h4>
+                        <div style="max-height: 300px; overflow-y: auto; margin-top: 10px;">
+                            <table border="1" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                                <tr>
+                                    <th style="padding: 8px; background-color: #f2f2f2;">Feature</th>
+                                    <th style="padding: 8px; background-color: #f2f2f2;">Value</th>
+                                    <th style="padding: 8px; background-color: #f2f2f2;">Status</th>
+                                </tr>
+                    `;
+                    
+                    // Add feature rows
+                    const featureNames = {
+                        'age_onset': 'Age at Onset',
+                        'heredity': 'Family History',
+                        'smoking_status': 'Smoking Status',
+                        'sex': 'Sex',
+                        'us1_thyroid_volume': 'US1 Thyroid Volume',
+                        'us1_nodules': 'US1 Nodules Count',
+                        'us1_nodules_cm': 'US1 Nodule Size',
+                        'tsh_1': 'TSH Level 1',
+                        'ft4_1': 'FT4 Level 1',
+                        'ft3_1': 'FT3 Level 1',
+                        'ft3_to_ft4_ratio': 'FT3/FT4 Ratio',
+                        'exophthalmos': 'Exophthalmos',
+                        'thyrotoxic_cardiomyopathy': 'Thyrotoxic Cardiomyopathy',
+                        'treatment_type': 'Treatment Type',
+                        'tsh_3': 'TSH Level 3',
+                        'us3_thyroid_volume': 'US3 Thyroid Volume',
+                        'us3_nodules': 'US3 Nodules Count',
+                        'us3_nodules_cm': 'US3 Nodule Size'
+                    };
+                    
+                    Object.keys(apiData).forEach(key => {
+                        const value = apiData[key];
+                        const displayValue = value === null ? '<em style="color: #666;">Unknown</em>' : value;
+                        const status = value === null ? 'Unknown' : 'Provided';
+                        const statusColor = value === null ? '#666' : '#388e3c';
+                        
+                        resultsDiv.innerHTML += `
+                            <tr>
+                                <td style="padding: 6px;">${featureNames[key] || key}</td>
+                                <td style="padding: 6px; text-align: center;">${displayValue}</td>
+                                <td style="padding: 6px; text-align: center; color: ${statusColor}">
+                                    ${status}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    resultsDiv.innerHTML += `</table></div>`;
+                    
+                    // Store the raw data for viewing
+                    window.lastPredictionData = {
+                        apiData: apiData,
+                        result: result
+                    };
+                    
+                    // Show view raw data button
+                    viewRawDataBtn.style.display = 'inline-flex';
+                    viewRawDataBtn.onclick = () => {
+                        alert(JSON.stringify(window.lastPredictionData, null, 2));
+                    };
+                    
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div style="color: red; padding: 20px; text-align: center;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h4>Error in Prediction</h4>
+                            <p>${result.message || 'Unknown error occurred'}</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div style="color: red; padding: 20px; text-align: center;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>Network Error</h4>
+                        <p>${error.message}</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">
+                            Please check if the ML backend server is running.
+                        </p>
+                    </div>
+                `;
+            }
+            
+            // Switch to results tab
+            switchTab('results');
+        }
+
+        // Get form data with proper null handling
+        function getFormData(form) {
+            const formData = {};
+            const formElements = form.elements;
+            
+            for (let element of formElements) {
+                if (element.name) {
+                    if (element.type === 'checkbox' && element.name.endsWith('_unknown')) {
+                        const fieldName = element.name.replace('_unknown', '');
+                        formData[element.name] = element.checked;
+                        
+                        // If unknown is checked, set the actual field to null
+                        if (element.checked) {
+                            formData[fieldName] = null;
+                        }
+                    } else if (element.type !== 'checkbox') {
+                        if (element.value === '' || (element.type === 'select-one' && element.value === '')) {
+                            formData[element.name] = element.name === 'sex' ? null : null;
+                        } else {
+                            formData[element.name] = element.value;
+                        }
+                    }
+                }
+            }
+            
+            return formData;
+        }
+
+        // Auto-calculation for FT3/FT4 ratio
+        function updateRatio() {
+            const ft3Input = document.getElementById('ft3_1');
+            const ft4Input = document.getElementById('ft4_1');
+            const ratioInput = document.getElementById('ft3_to_ft4_ratio');
+            const ft3Unknown = document.getElementById('ft3_1_unknown');
+            const ft4Unknown = document.getElementById('ft4_1_unknown');
+            
+            const ft3 = parseFloat(ft3Input.value) || 0;
+            const ft4 = parseFloat(ft4Input.value) || 1;
+            
+            // Only calculate if both values are known and not disabled
+            if (!ft3Input.disabled && !ft4Input.disabled && ft4 > 0) {
+                const ratio = (ft3 / ft4).toFixed(2);
+                ratioInput.value = ratio;
+                
+                // Mark ratio as known
+                const ratioUnknown = document.getElementById('ft3_to_ft4_ratio_unknown');
+                if (ratioUnknown) {
+                    ratioUnknown.checked = false;
+                    ratioInput.disabled = false;
+                    ratioInput.style.backgroundColor = '';
+                }
+            }
+        }
+
+        // Initialize unknown checkboxes
+        function initializeUnknownCheckboxes() {
+            const unknownCheckboxes = document.querySelectorAll('input[type="checkbox"][name$="_unknown"]');
+            unknownCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const fieldName = this.name.replace('_unknown', '');
+                    const field = document.querySelector(`[name="${fieldName}"]`);
+                    
+                    if (this.checked) {
+                        // Mark field as unknown
+                        if (field) {
+                            field.value = '';
+                            field.disabled = true;
+                            field.style.backgroundColor = '#f5f5f5';
+                        }
+                    } else {
+                        // Field is known, enable it
+                        if (field) {
+                            field.disabled = false;
+                            field.style.backgroundColor = '';
+                            if (field.type !== 'select-one') {
+                                field.focus();
+                            }
+                        }
+                    }
+                });
+                
+                // Trigger initial state
+                checkbox.dispatchEvent(new Event('change'));
+            });
+        }
+
+        // Show message to user
+        function showMessage(message, type) {
+            // Create message element
+            const messageEl = document.createElement('div');
+            messageEl.textContent = message;
+            messageEl.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 5px;
+                color: white;
+                font-weight: bold;
+                z-index: 1000;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease;
+            `;
+            
+            if (type === 'success') {
+                messageEl.style.backgroundColor = '#2ecc71';
+            } else if (type === 'error') {
+                messageEl.style.backgroundColor = '#e74c3c';
+            } else if (type === 'info') {
+                messageEl.style.backgroundColor = '#3498db';
+            } else {
+                messageEl.style.backgroundColor = '#3498db';
+            }
+            
+            // Add to document
+            document.body.appendChild(messageEl);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                messageEl.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (messageEl.parentNode) {
+                        document.body.removeChild(messageEl);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    if (tab.classList.contains('active')) return;
+                    switchTab(tab.dataset.tab);
+                });
+            });
+            
+            // Add patient button
+            addPatientBtn.addEventListener('click', createNewPatient);
+            
+            // Add follow-up button
+            addReadmissionBtn.addEventListener('click', () => {
+                switchTab('readmission');
+            });
+            
+            // Save initial data button
+            saveInitialBtn.addEventListener('click', saveInitialData);
+            
+            // Save follow-up data button
+            saveReadmissionBtn.addEventListener('click', saveReadmissionData);
+            
+            // Calculate risk button
+            calculateRiskBtn.addEventListener('click', calculateRecurrenceRisk);
+        }
+
+        // Add CSS animations for messages
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
 </body>
 </html>
