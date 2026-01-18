@@ -6,6 +6,7 @@
     <title>Thyroid Disease Patient Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Existing CSS remains unchanged */
         :root {
             --primary-color: #2c3e50;
             --secondary-color: #3498db;
@@ -398,6 +399,86 @@
             border-radius: var(--border-radius);
         }
 
+        /* NEW: Model selection styles */
+        .model-selection {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .model-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .model-option {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .model-radio {
+            display: none;
+        }
+
+        .model-label {
+            display: block;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .model-radio:checked + .model-label {
+            border-color: var(--secondary-color);
+            background-color: #e8f4fc;
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .model-label:hover {
+            border-color: var(--accent-color);
+        }
+
+        .model-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .model-type {
+            font-size: 0.85rem;
+            color: #666;
+            padding: 3px 8px;
+            background-color: #f0f0f0;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .model-type.init {
+            background-color: #e8f6f3;
+            color: #1abc9c;
+        }
+
+        .model-type.follow-up {
+            background-color: #e8f4fc;
+            color: #3498db;
+        }
+
+        .model-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .model-disabled .model-label {
+            cursor: not-allowed;
+        }
+
         @media (max-width: 1100px) {
             .main-content {
                 flex-direction: column;
@@ -712,6 +793,15 @@
                             </h3>
                             <p>This assessment calculates the risk of disease recurrence based on patient data collected during initial and follow-up visits.</p>
                             
+                            <!-- NEW: Model Selection Section -->
+                            <div class="model-selection" id="modelSelectionSection" style="display: none;">
+                                <h4>Select Prediction Model</h4>
+                                <p>Choose the appropriate model based on available patient data:</p>
+                                <div class="model-options" id="modelOptions">
+                                    <!-- Model options will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            
                             <div id="calculationResults">
                                 <div class="empty-state">
                                     <i class="fas fa-calculator"></i>
@@ -745,6 +835,7 @@
         let currentPatientId = null;
         let isNewPatient = false;
         let predictionModels = [];
+        let selectedModel = null;
 
         // DOM elements
         const patientList = document.getElementById('patientList');
@@ -760,6 +851,8 @@
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
         const serverStatus = document.getElementById('serverStatus');
+        const modelSelectionSection = document.getElementById('modelSelectionSection');
+        const modelOptions = document.getElementById('modelOptions');
         
         // Form elements
         const initialForm = document.getElementById('initialForm');
@@ -769,7 +862,7 @@
         const API_BASE_URL = window.location.origin;
         const PREDICT_ENDPOINT = '/api/predict_ml';
         const TEST_ENDPOINT = '/api/predict';
-        const MODELS_ENDPIONT = '/api/models';
+        const MODELS_ENDPOINT = '/api/models';
 
         // Initialize the application
         async function initApp() {
@@ -778,10 +871,11 @@
             // Check API connection
             await checkAPIStatus();
             
+            // Load prediction models
+            await loadPredictionModels();
+            
             // Load patients from localStorage
             loadPatientsFromStorage();
-
-            loadModelsFromStorage();
             
             setupEventListeners();
             
@@ -819,20 +913,101 @@
             }
         }
 
-        async function loadModelsFromStorage() {
+        // Load available prediction models
+        async function loadPredictionModels() {
             try {
-                const response = await fetch(MODELS_ENDPIONT, {
+                const response = await fetch(MODELS_ENDPOINT, {
                     method: 'GET',
                 });
                 
                 if (response.ok) {
-                    console.log('MODELS DATA:', await response.json())
+                    const data = await response.json();
+                    predictionModels = data;
+                    console.log('Loaded prediction models:', predictionModels);
                 } else {
-                    console.error('MODELS ERROR response:', await response)
+                    console.error('Failed to load models:', await response.text());
                 }
             } catch (error) {
-                console.error('API connection error:', error);
+                console.error('Error loading prediction models:', error);
             }
+        }
+
+        // Render model selection based on patient status
+        function renderModelSelection() {
+            if (!currentPatientId) {
+                modelSelectionSection.style.display = 'none';
+                return;
+            }
+            
+            const patient = patients.find(p => p.id === currentPatientId);
+            if (!patient) {
+                modelSelectionSection.style.display = 'none';
+                return;
+            }
+            
+            // Filter models based on patient status
+            const availableModels = predictionModels.filter(model => {
+                if (model.type === "init") {
+                    // Initial models require only initial data
+                    return true;
+                } else if (model.type === "follow-up") {
+                    // Follow-up models require follow-up data
+                    return patient.has_followup === true;
+                }
+                return false;
+            });
+            
+            if (availableModels.length === 0) {
+                modelSelectionSection.style.display = 'none';
+                return;
+            }
+            
+            // Clear previous options
+            modelOptions.innerHTML = '';
+            
+            // Create radio buttons for each model
+            availableModels.forEach((model, index) => {
+                const modelId = `model-${index}`;
+                const modelOption = document.createElement('div');
+                modelOption.className = 'model-option';
+                
+                const isDisabled = model.type === "follow-up" && !patient.has_followup;
+                
+                modelOption.innerHTML = `
+                    <input type="radio" 
+                           id="${modelId}" 
+                           name="predictionModel" 
+                           value="${model.name}" 
+                           class="model-radio" 
+                           ${index === 0 ? 'checked' : ''}
+                           ${isDisabled ? 'disabled' : ''}>
+                    <label for="${modelId}" class="model-label ${isDisabled ? 'model-disabled' : ''}">
+                        <div class="model-name">${model.name.replace(/_/g, ' ').toUpperCase()}</div>
+                        <div class="model-type ${model.type}">${model.type.toUpperCase()} MODEL</div>
+                        <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
+                            ${model.type === "init" ? "Requires initial data only" : "Requires follow-up data"}
+                        </div>
+                    </label>
+                `;
+                
+                modelOptions.appendChild(modelOption);
+                
+                // Add event listener
+                const radioInput = document.getElementById(modelId);
+                radioInput.addEventListener('change', function() {
+                    if (this.checked) {
+                        selectedModel = model.name;
+                        console.log('Selected model:', selectedModel);
+                    }
+                });
+                
+                // Set default selection
+                if (index === 0) {
+                    selectedModel = model.name;
+                }
+            });
+            
+            modelSelectionSection.style.display = 'block';
         }
 
         // Test API endpoint
@@ -851,6 +1026,9 @@
                 const data = await response.json();
                 showMessage(`API Test Successful: ${data.message || 'Connected'}`, 'success');
                 serverStatus.innerHTML = '<span style="color: green;">✅ ML Backend Server: Running</span>';
+                
+                // Reload models after successful test
+                await loadPredictionModels();
                 
             } catch (error) {
                 showMessage(`API Test Failed: ${error.message}`, 'error');
@@ -1022,6 +1200,9 @@
                 switchTab('initial');
             }
             
+            // Update model selection based on patient status
+            renderModelSelection();
+            
             // Update patient list UI
             renderPatientList();
             
@@ -1077,6 +1258,11 @@
                     content.classList.remove('active');
                 }
             });
+            
+            // When switching to results tab, update model selection
+            if (tabName === 'results') {
+                renderModelSelection();
+            }
         }
 
         // Get status text
@@ -1147,6 +1333,9 @@
             // Switch to initial tab
             switchTab('initial');
             
+            // Update model selection
+            renderModelSelection();
+            
             // Render updated patient list
             renderPatientList();
             
@@ -1200,6 +1389,9 @@
             // Save to storage
             savePatientsToStorage();
             
+            // Update model selection
+            renderModelSelection();
+            
             // Show success message
             showMessage('Initial patient data saved successfully!', 'success');
             
@@ -1243,6 +1435,9 @@
             // Save to storage
             savePatientsToStorage();
             
+            // Update model selection (now follow-up models should be available)
+            renderModelSelection();
+            
             // Show success message
             showMessage('Follow-up data saved successfully!', 'success');
             
@@ -1269,6 +1464,12 @@
             
             if (missingFields.length > 0) {
                 showMessage(`Missing required data: ${missingFields.join(', ')}`, 'error');
+                return;
+            }
+            
+            // Check if model is selected
+            if (!selectedModel) {
+                showMessage('Please select a prediction model first', 'error');
                 return;
             }
             
@@ -1323,6 +1524,9 @@
                 apiData[fieldMapping[patientField]] = value;
             });
             
+            // Add selected model to API request
+            apiData.model_name = selectedModel;
+            
             console.log('Sending data to API:', apiData);
             
             // Show loading state
@@ -1330,7 +1534,7 @@
             resultsDiv.innerHTML = `
                 <div style="text-align: center; padding: 20px;">
                     <div class="spinner"></div>
-                    <p style="margin-top: 10px;">Calculating recurrence risk with ML model...</p>
+                    <p style="margin-top: 10px;">Calculating recurrence risk with ${selectedModel}...</p>
                 </div>
             `;
             
@@ -1348,32 +1552,9 @@
                 if (result.status === 'success') {
                     const prediction = result.prediction;
                     const probability = (result.probability * 100).toFixed(1);
-                    
-                    // Display results
-                    resultsDiv.innerHTML = `
-                        <h4>ML Model Prediction Results:</h4>
-                        <div style="background-color: ${prediction === 1 ? '#ffebee' : '#e8f5e9'}; 
-                                    padding: 20px; border-radius: 5px; margin: 15px 0;">
-                            <div style="font-size: 24px; font-weight: bold; 
-                                        color: ${prediction === 1 ? '#d32f2f' : '#388e3c'}; margin-bottom: 10px;">
-                                ${prediction === 1 ? 'HIGH RECURRENCE RISK ⚠️' : 'LOW RECURRENCE RISK ✅'}
-                            </div>
-                            <div style="font-size: 18px; margin-bottom: 10px;">
-                                <strong>Probability:</strong> ${probability}%
-                            </div>
-                            <div><strong>Interpretation:</strong> ${result.interpretation || 'Based on ML model analysis'}</div>
-                        </div>
-                        
-                        <h4>Input Summary:</h4>
-                        <div style="max-height: 300px; overflow-y: auto; margin-top: 10px;">
-                            <table border="1" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-                                <tr>
-                                    <th style="padding: 8px; background-color: #f2f2f2;">Feature</th>
-                                    <th style="padding: 8px; background-color: #f2f2f2;">Value</th>
-                                    <th style="padding: 8px; background-color: #f2f2f2;">Status</th>
-                                </tr>
-                    `;
-                    
+
+                    let featureRowsHTML = '';
+
                     // Add feature rows
                     const featureNames = {
                         'age_onset': 'Age at Onset',
@@ -1397,6 +1578,9 @@
                     };
                     
                     Object.keys(apiData).forEach(key => {
+                        // Skip model_name in the feature table
+                        if (key === 'model_name') return;
+                        
                         const value = apiData[key];
                         let displayValue;
                         let status;
@@ -1421,8 +1605,8 @@
                                 displayValue = `Type ${value}`;
                             }
                         }
-                        
-                        resultsDiv.innerHTML += `
+
+                        featureRowsHTML += `
                             <tr>
                                 <td style="padding: 6px;">${featureNames[key] || key}</td>
                                 <td style="padding: 6px; text-align: center;">${displayValue}</td>
@@ -1432,9 +1616,7 @@
                             </tr>
                         `;
                     });
-                    
-                    resultsDiv.innerHTML += `</table></div>`;
-                    
+
                     // Store the raw data for viewing
                     window.lastPredictionData = {
                         apiData: apiData,
@@ -1446,7 +1628,37 @@
                     viewRawDataBtn.onclick = () => {
                         alert(JSON.stringify(window.lastPredictionData, null, 2));
                     };
-                    
+
+                    // Display results
+                    resultsDiv.innerHTML = `
+                        <h4>ML Model Prediction Results (${selectedModel}):</h4>
+                        <div style="background-color: ${prediction === 1 ? '#ffebee' : '#e8f5e9'}; 
+                                    padding: 20px; border-radius: 5px; margin: 15px 0;">
+                            <div style="font-size: 24px; font-weight: bold; 
+                                        color: ${prediction === 1 ? '#d32f2f' : '#388e3c'}; margin-bottom: 10px;">
+                                ${prediction === 1 ? 'HIGH RECURRENCE RISK ⚠️' : 'LOW RECURRENCE RISK ✅'}
+                            </div>
+                            <div style="font-size: 18px; margin-bottom: 10px;">
+                                <strong>Probability:</strong> ${probability}%
+                            </div>
+                            <div><strong>Model used:</strong> ${selectedModel}</div>
+                            <div><strong>Interpretation:</strong> ${result.interpretation || 'Based on ML model analysis'}</div>
+                        </div>
+                        
+                        <h4>Input Summary:</h4>
+                        <div style="max-height: 300px; overflow-y: auto; margin-top: 10px;">
+                            <table border="1" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                                <tr>
+                                    <th style="padding: 8px; background-color: #f2f2f2;">Feature</th>
+                                    <th style="padding: 8px; background-color: #f2f2f2;">Value</th>
+                                    <th style="padding: 8px; background-color: #f2f2f2;">Status</th>
+                                </tr>
+                                <tbody>
+                                    ${featureRowsHTML}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
                 } else {
                     resultsDiv.innerHTML = `
                         <div style="color: red; padding: 20px; text-align: center;">

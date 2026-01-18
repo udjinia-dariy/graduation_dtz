@@ -23,7 +23,7 @@ def predict_ml():
     # GlobalInfoObj.get_model('random_forest_model').predict(data)
  
     # Надо добавить проверку - какой моделью должна проверяться фигня
-    prediction, probability = GlobalInfoObj.get_model('xgboost_model').predict(data)
+    prediction, probability = GlobalInfoObj.get_model(data['model_name']).predict(data)
 
     print("Prediction result:", prediction, probability)
 
