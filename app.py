@@ -14,6 +14,26 @@ def home():
 def get_available_models():
     return jsonify(GlobalInfoObj.get_all_models_info())
 
+@app.route('/api/patients', methods=['GET'])
+def get_all_patients():
+    return jsonify(GlobalInfoObj.get_all_patients())
+
+# TODO: should be /api/patient/{id} 
+@app.route('/api/patient/', methods=['POST'])
+def add_patient():
+    GlobalInfoObj.add_patient(request.json)
+    return jsonify({
+        'status': 'success'
+    })
+
+# # TODO: should be /api/patient/{id} 
+# @app.route('/api/patient/', methods=['POST'])
+# def edit_patient():
+#     GlobalInfoObj.edit_patient(id, request.json)
+#     return jsonify({
+#         'status': 'success'
+#     })
+
 @app.route('/api/predict_ml', methods=['POST'])
 def predict_ml():
     # Get and process data

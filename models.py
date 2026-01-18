@@ -119,8 +119,16 @@ class Model:
         probability = self.model.predict_proba(features_array)
         return (prediction.tolist()[0], probability.tolist()[0][1])
 
+# TODO: move this in separate file
+class Patient:
+    def __init__(self, data):
+        self.id = generate_unique_id()
+        # patient data
+
+# TODO: move this in separate file
 class GlobalInfo:
     models = dict()
+    patients = dict()
 
     def add_model(self, model_name, scaler_name, is_initial = False):
         # TODO: add exception on model's addition fail
