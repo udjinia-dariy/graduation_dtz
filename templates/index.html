@@ -744,6 +744,7 @@
         let patients = [];
         let currentPatientId = null;
         let isNewPatient = false;
+        let predictionModels = [];
 
         // DOM elements
         const patientList = document.getElementById('patientList');
@@ -768,6 +769,7 @@
         const API_BASE_URL = window.location.origin;
         const PREDICT_ENDPOINT = '/api/predict_ml';
         const TEST_ENDPOINT = '/api/predict';
+        const MODELS_ENDPIONT = '/api/models';
 
         // Initialize the application
         async function initApp() {
@@ -778,6 +780,8 @@
             
             // Load patients from localStorage
             loadPatientsFromStorage();
+
+            loadModelsFromStorage();
             
             setupEventListeners();
             
@@ -811,6 +815,22 @@
                 }
             } catch (error) {
                 serverStatus.innerHTML = '<span style="color: orange;">⚠️ ML Backend Server: Offline</span>';
+                console.error('API connection error:', error);
+            }
+        }
+
+        async function loadModelsFromStorage() {
+            try {
+                const response = await fetch(MODELS_ENDPIONT, {
+                    method: 'GET',
+                });
+                
+                if (response.ok) {
+                    console.log('MODELS DATA:', await response.json())
+                } else {
+                    console.error('MODELS ERROR response:', await response)
+                }
+            } catch (error) {
                 console.error('API connection error:', error);
             }
         }
@@ -1277,6 +1297,7 @@
             
             // Map patient data to API expected format
             const fieldMapping = {
+                'status': 'status',
                 'age_onset': 'age_onset',
                 'heredity': 'heredity',
                 'smoking_status': 'smoking_status',
