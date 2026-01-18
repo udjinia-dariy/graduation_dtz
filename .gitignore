@@ -4,3 +4,5 @@ dtz_venv/*
 __pycache__/
 *.py[codz]
 *$py.class
+
+patient_storage/

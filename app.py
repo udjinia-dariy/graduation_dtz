@@ -18,21 +18,64 @@ def get_available_models():
 def get_all_patients():
     return jsonify(GlobalInfoObj.get_all_patients())
 
-# TODO: should be /api/patient/{id} 
+# Get specific patient
+@app.route('/api/patient/<string:patient_id>', methods=['GET'])
+def get_patient(patient_id):
+    patient = GlobalInfoObj.get_patient(patient_id)
+    if patient:
+        return jsonify(patient.to_dict())
+    return jsonify({'error': 'Patient not found'}), 404
+
+# Add new patient
 @app.route('/api/patient/', methods=['POST'])
 def add_patient():
-    GlobalInfoObj.add_patient(request.json)
-    return jsonify({
-        'status': 'success'
-    })
+    try:
+        patient_data = request.json
+        if not patient_data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        patient = GlobalInfoObj.add_patient(patient_data)
+        if patient:
+            return jsonify({
+                'status': 'success',
+                'patient_id': patient.id,
+                'message': 'Patient added successfully'
+            })
+        return jsonify({'error': 'Failed to add patient'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-# # TODO: should be /api/patient/{id} 
-# @app.route('/api/patient/', methods=['POST'])
-# def edit_patient():
-#     GlobalInfoObj.edit_patient(id, request.json)
-#     return jsonify({
-#         'status': 'success'
-#     })
+# Edit existing patient
+@app.route('/api/patient/<string:patient_id>', methods=['PUT'])
+def edit_patient(patient_id):
+    try:
+        patient_data = request.json
+        if not patient_data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        patient = GlobalInfoObj.edit_patient(patient_id, patient_data)
+        if patient:
+            return jsonify({
+                'status': 'success',
+                'patient_id': patient.id,
+                'message': 'Patient updated successfully'
+            })
+        return jsonify({'error': 'Patient not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Delete patient
+@app.route('/api/patient/<string:patient_id>', methods=['DELETE'])
+def delete_patient(patient_id):
+    try:
+        if GlobalInfoObj.delete_patient(patient_id):
+            return jsonify({
+                'status': 'success',
+                'message': 'Patient deleted successfully'
+            })
+        return jsonify({'error': 'Patient not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/predict_ml', methods=['POST'])
 def predict_ml():
@@ -61,8 +104,7 @@ if __name__ == '__main__':
     # TODO: separate this info in special file with model description
     GlobalInfoObj.add_model('xgboost_model', 'scaler')
     GlobalInfoObj.add_model('random_forest_model', 'scaler')
-    GlobalInfoObj.add_model('init_random_forest_model', 'init_scaler', is_initial = True)
+    GlobalInfoObj.add_model('init_random_forest_model', 'init_scaler', is_initial=True)
 
     # Run the server
     app.run(host='0.0.0.0', port=5000, debug=True)
-
