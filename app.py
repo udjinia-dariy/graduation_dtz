@@ -38,9 +38,10 @@ if __name__ == '__main__':
     if not os.path.exists('models'):
         os.makedirs('models')
 
+    # TODO: separate this info in special file with model description
     GlobalInfoObj.add_model('xgboost_model', 'scaler')
     GlobalInfoObj.add_model('random_forest_model', 'scaler')
-    GlobalInfoObj.add_model('initial_data_random_forest_model', 'initial_data_scaler', is_initial = True)
+    GlobalInfoObj.add_model('init_random_forest_model', 'init_scaler', is_initial = True)
 
     # Run the server
     app.run(host='0.0.0.0', port=5000, debug=True)

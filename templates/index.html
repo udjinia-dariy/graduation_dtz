@@ -972,6 +972,10 @@
                 modelOption.className = 'model-option';
                 
                 const isDisabled = model.type === "follow-up" && !patient.has_followup;
+
+                const isSelectedByDefault = () => {
+                    return selectedModel === null && index === 0 || selectedModel === model.name 
+                }
                 
                 modelOption.innerHTML = `
                     <input type="radio" 
@@ -979,7 +983,7 @@
                            name="predictionModel" 
                            value="${model.name}" 
                            class="model-radio" 
-                           ${index === 0 ? 'checked' : ''}
+                           ${isSelectedByDefault() ? 'checked' : ''}
                            ${isDisabled ? 'disabled' : ''}>
                     <label for="${modelId}" class="model-label ${isDisabled ? 'model-disabled' : ''}">
                         <div class="model-name">${model.name.replace(/_/g, ' ').toUpperCase()}</div>
@@ -1002,7 +1006,7 @@
                 });
                 
                 // Set default selection
-                if (index === 0) {
+                if (isSelectedByDefault()) {
                     selectedModel = model.name;
                 }
             });
