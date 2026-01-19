@@ -33,7 +33,6 @@ def add_patient():
         patient_data = request.json
         if not patient_data:
             return jsonify({'error': 'No data provided'}), 400
-        
         patient = GlobalInfoObj.add_patient(patient_data)
         if patient:
             return jsonify({
@@ -49,7 +48,7 @@ def add_patient():
 @app.route('/api/patient/<string:patient_id>', methods=['PUT'])
 def edit_patient(patient_id):
     try:
-        patient_data = request.json
+        patient_data = request.json['patient_data']
         if not patient_data:
             return jsonify({'error': 'No data provided'}), 400
         
