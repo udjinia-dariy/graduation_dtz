@@ -1255,9 +1255,6 @@
                     <div class="patient-age">Age at onset: ${ageOnset}</div>
                     <div class="${statusClass}" style="margin-top: 5px; font-size: 0.8rem;">${statusText}</div>
                     <div class="patient-actions">
-                        <button class="btn btn-small btn-primary edit-patient-btn" data-id="${patient.id}">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
                         <button class="btn btn-small btn-danger delete-patient-btn" data-id="${patient.id}">
                             <i class="fas fa-trash"></i> Delete
                         </button>
@@ -1270,19 +1267,11 @@
             // Add click event listeners to patient items
             document.querySelectorAll('.patient-item').forEach(item => {
                 item.addEventListener('click', (e) => {
-                    // Don't trigger selection if clicking on edit/delete buttons
-                    if (e.target.closest('.edit-patient-btn') || e.target.closest('.delete-patient-btn')) {
+                    // Don't trigger selection if clicking on delete buttons
+                    if (e.target.closest('.delete-patient-btn')) {
                         return;
                     }
                     selectPatient(item.dataset.id);
-                });
-            });
-            
-            // Add event listeners to edit buttons
-            document.querySelectorAll('.edit-patient-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    selectPatient(btn.dataset.id);
                 });
             });
             
@@ -1806,7 +1795,7 @@
                         let status;
                         let statusColor;
                         
-                        if (value === null) {
+                        if (value === null || value === -1) {
                             displayValue = '<em style="color: #666;">Unknown</em>';
                             status = 'Unknown';
                             statusColor = '#666';
