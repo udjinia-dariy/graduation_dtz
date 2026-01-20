@@ -1,5 +1,6 @@
 from prelude import *
 import json
+import shap
 from datetime import datetime
 import uuid
 
@@ -96,21 +97,22 @@ def generate_unique_id():
 
 
 class Model:
-    def __init__(self, model_name, scaler_name, is_initial):
+    def __init__(self, model_name, scaler_name, is_initial, is_tree):
         self.model_name = model_name
         self.scaler_name = scaler_name
         # If models only for inital_cases - it works withanother set of params
         self.all_features_names = INITIAL_FEASTURES_NAMES if is_initial else ALL_FEATURE_NAMES
-        self.is_initial = is_initial
-        self._load()
+        self._load(is_tree)
 
     def _gen_paths(self, base='models'):
         # Think about extensions
         return (os.path.join(base, self.model_name + '.pkl'), os.path.join(base, self.scaler_name + '.pkl'))
 
-    def _load(self):
+    # TODO: is_tree must be in another place
+    def _load(self, is_tree):
         (model_path, scaler_path) = self._gen_paths() 
         self.model, self.scaler = load_ml_model(model_path, scaler_path)
+        self.explainer = shap.TreeExplainer(self.model) if is_tree else None
 
     def get_type(self):
         return 'init' if self.is_initial else 'follow-up'
@@ -133,7 +135,38 @@ class Model:
         # Make prediction
         prediction = self.model.predict(features_array)
         probability = self.model.predict_proba(features_array)
-        return (prediction.tolist()[0], probability.tolist()[0][1])
+        if self.explainer == None:
+            return {
+                'prediction': prediction.tolist()[0],
+                'probability': probability.tolist()[0][1],
+            }
+        shap_values = self.explainer.shap_values(features_array)
+
+        print("SHAP_VALUES", shap_values)
+
+        # Prepare explanation
+        explanation = {}
+        for i, feature in enumerate(self.all_features_names):
+            explanation[feature] = {
+                'value': float(features_array[0][i]),
+                'shap_effect': float(shap_values[1][0][i]) if isinstance(shap_values, list) else float(shap_values[0][i]),
+                'scaled_importance': float(abs(shap_values[1][0][i])) if isinstance(shap_values, list) else float(abs(shap_values[0][i]))
+            }
+    
+        
+        # Sort features by absolute impact
+        sorted_features = sorted(
+            explanation.items(), 
+            key=lambda x: abs(x[1]['shap_effect']), 
+            reverse=True
+        )
+        
+        return {
+            'prediction': prediction.tolist()[0],
+            'probability': probability.tolist()[0][1],
+            'feature_contributions': dict(sorted_features),
+            'base_value': float(self.explainer.expected_value[1] if isinstance(self.explainer.expected_value, list) else self.explainer.expected_value)
+        }
 
 
 class Patient:
@@ -232,9 +265,9 @@ class GlobalInfo:
     def __init__(self):
         self.patient_storage = PatientStorage()
     
-    def add_model(self, model_name, scaler_name, is_initial=False):
+    def add_model(self, model_name, scaler_name, is_initial=False, is_tree=False):
         # TODO: add exception on model's addition fail
-        self.models[model_name] = Model(model_name, scaler_name, is_initial)
+        self.models[model_name] = Model(model_name, scaler_name, is_initial, is_tree)
     
     def get_model(self, model_name):
         return self.models.get(model_name)

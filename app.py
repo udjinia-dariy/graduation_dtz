@@ -85,13 +85,15 @@ def predict_ml():
     # GlobalInfoObj.get_model('random_forest_model').predict(data)
  
     # Надо добавить проверку - какой моделью должна проверяться фигня
-    prediction, probability = GlobalInfoObj.get_model(data['model_name']).predict(data)
+    res = GlobalInfoObj.get_model(data['model_name']).predict(data)
 
     print("Prediction result:", prediction, probability)
 
     return jsonify({
-        'prediction': prediction,
-        'probability': probability,
+        'prediction': res['prediction'],
+        'probability': res['probability'],
+        'feature_contributions': res['feature_contributions'],
+        'base_value': res['base_value'],
         'status': 'success'
     })
 
@@ -105,12 +107,12 @@ if __name__ == '__main__':
 
     # TODO: separate this info in special file with model description
     GlobalInfoObj.add_model('xgboost_model', 'scaler')
-    GlobalInfoObj.add_model('random_forest_model', 'scaler')
-    GlobalInfoObj.add_model('init_random_forest_model', 'init_scaler', is_initial=True)
+    GlobalInfoObj.add_model('random_forest_model', 'scaler', is_tree=True)
+    GlobalInfoObj.add_model('init_random_forest_model', 'init_scaler', is_initial=True, is_tree=True)
 
-    print_explanation('xgboost_model')
-    print_explanation('random_forest_model')
-    print_explanation('init_random_forest_model')
+    # print_explanation('xgboost_model')
+    # print_explanation('random_forest_model')
+    # print_explanation('init_random_forest_model')
 
     # Run the server
     app.run(host='0.0.0.0', port=5000, debug=True)
