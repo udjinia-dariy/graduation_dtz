@@ -95,6 +95,9 @@ def predict_ml():
         'status': 'success'
     })
 
+def print_explanation(name):
+    print("Explanation for ", name, GlobalInfoObj.get_model(name).explain_features())
+
 if __name__ == '__main__':
     # Create models directory if it doesn't exist
     if not os.path.exists('models'):
@@ -104,6 +107,10 @@ if __name__ == '__main__':
     GlobalInfoObj.add_model('xgboost_model', 'scaler')
     GlobalInfoObj.add_model('random_forest_model', 'scaler')
     GlobalInfoObj.add_model('init_random_forest_model', 'init_scaler', is_initial=True)
+
+    print_explanation('xgboost_model')
+    print_explanation('random_forest_model')
+    print_explanation('init_random_forest_model')
 
     # Run the server
     app.run(host='0.0.0.0', port=5000, debug=True)

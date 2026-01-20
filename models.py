@@ -115,6 +115,16 @@ class Model:
     def get_type(self):
         return 'init' if self.is_initial else 'follow-up'
 
+    def explain_features(self):
+        if hasattr(self.model, 'feature_importances_'):
+            return True, dict(zip(self.all_features_names, self.model.feature_importances_))
+        else:
+            importances = np.mean([
+                est.feature_importances_ 
+                for est in self.model.estimators_
+            ], axis=0)
+            return False, dict(zip(self.all_features_names, importances))
+
     def predict(self, data):
         # Maybe extract_features should be done outside of this method
         # TODO: sign about architecture problems - one parametr in two places
