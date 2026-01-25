@@ -1,5 +1,5 @@
 from prelude import *
-from models import GlobalInfo, Model
+from global_info import GlobalInfo
 
 app = Flask(__name__, static_folder='static')
 
@@ -87,13 +87,13 @@ def predict_ml():
     # Надо добавить проверку - какой моделью должна проверяться фигня
     res = GlobalInfoObj.get_model(data['model_name']).predict(data)
 
-    print("Prediction result:", prediction, probability)
+    print("Prediction result:", res['prediction'], res['probability'])
 
     return jsonify({
         'prediction': res['prediction'],
         'probability': res['probability'],
-        'feature_contributions': res['feature_contributions'],
-        'base_value': res['base_value'],
+        # 'feature_contributions': res['feature_contributions'],
+        # 'base_value': res['base_value'],
         'status': 'success'
     })
 
