@@ -65,35 +65,44 @@ def load_ml_model(model_path, scaler_path):
         print(f"Error loading model: {str(e)}")
         return None, None
 
-def extract_features(data, features_names_list):
-    return [
-        data.get(name, -1) 
-        for name in features_names_list
-    ]
+def extract_features(data, features_names_list, fill_type=np.nan):
+    features = []
+    for name in features_names_list:
+        value = data.get(name)
+        if value is None or value == "":
+            features.append(fill_type)
+        else:
+            features.append(value)
+    return features
 
-def prepare_features(features, scaler, features_names_list):
+def prepare_features(features, scaler, features_names_list, fill_none=False):
     # Create DataFrame with proper column names
     features_df = pd.DataFrame([features], columns=features_names_list)
 
-    print(f"DataFrame shape: {features_df.shape}")
+    if fill_none:
+        # if nesseccary to fill None by hands
+        numerical_cols_names = filter_array(NUM_COLS, features_names_list)
+        # Convert to numpy array for prediction
+        if scaler is not None:
+            # Scale only numerical columns
+            features_df[numerical_cols_names] = scaler.transform(features_df[numerical_cols_names])
+            print(f"Scaled numerical columns: {numerical_cols_names}")
 
-    numerical_cols_names = filter_array(NUM_COLS, features_names_list)
-    # Convert to numpy array for prediction
-    if scaler is not None:
-        # Scale only numerical columns
-        features_df[numerical_cols_names] = scaler.transform(features_df[numerical_cols_names])
-        print(f"Scaled numerical columns: {numerical_cols_names}")
+        # Convert to numpy array for prediction
+        return features_df.values
 
-    # Convert to numpy array for prediction
-    return features_df.values
+    # if None processing already in processor - do nothing else
+    return scaler.transform(features_df)
+
 
 class Model:
-    def __init__(self, model_name, scaler_name, is_initial, is_tree):
+    def __init__(self, model_name, scaler_name, is_initial, is_tree, should_manualy_fill_none):
         self.model_name = model_name
         self.scaler_name = scaler_name
         # If models only for inital_cases - it works withanother set of params
         self.is_initial = is_initial
         self.all_features_names = INITIAL_FEASTURES_NAMES if is_initial else ALL_FEATURE_NAMES
+        self.should_manualy_fill_none = should_manualy_fill_none
         self._load(is_tree)
 
     def _gen_paths(self, base='models'):
@@ -156,7 +165,7 @@ class Model:
         }
 
     def predict(self, data):
-        features_array = prepare_features(extract_features(data, self.all_features_names), self.scaler, self.all_features_names)
+        features_array = prepare_features(extract_features(data, self.all_features_names), self.scaler, self.all_features_names, self.should_manualy_fill_none)
 
         # Make prediction
         prediction = self.model.predict(features_array)

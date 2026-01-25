@@ -700,10 +700,14 @@
                                         </div>
                                     </div>
                                     <div class="form-col">
-                                        <label for="us1_nodules">Initial number of nodules</label>
-                                        <input type="number" id="us1_nodules" name="us1_nodules" min="0" step="1">
+                                        <label for="us1_nodules">Is presented of nodules</label>
+                                        <select id="us1_nodules" name="us1_nodules">
+                                            <option value="" disabled selected hidden>Select nodules</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="us1_nodules_unknown" name="us1_nodules_unknown">
+                                            <input type="checkbox" id="us1_nodules" name="us1_nodules_unknown">
                                             <label for="us1_nodules_unknown">Unknown</label>
                                         </div>
                                     </div>
@@ -846,10 +850,14 @@
                                 </div>
                                 <div class="form-row">
                                     <div class="form-col">
-                                        <label for="us3_nodules">Number of nodules after 1.5 years</label>
-                                        <input type="number" id="us3_nodules" name="us3_nodules" min="0" step="1">
+                                        <label for="us3_nodules">Is presented of nodules</label>
+                                        <select id="us3_nodules" name="us3_nodules">
+                                            <option value="" disabled selected hidden>Select nodules</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="us3_nodules_unknown" name="us3_nodules_unknown">
+                                            <input type="checkbox" id="us3_nodules" name="us3_nodules_unknown">
                                             <label for="us3_nodules_unknown">Unknown</label>
                                         </div>
                                     </div>
@@ -1721,9 +1729,7 @@
                 let value = patient[patientField];
                 
                 // Convert null/undefined to -1 (as expected by backend)
-                if (value === null || value === undefined || value === '') {
-                    value = -1;
-                } else if (typeof value === 'string') {
+                if (typeof value === 'string') {
                     // Try to parse numeric strings
                     const num = parseFloat(value);
                     value = isNaN(num) ? value : num;
@@ -1755,7 +1761,10 @@
                     body: JSON.stringify(apiData)
                 });
                 
-                const result = await response.json();
+                const tempText = await response.text();
+                const validJson = tempText
+                    .replace(/NaN/g, 'null');
+                const result = JSON.parse(validJson);
                 
                 if (result.status === 'success') {
                     const prediction = result.prediction;
@@ -1772,7 +1781,7 @@
                         'smoking_status': 'Smoking Status',
                         'sex': 'Sex',
                         'us1_thyroid_volume': 'US1 Thyroid Volume',
-                        'us1_nodules': 'US1 Nodules Count',
+                        'us1_nodules': 'US1 Nodules',
                         'us1_nodules_cm': 'US1 Nodule Size',
                         'tsh_1': 'TSH Level 1',
                         'ft4_1': 'FT4 Level 1',
@@ -1783,7 +1792,7 @@
                         'treatment_type': 'Treatment Type',
                         'tsh_3': 'TSH Level 3',
                         'us3_thyroid_volume': 'US3 Thyroid Volume',
-                        'us3_nodules': 'US3 Nodules Count',
+                        'us3_nodules': 'US3 Nodules',
                         'us3_nodules_cm': 'US3 Nodule Size'
                     };
                     
@@ -1810,7 +1819,7 @@
                             // Special formatting for some fields
                             if (key === 'sex') {
                                 displayValue = value === 1 ? 'Male' : 'Female';
-                            } else if (key === 'heredity' || key === 'smoking_status' || 
+                            } else if (key === 'heredity' || key === 'smoking_status' || key === 'us1_nodules' || key === 'us3_nodules' || 
                                       key === 'exophthalmos' || key === 'thyrotoxic_cardiomyopathy') {
                                 displayValue = value === 1 ? 'Yes' : 'No';
                             } else if (key === 'treatment_type') {

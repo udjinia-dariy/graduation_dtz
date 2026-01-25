@@ -8,9 +8,9 @@ class GlobalInfo:
     def __init__(self):
         self.patient_storage = PatientStorage()
     
-    def add_model(self, model_name, scaler_name, is_initial=False, is_tree=False):
+    def add_model(self, model_name, scaler_name, is_initial=False, is_tree=False, should_manualy_fill_none=False):
         # TODO: add exception on model's addition fail
-        self.models[model_name] = Model(model_name, scaler_name, is_initial, is_tree)
+        self.models[model_name] = Model(model_name, scaler_name, is_initial, is_tree, should_manualy_fill_none)
     
     def get_model(self, model_name):
         return self.models.get(model_name)
