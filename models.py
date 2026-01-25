@@ -134,9 +134,6 @@ class Model:
                 'value': float(features_array[0, i]),
                 'shap_effect': shap_effect,
                 'scaled_importance': float(abs(shap_effect)),
-                # Optional: show both classes
-                'shap_class_0': float(shap_values[0, i, 0]),
-                'shap_class_1': float(shap_values[0, i, 1])
             }
         
         # Sort by absolute impact on positive class

@@ -1760,8 +1760,9 @@
                 if (result.status === 'success') {
                     const prediction = result.prediction;
                     const probability = (result.probability * 100).toFixed(1);
-
-                    // TODO: here will be each parameter influence in case where it exist
+                    
+                    // Check if feature contributions exist in the response
+                    const featureContributions = result.feature_contributions;
                     let featureRowsHTML = '';
 
                     // Add feature rows
@@ -1794,6 +1795,8 @@
                         let displayValue;
                         let status;
                         let statusColor;
+                        let importanceDisplay = 'N/A';
+                        let importanceColor = '#666';
                         
                         if (value === null || value === -1) {
                             displayValue = '<em style="color: #666;">Unknown</em>';
@@ -1814,6 +1817,32 @@
                                 displayValue = `Type ${value}`;
                             }
                         }
+                        
+                        // Check if we have feature importance data
+                        if (featureContributions && featureContributions[key]) {
+                            const scaledImportance = featureContributions[key].scaled_importance;
+                            const shapEffect = featureContributions[key].shap_effect;
+                            
+                            // Format the importance as percentage
+                            const importancePercent = (scaledImportance * 100).toFixed(2);
+                            
+                            // Determine color based on importance magnitude
+                            if (scaledImportance > 0.05) {
+                                importanceColor = '#d32f2f'; // Red for high importance
+                            } else if (scaledImportance > 0.01) {
+                                importanceColor = '#f57c00'; // Orange for medium importance
+                            } else {
+                                importanceColor = '#388e3c'; // Green for low importance
+                            }
+                            
+                            // Create tooltip with SHAP effect information
+                            const tooltip = `SHAP effect: ${shapEffect.toFixed(4)}`;
+                            importanceDisplay = `
+                                <span title="${tooltip}" style="cursor: help; color: ${importanceColor}; font-weight: bold;">
+                                    ${importancePercent}%
+                                </span>
+                            `;
+                        }
 
                         featureRowsHTML += `
                             <tr>
@@ -1822,9 +1851,13 @@
                                 <td style="padding: 6px; text-align: center; color: ${statusColor}">
                                     ${status}
                                 </td>
+                                <td style="padding: 6px; text-align: center;">
+                                    ${importanceDisplay}
+                                </td>
                             </tr>
                         `;
                     });
+                    
                     // Store the raw data for viewing
                     window.lastPredictionData = {
                         apiData: apiData,
@@ -1837,9 +1870,35 @@
                         alert(JSON.stringify(window.lastPredictionData, null, 2));
                     };
 
+                    // Add importance summary section
+                    let importanceSummaryHTML = '';
+                    if (featureContributions) {
+                        // Find top 3 most important features
+                        const sortedFeatures = Object.keys(featureContributions)
+                            .map(key => ({
+                                name: featureNames[key] || key,
+                                importance: featureContributions[key].scaled_importance,
+                                shap: featureContributions[key].shap_effect
+                            }))
+                            .sort((a, b) => b.importance - a.importance)
+                            .slice(0, 3);
+                        
+                        if (sortedFeatures.length > 0) {
+                            importanceSummaryHTML = `
+                                <div style="margin-top: 20px; padding: 15px; background-color: #f0f7ff; border-radius: 5px; border-left: 4px solid #3498db;">
+                                    <h5><i class="fas fa-chart-bar"></i> Key Factors Influencing Prediction:</h5>
+                                    <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+                                        ${sortedFeatures.map(feature => `
+                                            <li><strong>${feature.name}:</strong> ${(feature.importance * 100).toFixed(2)}% influence</li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            `;
+                        }
+                    }
+
                     // Display results
                     resultsDiv.innerHTML = `
-                        <h4>ML Model Prediction Results (${selectedModel}):</h4>
                         <div style="background-color: ${prediction == 1 ? '#ffebee' : '#e8f5e9'}; 
                                     padding: 20px; border-radius: 5px; margin: 15px 0;">
                             <div style="font-size: 24px; font-weight: bold; 
@@ -1850,27 +1909,31 @@
                                 <strong>Probability:</strong> ${probability}%
                             </div>
                             <div><strong>Model used:</strong> ${selectedModel}</div>
-                            <div><strong>Interpretation:</strong> ${result.interpretation || 'Based on ML model analysis'}</div>
                         </div>
                         
-                        <h4>Input Summary:</h4>
+                        ${importanceSummaryHTML}
+                        
+                        <h4>Summary:</h4>
                         <div style="max-height: 300px; overflow-y: auto; margin-top: 10px;">
                             <table border="1" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-                                <tr>
-                                    <th style="padding: 8px; background-color: #f2f2f2;">Feature</th>
-                                    <th style="padding: 8px; background-color: #f2f2f2;">Value</th>
-                                    <th style="padding: 8px; background-color: #f2f2f2;">Status</th>
-                                </tr>
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 8px; background-color: #f2f2f2;">Feature</th>
+                                        <th style="padding: 8px; background-color: #f2f2f2; text-align: center;">Value</th>
+                                        <th style="padding: 8px; background-color: #f2f2f2; text-align: center;">Status</th>
+                                        <th style="padding: 8px; background-color: #f2f2f2; text-align: center;">Relative Importance</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     ${featureRowsHTML}
                                 </tbody>
                             </table>
                         </div>
                         <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
-                            <h5>Note about -1 values:</h5>
-                            <p style="font-size: 0.9rem; margin: 0;">
-                                The value -1 is used by the ML model to represent unknown/missing data.
-                                This allows the model to make predictions even when some information is not available.
+                            <p style="font-size: 0.9rem; margin-top: 5px;">
+                                <strong>Feature Importance:</strong> Shows how much each feature contributed to the prediction.
+                                Higher percentages indicate greater influence on the model's decision.
+                                Hover over percentages to see SHAP effect values.
                             </p>
                         </div>
                     `;
