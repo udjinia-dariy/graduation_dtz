@@ -81,21 +81,14 @@ def predict_ml():
     # Get and process data
     data = request.json
 
-    # Should validate data here first (or maybe in model)
-    # GlobalInfoObj.get_model('random_forest_model').predict(data)
- 
-    # Надо добавить проверку - какой моделью должна проверяться фигня
+    # Should validate data here first
     res = GlobalInfoObj.get_model(data['model_name']).predict(data)
 
     print("Prediction result:", res['prediction'], res['probability'])
 
-    return jsonify({
-        'prediction': res['prediction'],
-        'probability': res['probability'],
-        # 'feature_contributions': res['feature_contributions'],
-        # 'base_value': res['base_value'],
-        'status': 'success'
-    })
+    response = dict(res)
+    response['status'] = 'success'
+    return jsonify(response)
 
 def print_explanation(name):
     print("Explanation for ", name, GlobalInfoObj.get_model(name).explain_features())

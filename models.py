@@ -119,44 +119,63 @@ class Model:
             ], axis=0)
             return False, dict(zip(self.all_features_names, importances))
 
+    def _explane(self, features_array):
+        shap_values = self.explainer.shap_values(features_array)
+        
+        # shap_values[0, i, 0] = contribution to class 0
+        # shap_values[0, i, 1] = contribution to class 1
+        
+        explanation = {}
+        for i, feature in enumerate(self.all_features_names):
+            # Use positive class contributions (class 1)
+            shap_effect = float(shap_values[0, i, 1])
+            
+            explanation[feature] = {
+                'value': float(features_array[0, i]),
+                'shap_effect': shap_effect,
+                'scaled_importance': float(abs(shap_effect)),
+                # Optional: show both classes
+                'shap_class_0': float(shap_values[0, i, 0]),
+                'shap_class_1': float(shap_values[0, i, 1])
+            }
+        
+        # Sort by absolute impact on positive class
+        sorted_features = sorted(
+            explanation.items(), 
+            key=lambda x: abs(x[1]['shap_effect']), 
+            reverse=True
+        )
+        
+        # Get base value
+        base_value = 0.0
+        if hasattr(self.explainer, 'expected_value'):
+            ev = self.explainer.expected_value
+            if isinstance(ev, np.ndarray) and ev.shape == (2,):
+                base_value = float(ev[1])  # Positive class base value
+
+        return {
+            'sorted_features': sorted_features,
+            'base_value': base_value
+        }
+
     def predict(self, data):
-        # Maybe extract_features should be done outside of this method
-        # TODO: sign about architecture problems - one parametr in two places
         features_array = prepare_features(extract_features(data, self.all_features_names), self.scaler, self.all_features_names)
 
         # Make prediction
         prediction = self.model.predict(features_array)
         probability = self.model.predict_proba(features_array)
-        # if self.explainer == None:
-        #     return {
-        #         'prediction': prediction.tolist()[0],
-        #         'probability': probability.tolist()[0][1],
-        #     }
-        # shap_values = self.explainer.shap_values(features_array)
-        #
-        # print("SHAP_VALUES", shap_values)
-        #
-        # # Prepare explanation
-        # explanation = {}
-        # for i, feature in enumerate(self.all_features_names):
-        #     explanation[feature] = {
-        #         'value': float(features_array[0][i]),
-        #         'shap_effect': float(shap_values[1][0][i]) if isinstance(shap_values, list) else float(shap_values[0][i]),
-        #         'scaled_importance': float(abs(shap_values[1][0][i])) if isinstance(shap_values, list) else float(abs(shap_values[0][i]))
-        #     }
-        #
-        #
-        # # Sort features by absolute impact
-        # sorted_features = sorted(
-        #     explanation.items(), 
-        #     key=lambda x: abs(x[1]['shap_effect']), 
-        #     reverse=True
-        # )
-        
+
+        if self.explainer is None:
+            return {
+                'prediction': prediction.tolist()[0],
+                'probability': probability.tolist()[0][1],
+            }
+
+        explanation = self._explane(features_array)
         return {
             'prediction': prediction.tolist()[0],
             'probability': probability.tolist()[0][1],
-            # 'feature_contributions': dict(sorted_features),
-            # 'base_value': float(self.explainer.expected_value[1] if isinstance(self.explainer.expected_value, list) else self.explainer.expected_value)
+            'feature_contributions': dict(explanation['sorted_features']),
+            'base_value': explanation['base_value'],
         }
 
