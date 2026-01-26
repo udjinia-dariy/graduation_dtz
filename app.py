@@ -95,11 +95,10 @@ if __name__ == '__main__':
     if not os.path.exists('models'):
         os.makedirs('models')
 
-    # TODO: separate this info in special file with model description
-    GlobalInfoObj.add_model('xgboost_model', 'scaler', should_manualy_fill_none=True)
-    GlobalInfoObj.add_model('random_forest_model', 'scaler', is_tree=True, should_manualy_fill_none=True)
-    GlobalInfoObj.add_model('init_random_forest_model', 'init_scaler', is_initial=True, is_tree=True, should_manualy_fill_none=True)
-    GlobalInfoObj.add_model('filled_random_forest_model', 'filled_preprocessor', is_tree=True)
+    # # TODO: separate this info in special file with model description
+    # GlobalInfoObj.add_model('xgboost_model', 'scaler', should_manualy_fill_none=True)
+    # GlobalInfoObj.add_model('random_forest_model', 'scaler', is_tree=True, should_manualy_fill_none=True)
+    # GlobalInfoObj.add_model('filled_random_forest_model', 'filled_preprocessor', is_tree=True)
 
     # Run the server
     app.run(host='0.0.0.0', port=5000, debug=True)

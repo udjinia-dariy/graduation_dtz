@@ -96,13 +96,15 @@ def prepare_features(features, scaler, features_names_list, fill_none=False):
 
 
 class Model:
-    def __init__(self, model_name, scaler_name, is_initial, is_tree, should_manualy_fill_none):
+    def __init__(self, model_name, scaler_name, is_initial, is_tree, should_manualy_fill_none, display_name="NoName", description="No description"):
         self.model_name = model_name
         self.scaler_name = scaler_name
         # If models only for inital_cases - it works withanother set of params
         self.is_initial = is_initial
         self.all_features_names = INITIAL_FEASTURES_NAMES if is_initial else ALL_FEATURE_NAMES
         self.should_manualy_fill_none = should_manualy_fill_none
+        self.description = description
+        self.display_name = display_name if display_name != "NoName" else model_name
         self._load(is_tree)
 
     def _gen_paths(self, base='models'):
@@ -115,8 +117,12 @@ class Model:
         self.model, self.scaler = load_ml_model(model_path, scaler_path)
         self.explainer = shap.TreeExplainer(self.model) if is_tree else None
 
-    def get_type(self):
-        return 'init' if self.is_initial else 'follow-up'
+    def get_info(self):
+        return {
+            'display_name': self.display_name,
+            'description': self.description,
+            'type': 'init' if self.is_initial else 'follow-up',
+        }
 
     def explain_features(self):
         if hasattr(self.model, 'feature_importances_'):
@@ -128,7 +134,7 @@ class Model:
             ], axis=0)
             return False, dict(zip(self.all_features_names, importances))
 
-    def _explane(self, features_array):
+    def _explain(self, features_array):
         shap_values = self.explainer.shap_values(features_array)
         
         # shap_values[0, i, 0] = contribution to class 0
@@ -177,7 +183,7 @@ class Model:
                 'probability': probability.tolist()[0][1],
             }
 
-        explanation = self._explane(features_array)
+        explanation = self._explain(features_array)
         return {
             'prediction': prediction.tolist()[0],
             'probability': probability.tolist()[0][1],
@@ -185,3 +191,48 @@ class Model:
             'base_value': explanation['base_value'],
         }
 
+class ModelsStorage:
+    def __init__(self, config_path):
+        self.config_path = config_path
+        self.models = {}
+        self._load_config()
+    
+    def _load_config(self):
+        try:
+            with open(self.config_path, 'r') as f:
+                config = json.load(f)
+            
+            for model_config in config.get('models', []):
+                self.add_model(
+                    model_name=model_config['model_filename'],
+                    scaler_name=model_config['scaler_filename'],
+                    is_initial=model_config.get('is_initial', False),
+                    is_tree=model_config.get('is_tree', True),
+                    should_manualy_fill_none=model_config.get('should_manualy_fill_none', False),
+                    display_name=model_config.get('display_name', 'NoName'),
+                    description=model_config.get('description', 'No desc'),
+                )
+        except FileNotFoundError:
+            print(f"Config file {self.config_path} not found")
+        except Exception as e:
+            print(f"Error loading config: {str(e)}")
+    
+    def add_model(self, model_name, scaler_name, is_initial=False, is_tree=True, should_manualy_fill_none=False, display_name=None, description=None):
+        try:
+            model = Model(model_name, scaler_name, is_initial, is_tree, should_manualy_fill_none, display_name, description)
+            if model.model is not None:
+                self.models[model_name] = model
+                return True
+        except Exception as e:
+            print(f"Error adding model {model_name}: {str(e)}")
+        return False
+    
+    def get_model(self, model_name):
+        return self.models.get(model_name)
+    
+    def get_all_models(self):
+        return self.models
+    
+    def get_all_models_info(self):
+        return [{'name': name, 'info': model.get_info()} 
+                for name, model in self.models.items()]

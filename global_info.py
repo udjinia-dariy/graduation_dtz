@@ -1,23 +1,19 @@
-from models import Model
+from models import ModelsStorage
 from patients import PatientStorage, Patient
 
 class GlobalInfo:
-    models = dict()
+    models_storage = None
     patient_storage = None
     
-    def __init__(self):
+    def __init__(self, config_path='models/models_config.json'):
+        self.models_storage = ModelsStorage(config_path)
         self.patient_storage = PatientStorage()
     
-    def add_model(self, model_name, scaler_name, is_initial=False, is_tree=False, should_manualy_fill_none=False):
-        # TODO: add exception on model's addition fail
-        self.models[model_name] = Model(model_name, scaler_name, is_initial, is_tree, should_manualy_fill_none)
-    
     def get_model(self, model_name):
-        return self.models.get(model_name)
-
+        return self.models_storage.get_model(model_name)
+    
     def get_all_models_info(self):
-        return [{'name': model_name, 'type': model.get_type()} 
-                for model_name, model in self.models.items()]
+        return self.models_storage.get_all_models_info()
     
     def get_all_patients(self):
         return self.patient_storage.get_all_patients()

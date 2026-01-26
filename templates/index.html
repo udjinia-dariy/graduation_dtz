@@ -931,6 +931,7 @@
         let isNewPatient = false;
         let predictionModels = [];
         let selectedModel = null;
+        let availableModels = [];
 
         // DOM elements
         const patientList = document.getElementById('patientList');
@@ -1122,11 +1123,11 @@
             }
             
             // Filter models based on patient status
-            const availableModels = predictionModels.filter(model => {
-                if (model.type === "init") {
+            availableModels = predictionModels.filter(model => {
+                if (model.info.type === "init") {
                     // Initial models require only initial data
                     return true;
-                } else if (model.type === "follow-up") {
+                } else if (model.info.type === "follow-up") {
                     // Follow-up models require follow-up data
                     // Check if patient has follow-up data
                     const hasFollowupData = patient.treatment_type !== null || 
@@ -1152,14 +1153,14 @@
                 modelOption.className = 'model-option';
                 
                 // Check if model should be disabled
-                const isDisabled = model.type === "follow-up" && 
+                const isDisabled = model.info.type === "follow-up" && 
                                  !(patient.treatment_type !== null || 
                                    patient.tsh_3 !== null ||
                                    patient.us3_thyroid_volume !== null);
 
                 // Check if this model should be selected by default
-                const isSelectedByDefault = () => {
-                    return (selectedModel === null && index === 0) || selectedModel === model.name;
+                const isSelected = () => {
+                    return selectedModel === model.name;
                 };
                 
                 modelOption.innerHTML = `
@@ -1168,13 +1169,16 @@
                            name="predictionModel" 
                            value="${model.name}" 
                            class="model-radio" 
-                           ${isSelectedByDefault() ? 'checked' : ''}
+                           ${isSelected() ? 'checked' : ''}
                            ${isDisabled ? 'disabled' : ''}>
                     <label for="${modelId}" class="model-label ${isDisabled ? 'model-disabled' : ''}">
-                        <div class="model-name">${model.name.replace(/_/g, ' ').toUpperCase()}</div>
-                        <div class="model-type ${model.type === 'init' ? 'init' : 'follow-up'}">${model.type.toUpperCase()} MODEL</div>
+                        <div class="model-name">${model.info.display_name.replace(/_/g, ' ').toUpperCase()}</div>
+                        <div class="model-type ${model.info.type === 'init' ? 'init' : 'follow-up'}">${model.info.type.toUpperCase()} MODEL</div>
                         <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
-                            ${model.type === "init" ? "Requires initial data only" : "Requires follow-up data"}
+                            ${model.info.type === "init" ? "Requires initial data only" : "Requires follow-up data"}
+                        </div>
+                        <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
+                            ${model.info.description}
                         </div>
                     </label>
                 `;
@@ -1191,7 +1195,7 @@
                 });
                 
                 // Set default selection
-                if (isSelectedByDefault() && !isDisabled) {
+                if (isSelected() && !isDisabled) {
                     selectedModel = model.name;
                 }
             });
@@ -1748,7 +1752,7 @@
             resultsDiv.innerHTML = `
                 <div style="text-align: center; padding: 20px;">
                     <div class="spinner"></div>
-                    <p style="margin-top: 10px;">Calculating recurrence risk with ${selectedModel}...</p>
+                    <p style="margin-top: 10px;">Calculating recurrence risk with ${availableModels.find(el => el.name === selectedModel)?.info.display_name}...</p>
                 </div>
             `;
             
@@ -1917,7 +1921,7 @@
                             <div style="font-size: 18px; margin-bottom: 10px;">
                                 <strong>Probability:</strong> ${probability}%
                             </div>
-                            <div><strong>Model used:</strong> ${selectedModel}</div>
+                            <div><strong>Model used:</strong> ${availableModels.find(el => el.name === selectedModel)?.info.display_name}</div>
                         </div>
                         
                         ${importanceSummaryHTML}

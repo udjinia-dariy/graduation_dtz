@@ -1,0 +1,34 @@
+{
+  "models": [
+    {
+      "id": "filled_random_forest",
+      "display_name": "Random forest",
+      "description": "Predicts risks based on random forest model",
+      "model_filename": "filled_random_forest_model",
+      "scaler_filename": "filled_preprocessor",
+      "is_initial": false,
+      "is_tree": true,
+      "should_manualy_fill_none": false
+    },
+    {
+      "id": "random_forest",
+      "display_name": "Random forest 2",
+      "description": "Predicts risks based on random forest model but little worse",
+      "model_filename": "random_forest_model",
+      "scaler_filename": "scaler",
+      "is_initial": false,
+      "is_tree": true,
+      "should_manualy_fill_none": true
+    },
+    {
+      "id": "xgboost",
+      "display_name": "Xgboost",
+      "description": "Xgboost based model with None for misses",
+      "model_filename": "xgboost_model",
+      "scaler_filename": "scaler",
+      "is_initial": false,
+      "is_tree": false,
+      "should_manualy_fill_none": true
+    }
+  ]
+}
