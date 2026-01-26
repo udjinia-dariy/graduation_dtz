@@ -266,16 +266,23 @@
         }
 
         .unknown-checkbox {
+            cursor: pointer;
             display: flex;
             align-items: center;
             margin-top: 8px;
         }
 
         .unknown-checkbox label {
+            cursor: pointer;
             margin-bottom: 0;
             font-weight: normal;
             font-size: 0.9rem;
             color: #666;
+        }
+
+        .unknown-checkbox input {
+            cursor: pointer;
+            width: 10%;
         }
 
         .tab-container {
@@ -667,8 +674,8 @@
                                             <option value="0">No</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="heredity_unknown" name="heredity_unknown">
                                             <label for="heredity_unknown">Unknown</label>
+                                            <input type="checkbox" id="heredity_unknown" name="heredity_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
@@ -679,8 +686,8 @@
                                             <option value="0">No</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="smoking_status_unknown" name="smoking_status_unknown">
                                             <label for="smoking_status_unknown">Unknown</label>
+                                            <input type="checkbox" id="smoking_status_unknown" name="smoking_status_unknown">
                                         </div>
                                     </div>
                                 </div>
@@ -695,8 +702,8 @@
                                         <label for="us1_thyroid_volume">Initial thyroid volume (cm³)</label>
                                         <input type="number" id="us1_thyroid_volume" name="us1_thyroid_volume" step="0.1" min="0">
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="us1_thyroid_volume_unknown" name="us1_thyroid_volume_unknown">
                                             <label for="us1_thyroid_volume_unknown">Unknown</label>
+                                            <input type="checkbox" id="us1_thyroid_volume_unknown" name="us1_thyroid_volume_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
@@ -707,8 +714,8 @@
                                             <option value="0">No</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="us1_nodules" name="us1_nodules_unknown">
                                             <label for="us1_nodules_unknown">Unknown</label>
+                                            <input type="checkbox" id="us1_nodules_unknown" name="us1_nodules_unknown">
                                         </div>
                                     </div>
                                 </div>
@@ -717,8 +724,8 @@
                                         <label for="us1_nodules_cm">Initial nodule size (cm)</label>
                                         <input type="number" id="us1_nodules_cm" name="us1_nodules_cm" step="0.1" min="0">
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="us1_nodules_cm_unknown" name="us1_nodules_cm_unknown">
                                             <label for="us1_nodules_cm_unknown">Unknown</label>
+                                            <input type="checkbox" id="us1_nodules_cm_unknown" name="us1_nodules_cm_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
@@ -729,8 +736,8 @@
                                             <option value="0">No</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="exophthalmos_unknown" name="exophthalmos_unknown">
                                             <label for="exophthalmos_unknown">Unknown</label>
+                                            <input type="checkbox" id="exophthalmos_unknown" name="exophthalmos_unknown">
                                         </div>
                                     </div>
                                 </div>
@@ -745,16 +752,16 @@
                                         <label for="tsh_1">Initial TSH</label>
                                         <input type="number" id="tsh_1" name="tsh_1" step="0.01" min="0">
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="tsh_1_unknown" name="tsh_1_unknown">
                                             <label for="tsh_1_unknown">Unknown</label>
+                                            <input type="checkbox" id="tsh_1_unknown" name="tsh_1_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
                                         <label for="ft4_1">Initial free T4</label>
                                         <input type="number" id="ft4_1" name="ft4_1" step="0.01" min="0">
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="ft4_1_unknown" name="ft4_1_unknown">
                                             <label for="ft4_1_unknown">Unknown</label>
+                                            <input type="checkbox" id="ft4_1_unknown" name="ft4_1_unknown">
                                         </div>
                                     </div>
                                 </div>
@@ -763,16 +770,16 @@
                                         <label for="ft3_1">Initial free T3</label>
                                         <input type="number" id="ft3_1" name="ft3_1" step="0.01" min="0">
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="ft3_1_unknown" name="ft3_1_unknown">
                                             <label for="ft3_1_unknown">Unknown</label>
+                                            <input type="checkbox" id="ft3_1_unknown" name="ft3_1_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
                                         <label for="ft3_to_ft4_ratio">Initial free T3/T4 ratio</label>
                                         <input type="number" id="ft3_to_ft4_ratio" name="ft3_to_ft4_ratio" step="0.01" min="0">
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="ft3_to_ft4_ratio_unknown" name="ft3_to_ft4_ratio_unknown">
                                             <label for="ft3_to_ft4_ratio_unknown">Unknown</label>
+                                            <input type="checkbox" id="ft3_to_ft4_ratio_unknown" name="ft3_to_ft4_ratio_unknown">
                                         </div>
                                     </div>
                                 </div>
@@ -805,22 +812,21 @@
                                             <option value="0">No</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="thyrotoxic_cardiomyopathy_unknown" name="thyrotoxic_cardiomyopathy_unknown">
                                             <label for="thyrotoxic_cardiomyopathy_unknown">Unknown</label>
+                                            <input type="checkbox" id="thyrotoxic_cardiomyopathy_unknown" name="thyrotoxic_cardiomyopathy_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
                                         <label for="treatment_type">Treatment type</label>
                                         <select id="treatment_type" name="treatment_type">
                                             <option value="" disabled selected hidden>Select option</option>
-                                            <option value="0">Type 0</option>
-                                            <option value="1">Type 1</option>
-                                            <option value="2">Type 2</option>
-                                            <option value="3">Type 3</option>
+                                            <option value="0">Thyroxine</option>
+                                            <option value="1">Mercazolil</option>
+                                            <option value="2">Combined</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="treatment_type_unknown" name="treatment_type_unknown">
                                             <label for="treatment_type_unknown">Unknown</label>
+                                            <input type="checkbox" id="treatment_type_unknown" name="treatment_type_unknown">
                                         </div>
                                     </div>
                                 </div>
@@ -835,16 +841,16 @@
                                         <label for="tsh_3">TSH after 1.5 years / before discontinuation</label>
                                         <input type="number" id="tsh_3" name="tsh_3" step="0.01" min="0">
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="tsh_3_unknown" name="tsh_3_unknown">
                                             <label for="tsh_3_unknown">Unknown</label>
+                                            <input type="checkbox" id="tsh_3_unknown" name="tsh_3_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
                                         <label for="us3_thyroid_volume">Thyroid volume after 1.5 years (cm³)</label>
                                         <input type="number" id="us3_thyroid_volume" name="us3_thyroid_volume" step="0.1" min="0">
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="us3_thyroid_volume_unknown" name="us3_thyroid_volume_unknown">
                                             <label for="us3_thyroid_volume_unknown">Unknown</label>
+                                            <input type="checkbox" id="us3_thyroid_volume_unknown" name="us3_thyroid_volume_unknown">
                                         </div>
                                     </div>
                                 </div>
@@ -857,16 +863,16 @@
                                             <option value="0">No</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="us3_nodules" name="us3_nodules_unknown">
                                             <label for="us3_nodules_unknown">Unknown</label>
+                                            <input type="checkbox" id="us3_nodules" name="us3_nodules_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
                                         <label for="us3_nodules_cm">Nodule size after 1.5 years (cm)</label>
                                         <input type="number" id="us3_nodules_cm" name="us3_nodules_cm" step="0.1" min="0">
                                         <div class="unknown-checkbox">
-                                            <input type="checkbox" id="us3_nodules_cm_unknown" name="us3_nodules_cm_unknown">
                                             <label for="us3_nodules_cm_unknown">Unknown</label>
+                                            <input type="checkbox" id="us3_nodules_cm_unknown" name="us3_nodules_cm_unknown">
                                         </div>
                                     </div>
                                 </div>
@@ -1331,20 +1337,6 @@
             
             // Populate initial form
             populateForm(initialForm, patient);
-            
-            // Populate follow-up form if data exists
-            if (hasFollowupData) {
-                populateForm(readmissionForm, patient);
-                // Enable follow-up tab
-                document.querySelector('.tab[data-tab="readmission"]').classList.add('active');
-                document.getElementById('readmission-tab').classList.add('active');
-            } else {
-                // Disable follow-up tab
-                document.querySelector('.tab[data-tab="readmission"]').classList.remove('active');
-                document.getElementById('readmission-tab').classList.remove('active');
-                // Switch to initial tab
-                switchTab('initial');
-            }
             
             // Update model selection based on patient status
             renderModelSelection();
