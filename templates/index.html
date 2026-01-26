@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thyroid Disease Patient Management System</title>
+    <title>Система управления пациентами с заболеваниями щитовидной железы</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Existing CSS remains unchanged */
@@ -83,7 +83,7 @@
 
         .content {
             flex: 3;
-            min-width: 700px;
+            min-width: 1000px;
             background-color: white;
             border-radius: var(--border-radius);
             padding: 25px;
@@ -581,81 +581,81 @@
             <div class="logo">
                 <i class="fas fa-stethoscope"></i>
                 <div>
-                    <h1>Thyroid Disease Patient Management</h1>
-                    <p>For medical professionals only</p>
+                    <h1>Управление пациентами с заболеваниями щитовидной железы</h1>
+                    <p>Только для медицинских специалистов</p>
                 </div>
             </div>
             <div class="user-info">
-                <i class="fas fa-user-md"></i> Doctor Dashboard
+                <i class="fas fa-user-md"></i> Панель врача
             </div>
         </header>
 
         <div class="server-status">
-            <div id="serverStatus">Checking server status...</div>
+            <div id="serverStatus">Проверка состояния сервера...</div>
             <button class="btn btn-primary" onclick="testAPI()" style="padding: 5px 10px; font-size: 0.9rem;">
-                <i class="fas fa-plug"></i> Test API Connection
+                <i class="fas fa-plug"></i> Проверить подключение к API
             </button>
         </div>
 
         <div class="main-content">
-            <!-- Sidebar with patient list -->
+            <!-- Боковая панель со списком пациентов -->
             <div class="sidebar">
                 <h2 class="section-title">
-                    <i class="fas fa-users"></i> Patients
+                    <i class="fas fa-users"></i> Пациенты
                 </h2>
                 <div class="patient-list" id="patientList">
-                    <!-- Patient list will be populated by JavaScript -->
+                    <!-- Список пациентов будет заполнен JavaScript -->
                 </div>
                 <button class="btn btn-accent btn-block" id="addPatientBtn">
-                    <i class="fas fa-user-plus"></i> Add New Patient
+                    <i class="fas fa-user-plus"></i> Добавить нового пациента
                 </button>
             </div>
 
-            <!-- Main content area -->
+            <!-- Основная область контента -->
             <div class="content">
                 <div class="patient-header" id="patientHeader">
                     <div>
-                        <h2 class="patient-name" id="patientName">Select a patient or add new</h2>
-                        <div class="patient-status" id="patientStatus">No patient selected</div>
+                        <h2 class="patient-name" id="patientName">Выберите пациента или добавьте нового</h2>
+                        <div class="patient-status" id="patientStatus">Пациент не выбран</div>
                     </div>
                     <div id="patientActions" style="display: none;">
                         <button class="btn btn-primary" id="addReadmissionBtn">
-                            <i class="fas fa-calendar-plus"></i> Add Follow-up Data (1.5 years)
+                            <i class="fas fa-calendar-plus"></i> Добавить данные наблюдения (1.5 года)
                         </button>
                     </div>
                 </div>
 
                 <div class="tab-container">
                     <div class="tabs">
-                        <div class="tab active" data-tab="initial">Initial Appointment</div>
-                        <div class="tab" data-tab="readmission">Follow-up Data</div>
-                        <div class="tab" data-tab="results">Recurrence Risk</div>
+                        <div class="tab active" data-tab="initial">Первичный приём</div>
+                        <div class="tab" data-tab="readmission">Данные наблюдения</div>
+                        <div class="tab" data-tab="results">Риск рецидива</div>
                     </div>
 
-                    <!-- Initial Appointment Tab -->
+                    <!-- Вкладка первичного приёма -->
                     <div class="tab-content active" id="initial-tab">
                         <form id="initialForm">
                             <div class="form-section">
                                 <h3 class="section-title">
-                                    <i class="fas fa-user-circle"></i> Patient Information
+                                    <i class="fas fa-user-circle"></i> Информация о пациенте
                                 </h3>
                                 <div class="form-row">
                                     <div class="form-col">
-                                        <label for="patient_name" class="required-field">Patient Name</label>
-                                        <input type="text" id="patient_name" name="patient_name" placeholder="Enter patient name" required>
+                                        <label for="patient_name" class="required-field">Имя пациента</label>
+                                        <input type="text" id="patient_name" name="patient_name" placeholder="Введите имя пациента" required>
                                     </div>
                                     <div class="form-col">
-                                        <label for="age_onset" class="required-field">Age at disease onset</label>
+                                        <label for="age_onset" class="required-field">Возраст при начале заболевания</label>
                                         <input type="number" id="age_onset" name="age_onset" min="0" max="120" required>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-col">
-                                        <label for="sex" class="required-field">Sex</label>
+                                        <label for="sex" class="required-field">Пол</label>
                                         <select id="sex" name="sex" required>
-                                            <option value="" disabled selected hidden>Select sex</option>
-                                            <option value="1">Male</option>
-                                            <option value="0">Female</option>
+                                            <option value="" disabled selected hidden>Выберите пол</option>
+                                            <option value="1">Мужской</option>
+                                            <option value="0">Женский</option>
                                         </select>
                                     </div>
                                 </div>
@@ -663,30 +663,30 @@
 
                             <div class="form-section">
                                 <h3 class="section-title">
-                                    <i class="fas fa-dna"></i> Heredity & Lifestyle
+                                    <i class="fas fa-dna"></i> Наследственность и образ жизни
                                 </h3>
                                 <div class="form-row">
                                     <div class="form-col">
-                                        <label for="heredity">Family history of thyroid disease</label>
+                                        <label for="heredity">Наследственная предрасположенность</label>
                                         <select id="heredity" name="heredity">
-                                            <option value="" disabled selected hidden>Select heredity</option>
-                                            <option value="1">Yes</option>
-                                            <option value="0">No</option>
+                                            <option value="" disabled selected hidden>Выберите вариант</option>
+                                            <option value="1">Да</option>
+                                            <option value="0">Нет</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <label for="heredity_unknown">Unknown</label>
+                                            <label for="heredity_unknown">Неизвестно</label>
                                             <input type="checkbox" id="heredity_unknown" name="heredity_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
-                                        <label for="smoking_status">Smoking status</label>
+                                        <label for="smoking_status">Курение</label>
                                         <select id="smoking_status" name="smoking_status">
-                                            <option value="" disabled selected hidden>Select smoking status</option>
-                                            <option value="1">Yes</option>
-                                            <option value="0">No</option>
+                                            <option value="" disabled selected hidden>Выберите вариант</option>
+                                            <option value="1">Да</option>
+                                            <option value="0">Нет</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <label for="smoking_status_unknown">Unknown</label>
+                                            <label for="smoking_status_unknown">Неизвестно</label>
                                             <input type="checkbox" id="smoking_status_unknown" name="smoking_status_unknown">
                                         </div>
                                     </div>
@@ -695,48 +695,48 @@
 
                             <div class="form-section">
                                 <h3 class="section-title">
-                                    <i class="fas fa-procedures"></i> Initial Examination
+                                    <i class="fas fa-procedures"></i> Первичное обследование
                                 </h3>
                                 <div class="form-row">
                                     <div class="form-col">
-                                        <label for="us1_thyroid_volume">Initial thyroid volume (cm³)</label>
+                                        <label for="us1_thyroid_volume">Первичный объём щитовидной железы (см³)</label>
                                         <input type="number" id="us1_thyroid_volume" name="us1_thyroid_volume" step="0.1" min="0">
                                         <div class="unknown-checkbox">
-                                            <label for="us1_thyroid_volume_unknown">Unknown</label>
+                                            <label for="us1_thyroid_volume_unknown">Неизвестно</label>
                                             <input type="checkbox" id="us1_thyroid_volume_unknown" name="us1_thyroid_volume_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
-                                        <label for="us1_nodules">Is presented of nodules</label>
+                                        <label for="us1_nodules">Наличие узлов</label>
                                         <select id="us1_nodules" name="us1_nodules">
-                                            <option value="" disabled selected hidden>Select nodules</option>
-                                            <option value="1">Yes</option>
-                                            <option value="0">No</option>
+                                            <option value="" disabled selected hidden>Выберите вариант</option>
+                                            <option value="1">Да</option>
+                                            <option value="0">Нет</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <label for="us1_nodules_unknown">Unknown</label>
+                                            <label for="us1_nodules_unknown">Неизвестно</label>
                                             <input type="checkbox" id="us1_nodules_unknown" name="us1_nodules_unknown">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-col">
-                                        <label for="us1_nodules_cm">Initial nodule size (cm)</label>
+                                        <label for="us1_nodules_cm">Первичный размер узлов (см)</label>
                                         <input type="number" id="us1_nodules_cm" name="us1_nodules_cm" step="0.1" min="0">
                                         <div class="unknown-checkbox">
-                                            <label for="us1_nodules_cm_unknown">Unknown</label>
+                                            <label for="us1_nodules_cm_unknown">Неизвестно</label>
                                             <input type="checkbox" id="us1_nodules_cm_unknown" name="us1_nodules_cm_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
-                                        <label for="exophthalmos">Exophthalmos</label>
+                                        <label for="exophthalmos">Экзофтальм</label>
                                         <select id="exophthalmos" name="exophthalmos">
-                                            <option value="" disabled selected hidden>Select option</option>
-                                            <option value="1">Yes</option>
-                                            <option value="0">No</option>
+                                            <option value="" disabled selected hidden>Выберите вариант</option>
+                                            <option value="1">Да</option>
+                                            <option value="0">Нет</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <label for="exophthalmos_unknown">Unknown</label>
+                                            <label for="exophthalmos_unknown">Неизвестно</label>
                                             <input type="checkbox" id="exophthalmos_unknown" name="exophthalmos_unknown">
                                         </div>
                                     </div>
@@ -745,40 +745,40 @@
 
                             <div class="form-section">
                                 <h3 class="section-title">
-                                    <i class="fas fa-vial"></i> Initial Lab Results
+                                    <i class="fas fa-vial"></i> Первичные результаты анализов
                                 </h3>
                                 <div class="form-row">
                                     <div class="form-col">
-                                        <label for="tsh_1">Initial TSH</label>
+                                        <label for="tsh_1">Первичный ТТГ</label>
                                         <input type="number" id="tsh_1" name="tsh_1" step="0.01" min="0">
                                         <div class="unknown-checkbox">
-                                            <label for="tsh_1_unknown">Unknown</label>
+                                            <label for="tsh_1_unknown">Неизвестно</label>
                                             <input type="checkbox" id="tsh_1_unknown" name="tsh_1_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
-                                        <label for="ft4_1">Initial free T4</label>
+                                        <label for="ft4_1">Первичный свободный Т4</label>
                                         <input type="number" id="ft4_1" name="ft4_1" step="0.01" min="0">
                                         <div class="unknown-checkbox">
-                                            <label for="ft4_1_unknown">Unknown</label>
+                                            <label for="ft4_1_unknown">Неизвестно</label>
                                             <input type="checkbox" id="ft4_1_unknown" name="ft4_1_unknown">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-col">
-                                        <label for="ft3_1">Initial free T3</label>
+                                        <label for="ft3_1">Первичный свободный Т3</label>
                                         <input type="number" id="ft3_1" name="ft3_1" step="0.01" min="0">
                                         <div class="unknown-checkbox">
-                                            <label for="ft3_1_unknown">Unknown</label>
+                                            <label for="ft3_1_unknown">Неизвестно</label>
                                             <input type="checkbox" id="ft3_1_unknown" name="ft3_1_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
-                                        <label for="ft3_to_ft4_ratio">Initial free T3/T4 ratio</label>
+                                        <label for="ft3_to_ft4_ratio">Первичное соотношение свободного Т3/Т4</label>
                                         <input type="number" id="ft3_to_ft4_ratio" name="ft3_to_ft4_ratio" step="0.01" min="0">
                                         <div class="unknown-checkbox">
-                                            <label for="ft3_to_ft4_ratio_unknown">Unknown</label>
+                                            <label for="ft3_to_ft4_ratio_unknown">Неизвестно</label>
                                             <input type="checkbox" id="ft3_to_ft4_ratio_unknown" name="ft3_to_ft4_ratio_unknown">
                                         </div>
                                     </div>
@@ -787,45 +787,45 @@
 
                             <div class="action-buttons">
                                 <button type="button" class="btn btn-primary" id="saveInitialBtn">
-                                    <i class="fas fa-save"></i> Save Initial Data
+                                    <i class="fas fa-save"></i> Сохранить первичные данные
                                 </button>
                                 <button type="button" class="btn btn-danger" id="deletePatientBtn" style="display: none;">
-                                    <i class="fas fa-trash"></i> Delete Patient
+                                    <i class="fas fa-trash"></i> Удалить пациента
                                 </button>
                             </div>
                         </form>
                     </div>
 
-                    <!-- Follow-up Tab -->
+                    <!-- Вкладка наблюдения -->
                     <div class="tab-content" id="readmission-tab">
                         <form id="readmissionForm">
                             <div class="form-section">
                                 <h3 class="section-title">
-                                    <i class="fas fa-heartbeat"></i> Clinical Status After 1.5 Years
+                                    <i class="fas fa-heartbeat"></i> Клиническое состояние через 1.5 года
                                 </h3>
                                 <div class="form-row">
                                     <div class="form-col">
-                                        <label for="thyrotoxic_cardiomyopathy">Thyrotoxic cardiomyopathy</label>
+                                        <label for="thyrotoxic_cardiomyopathy">Тиреотоксическая кардиомиопатия</label>
                                         <select id="thyrotoxic_cardiomyopathy" name="thyrotoxic_cardiomyopathy">
-                                            <option value="" disabled selected hidden>Select option</option>
-                                            <option value="1">Yes</option>
-                                            <option value="0">No</option>
+                                            <option value="" disabled selected hidden>Выберите вариант</option>
+                                            <option value="1">Да</option>
+                                            <option value="0">Нет</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <label for="thyrotoxic_cardiomyopathy_unknown">Unknown</label>
+                                            <label for="thyrotoxic_cardiomyopathy_unknown">Неизвестно</label>
                                             <input type="checkbox" id="thyrotoxic_cardiomyopathy_unknown" name="thyrotoxic_cardiomyopathy_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
-                                        <label for="treatment_type">Treatment type</label>
+                                        <label for="treatment_type">Тип лечения</label>
                                         <select id="treatment_type" name="treatment_type">
-                                            <option value="" disabled selected hidden>Select option</option>
-                                            <option value="0">Thyroxine</option>
-                                            <option value="1">Mercazolil</option>
-                                            <option value="2">Combined</option>
+                                            <option value="" disabled selected hidden>Выберите вариант</option>
+                                            <option value="0">Тироксин</option>
+                                            <option value="1">Мерказолил</option>
+                                            <option value="2">Комбинированное</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <label for="treatment_type_unknown">Unknown</label>
+                                            <label for="treatment_type_unknown">Неизвестно</label>
                                             <input type="checkbox" id="treatment_type_unknown" name="treatment_type_unknown">
                                         </div>
                                     </div>
@@ -834,44 +834,44 @@
 
                             <div class="form-section">
                                 <h3 class="section-title">
-                                    <i class="fas fa-stethoscope"></i> Follow-up Examination
+                                    <i class="fas fa-stethoscope"></i> Обследование при наблюдении
                                 </h3>
                                 <div class="form-row">
                                     <div class="form-col">
-                                        <label for="tsh_3">TSH after 1.5 years / before discontinuation</label>
+                                        <label for="tsh_3">ТТГ через 1.5 года / до отмены</label>
                                         <input type="number" id="tsh_3" name="tsh_3" step="0.01" min="0">
                                         <div class="unknown-checkbox">
-                                            <label for="tsh_3_unknown">Unknown</label>
+                                            <label for="tsh_3_unknown">Неизвестно</label>
                                             <input type="checkbox" id="tsh_3_unknown" name="tsh_3_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
-                                        <label for="us3_thyroid_volume">Thyroid volume after 1.5 years (cm³)</label>
+                                        <label for="us3_thyroid_volume">Объём щитовидной железы через 1.5 года (см³)</label>
                                         <input type="number" id="us3_thyroid_volume" name="us3_thyroid_volume" step="0.1" min="0">
                                         <div class="unknown-checkbox">
-                                            <label for="us3_thyroid_volume_unknown">Unknown</label>
+                                            <label for="us3_thyroid_volume_unknown">Неизвестно</label>
                                             <input type="checkbox" id="us3_thyroid_volume_unknown" name="us3_thyroid_volume_unknown">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-col">
-                                        <label for="us3_nodules">Is presented of nodules</label>
+                                        <label for="us3_nodules">Наличие узлов</label>
                                         <select id="us3_nodules" name="us3_nodules">
-                                            <option value="" disabled selected hidden>Select nodules</option>
-                                            <option value="1">Yes</option>
-                                            <option value="0">No</option>
+                                            <option value="" disabled selected hidden>Выберите вариант</option>
+                                            <option value="1">Да</option>
+                                            <option value="0">Нет</option>
                                         </select>
                                         <div class="unknown-checkbox">
-                                            <label for="us3_nodules_unknown">Unknown</label>
+                                            <label for="us3_nodules_unknown">Неизвестно</label>
                                             <input type="checkbox" id="us3_nodules" name="us3_nodules_unknown">
                                         </div>
                                     </div>
                                     <div class="form-col">
-                                        <label for="us3_nodules_cm">Nodule size after 1.5 years (cm)</label>
+                                        <label for="us3_nodules_cm">Размер узлов через 1.5 года (см)</label>
                                         <input type="number" id="us3_nodules_cm" name="us3_nodules_cm" step="0.1" min="0">
                                         <div class="unknown-checkbox">
-                                            <label for="us3_nodules_cm_unknown">Unknown</label>
+                                            <label for="us3_nodules_cm_unknown">Неизвестно</label>
                                             <input type="checkbox" id="us3_nodules_cm_unknown" name="us3_nodules_cm_unknown">
                                         </div>
                                     </div>
@@ -880,43 +880,43 @@
 
                             <div class="action-buttons">
                                 <button type="button" class="btn btn-primary" id="saveReadmissionBtn">
-                                    <i class="fas fa-save"></i> Save Follow-up Data
+                                    <i class="fas fa-save"></i> Сохранить данные наблюдения
                                 </button>
                             </div>
                         </form>
                     </div>
 
-                    <!-- Results Tab -->
+                    <!-- Вкладка результатов -->
                     <div class="tab-content" id="results-tab">
                         <div class="results-container">
                             <h3 class="section-title">
-                                <i class="fas fa-chart-line"></i> Recurrence Risk Assessment
+                                <i class="fas fa-chart-line"></i> Оценка риска рецидива
                             </h3>
-                            <p>This assessment calculates the risk of disease recurrence based on patient data collected during initial and follow-up visits.</p>
+                            <p>Эта оценка рассчитывает риск рецидива заболевания на основе данных пациента, собранных во время первичного и последующих визитов.</p>
                             
-                            <!-- Model Selection Section -->
+                            <!-- Раздел выбора модели -->
                             <div class="model-selection" id="modelSelectionSection" style="display: none;">
-                                <h4>Select Prediction Model</h4>
-                                <p>Choose the appropriate model based on available patient data:</p>
+                                <h4>Выберите модель прогнозирования</h4>
+                                <p>Выберите подходящую модель на основе доступных данных пациента:</p>
                                 <div class="model-options" id="modelOptions">
-                                    <!-- Model options will be populated by JavaScript -->
+                                    <!-- Варианты моделей будут заполнены JavaScript -->
                                 </div>
                             </div>
                             
                             <div id="calculationResults">
                                 <div class="empty-state">
                                     <i class="fas fa-calculator"></i>
-                                    <h3>No calculation performed yet</h3>
-                                    <p>Fill in patient data and click "Calculate Recurrence Risk" to see results.</p>
+                                    <h3>Расчёт ещё не выполнен</h3>
+                                    <p>Заполните данные пациента и нажмите "Рассчитать риск рецидива" для просмотра результатов.</p>
                                 </div>
                             </div>
                             
                             <div class="action-buttons">
                                 <button class="btn btn-accent" id="calculateRiskBtn">
-                                    <i class="fas fa-calculator"></i> Calculate Recurrence Risk
+                                    <i class="fas fa-calculator"></i> Рассчитать риск рецидива
                                 </button>
                                 <button class="btn btn-primary" id="viewRawDataBtn" style="display: none;">
-                                    <i class="fas fa-code"></i> View Raw Data
+                                    <i class="fas fa-code"></i> Просмотреть исходные данные
                                 </button>
                             </div>
                         </div>
@@ -926,7 +926,7 @@
         </div>
 
         <footer>
-            <p>Thyroid Disease Patient Management System &copy; 2023 | Connected to ML Backend API</p>
+            <p>Система управления пациентами с заболеваниями щитовидной железы &copy; 2023 | Подключено к ML Backend API</p>
         </footer>
     </div>
 
@@ -970,7 +970,7 @@
 
         // Initialize the application
         async function initApp() {
-            showMessage('Loading application...', 'info');
+            showMessage('Загрузка приложения...', 'info');
             
             // Check API connection
             await checkAPIStatus();
@@ -990,13 +990,13 @@
             // Initialize all unknown checkboxes
             initializeUnknownCheckboxes();
             
-            showMessage('Application ready', 'success');
+            showMessage('Приложение готово', 'success');
         }
 
         // Check API connection status
         async function checkAPIStatus() {
             try {
-                serverStatus.innerHTML = '<span style="color: #666;">Checking server connection...</span>';
+                serverStatus.innerHTML = '<span style="color: #666;">Проверка подключения к серверу...</span>';
                 
                 // Test by fetching models endpoint
                 const response = await fetch(MODELS_ENDPOINT, {
@@ -1004,12 +1004,12 @@
                 });
                 
                 if (response.ok) {
-                    serverStatus.innerHTML = '<span style="color: green;">✅ Backend Server: Running</span>';
+                    serverStatus.innerHTML = '<span style="color: green;">✅ Серверная часть: Работает</span>';
                 } else {
-                    serverStatus.innerHTML = '<span style="color: red;">❌ Backend Server: Error</span>';
+                    serverStatus.innerHTML = '<span style="color: red;">❌ Серверная часть: Ошибка</span>';
                 }
             } catch (error) {
-                serverStatus.innerHTML = '<span style="color: orange;">⚠️ Backend Server: Offline</span>';
+                serverStatus.innerHTML = '<span style="color: orange;">⚠️ Серверная часть: Не в сети</span>';
                 console.error('API connection error:', error);
             }
         }
@@ -1179,9 +1179,9 @@
                            ${isDisabled ? 'disabled' : ''}>
                     <label for="${modelId}" class="model-label ${isDisabled ? 'model-disabled' : ''}">
                         <div class="model-name">${model.info.display_name.replace(/_/g, ' ').toUpperCase()}</div>
-                        <div class="model-type ${model.info.type === 'init' ? 'init' : 'follow-up'}">${model.info.type.toUpperCase()} MODEL</div>
+                        <div class="model-type ${model.info.type === 'init' ? 'init' : 'follow-up'}">${model.info.type.toUpperCase()} МОДЕЛЬ</div>
                         <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
-                            ${model.info.type === "init" ? "Requires initial data only" : "Requires follow-up data"}
+                            ${model.info.type === "init" ? "Требуются только первичные данные" : "Требуются данные наблюдения"}
                         </div>
                         <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
                             ${model.info.description}
@@ -1212,28 +1212,28 @@
         // Test API endpoint
         async function testAPI() {
             try {
-                serverStatus.innerHTML = '<div class="spinner"></div> Testing API...';
+                serverStatus.innerHTML = '<div class="spinner"></div> Тестирование API...';
                 
                 // Test multiple endpoints
                 const modelsResponse = await fetch(MODELS_ENDPOINT);
                 const patientsResponse = await fetch(PATIENTS_ENDPOINT);
                 
                 if (modelsResponse.ok && patientsResponse.ok) {
-                    showMessage('API Test Successful: All endpoints working', 'success');
-                    serverStatus.innerHTML = '<span style="color: green;">✅ Backend Server: Running</span>';
+                    showMessage('Тест API успешен: все конечные точки работают', 'success');
+                    serverStatus.innerHTML = '<span style="color: green;">✅ Серверная часть: Работает</span>';
                     
                     // Reload data after successful test
                     await loadPredictionModels();
                     await loadPatientsFromBackend();
                     
                 } else {
-                    showMessage('API Test Failed: Some endpoints not responding', 'error');
-                    serverStatus.innerHTML = '<span style="color: red;">❌ Backend Server: Connection Failed</span>';
+                    showMessage('Тест API не удался: некоторые конечные точки не отвечают', 'error');
+                    serverStatus.innerHTML = '<span style="color: red;">❌ Серверная часть: Подключение не удалось</span>';
                 }
                 
             } catch (error) {
-                showMessage(`API Test Failed: ${error.message}`, 'error');
-                serverStatus.innerHTML = '<span style="color: red;">❌ Backend Server: Connection Failed</span>';
+                showMessage(`Тест API не удался: ${error.message}`, 'error');
+                serverStatus.innerHTML = '<span style="color: red;">❌ Серверная часть: Подключение не удалось</span>';
             }
         }
 
@@ -1245,7 +1245,7 @@
                 patientList.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-users"></i>
-                        <p>No patients found</p>
+                        <p>Пациенты не найдены</p>
                     </div>
                 `;
                 return;
@@ -1261,20 +1261,20 @@
                                        patient.tsh_3 !== null ||
                                        patient.us3_thyroid_volume !== null;
                 
-                let statusText = hasFollowupData ? 'Has follow-up data' : 'Initial visit only';
+                let statusText = hasFollowupData ? 'Есть данные наблюдения' : 'Только первичный визит';
                 let statusClass = hasFollowupData ? 'status-followup' : 'status-new';
                 
                 // Extract name from patient data
-                const patientName = patient.patient_name || patient.name || `Patient ${patient.id}`;
-                const ageOnset = patient.age_onset || 'Unknown';
+                const patientName = patient.patient_name || patient.name || `Пациент ${patient.id}`;
+                const ageOnset = patient.age_onset || 'Неизвестно';
                 
                 patientItem.innerHTML = `
                     <div class="patient-id">${patientName}</div>
-                    <div class="patient-age">Age at onset: ${ageOnset}</div>
+                    <div class="patient-age">Возраст начала заболевания: ${ageOnset}</div>
                     <div class="${statusClass}" style="margin-top: 5px; font-size: 0.8rem;">${statusText}</div>
                     <div class="patient-actions">
                         <button class="btn btn-small btn-danger delete-patient-btn" data-id="${patient.id}">
-                            <i class="fas fa-trash"></i> Delete
+                            <i class="fas fa-trash"></i> Удалить
                         </button>
                     </div>
                 `;
@@ -1298,7 +1298,7 @@
                 btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const patientId = btn.dataset.id;
-                    if (confirm('Are you sure you want to delete this patient?')) {
+                    if (confirm('Вы уверены, что хотите удалить этого пациента?')) {
                         await deletePatient(patientId);
                     }
                 });
@@ -1314,7 +1314,7 @@
             if (!patient) return;
             
             // Update patient header
-            const displayName = patient.patient_name || patient.name || `Patient ${patient.id}`;
+            const displayName = patient.patient_name || patient.name || `Пациент ${patient.id}`;
             patientName.textContent = displayName;
             
             // Determine status
@@ -1323,11 +1323,11 @@
                                    patient.us3_thyroid_volume !== null;
             
             if (hasFollowupData) {
-                patientStatus.textContent = 'Has follow-up data';
+                patientStatus.textContent = 'Есть данные наблюдения';
                 patientStatus.className = 'patient-status status-followup';
                 patientActions.style.display = 'none';
             } else {
-                patientStatus.textContent = 'Initial visit only';
+                patientStatus.textContent = 'Только первичный визит';
                 patientStatus.className = 'patient-status status-new';
                 patientActions.style.display = 'block';
             }
@@ -1348,8 +1348,8 @@
             document.getElementById('calculationResults').innerHTML = `
                 <div class="empty-state">
                     <i class="fas fa-calculator"></i>
-                    <h3>No calculation performed yet</h3>
-                    <p>Fill in patient data and click "Calculate Recurrence Risk" to see results.</p>
+                    <h3>Расчёт ещё не выполнен</h3>
+                    <p>Заполните данные пациента и нажмите "Рассчитать риск рецидива" для просмотра результатов.</p>
                 </div>
             `;
             
@@ -1441,8 +1441,8 @@
                     isNewPatient = true;
                     
                     // Update UI
-                    patientName.textContent = 'New Patient';
-                    patientStatus.textContent = 'Initial visit (new)';
+                    patientName.textContent = 'Новый пациент';
+                    patientStatus.textContent = 'Первичный визит (новый)';
                     patientStatus.className = 'patient-status status-new';
                     patientActions.style.display = 'none';
                     deletePatientBtn.style.display = 'inline-flex';
@@ -1466,17 +1466,17 @@
                     // Initialize unknown checkboxes for new form
                     initializeUnknownCheckboxes();
                     
-                    showMessage('New patient created. Please fill in the initial data.', 'success');
+                    showMessage('Новый пациент создан. Пожалуйста, заполните первичные данные.', 'success');
                 }
             } catch (error) {
-                showMessage(`Error creating patient: ${error.message}`, 'error');
+                showMessage(`Ошибка при создании пациента: ${error.message}`, 'error');
             }
         }
 
         // Save initial patient data
         async function saveInitialData() {
             if (!currentPatientId) {
-                showMessage('Please create or select a patient first', 'error');
+                showMessage('Пожалуйста, сначала создайте или выберите пациента', 'error');
                 return;
             }
             
@@ -1498,17 +1498,17 @@
             
             // Ensure we have required fields
             if (!patient.patient_name) {
-                showMessage('Patient name is required', 'error');
+                showMessage('Имя пациента обязательно', 'error');
                 return;
             }
             
             if (!patient.age_onset) {
-                showMessage('Age at onset is required', 'error');
+                showMessage('Возраст при начале заболевания обязателен', 'error');
                 return;
             }
             
             if (patient.sex === null || patient.sex === undefined) {
-                showMessage('Sex is required', 'error');
+                showMessage('Пол обязателен', 'error');
                 return;
             }
             
@@ -1550,21 +1550,21 @@
                     renderModelSelection();
                     
                     // Show success message
-                    showMessage('Patient data saved successfully!', 'success');
+                    showMessage('Данные пациента успешно сохранены!', 'success');
                     
                     // Update UI
                     renderPatientList();
                     selectPatient(patient.id); // Refresh the view
                 }
             } catch (error) {
-                showMessage(`Error saving patient: ${error.message}`, 'error');
+                showMessage(`Ошибка при сохранении пациента: ${error.message}`, 'error');
             }
         }
 
         // Save follow-up data
         async function saveReadmissionData() {
             if (!currentPatientId) {
-                showMessage('Please select a patient first', 'error');
+                showMessage('Пожалуйста, сначала выберите пациента', 'error');
                 return;
             }
             
@@ -1626,7 +1626,7 @@
                     renderModelSelection();
                     
                     // Show success message
-                    showMessage('Follow-up data saved successfully!', 'success');
+                    showMessage('Данные наблюдения успешно сохранены!', 'success');
                     
                     // Update UI
                     renderPatientList();
@@ -1634,7 +1634,7 @@
                     switchTab('readmission');
                 }
             } catch (error) {
-                showMessage(`Error saving follow-up data: ${error.message}`, 'error');
+                showMessage(`Ошибка при сохранении данных наблюдения: ${error.message}`, 'error');
             }
         }
 
@@ -1649,8 +1649,8 @@
                     // If we deleted the current patient, clear the form
                     if (currentPatientId === patientId) {
                         currentPatientId = null;
-                        patientName.textContent = 'Select a patient or add new';
-                        patientStatus.textContent = 'No patient selected';
+                        patientName.textContent = 'Выберите пациента или добавьте нового';
+                        patientStatus.textContent = 'Пациент не выбран';
                         patientStatus.className = 'patient-status';
                         patientActions.style.display = 'none';
                         deletePatientBtn.style.display = 'none';
@@ -1662,17 +1662,17 @@
                     // Update UI
                     renderPatientList();
                     
-                    showMessage('Patient deleted successfully', 'success');
+                    showMessage('Пациент успешно удалён', 'success');
                 }
             } catch (error) {
-                showMessage(`Error deleting patient: ${error.message}`, 'error');
+                showMessage(`Ошибка при удалении пациента: ${error.message}`, 'error');
             }
         }
 
         // Calculate recurrence risk using ML backend
         async function calculateRecurrenceRisk() {
             if (!currentPatientId) {
-                showMessage('Please select a patient first', 'error');
+                showMessage('Пожалуйста, сначала выберите пациента', 'error');
                 return;
             }
             
@@ -1686,13 +1686,13 @@
             );
             
             if (missingFields.length > 0) {
-                showMessage(`Missing required data: ${missingFields.join(', ')}`, 'error');
+                showMessage(`Отсутствуют необходимые данные: ${missingFields.join(', ')}`, 'error');
                 return;
             }
             
             // Check if model is selected
             if (!selectedModel) {
-                showMessage('Please select a prediction model first', 'error');
+                showMessage('Пожалуйста, сначала выберите модель прогнозирования', 'error');
                 return;
             }
             
@@ -1744,7 +1744,7 @@
             resultsDiv.innerHTML = `
                 <div style="text-align: center; padding: 20px;">
                     <div class="spinner"></div>
-                    <p style="margin-top: 10px;">Calculating recurrence risk with ${availableModels.find(el => el.name === selectedModel)?.info.display_name}...</p>
+                    <p style="margin-top: 10px;">Расчёт риска рецидива с помощью ${availableModels.find(el => el.name === selectedModel)?.info.display_name}...</p>
                 </div>
             `;
             
@@ -1772,24 +1772,24 @@
 
                     // Add feature rows
                     const featureNames = {
-                        'age_onset': 'Age at Onset',
-                        'heredity': 'Family History',
-                        'smoking_status': 'Smoking Status',
-                        'sex': 'Sex',
-                        'us1_thyroid_volume': 'US1 Thyroid Volume',
-                        'us1_nodules': 'US1 Nodules',
-                        'us1_nodules_cm': 'US1 Nodule Size',
-                        'tsh_1': 'TSH Level 1',
-                        'ft4_1': 'FT4 Level 1',
-                        'ft3_1': 'FT3 Level 1',
-                        'ft3_to_ft4_ratio': 'FT3/FT4 Ratio',
-                        'exophthalmos': 'Exophthalmos',
-                        'thyrotoxic_cardiomyopathy': 'Thyrotoxic Cardiomyopathy',
-                        'treatment_type': 'Treatment Type',
-                        'tsh_3': 'TSH Level 3',
-                        'us3_thyroid_volume': 'US3 Thyroid Volume',
-                        'us3_nodules': 'US3 Nodules',
-                        'us3_nodules_cm': 'US3 Nodule Size'
+                        'age_onset': 'Возраст при начале',
+                        'heredity': 'Наследственная предрасположенность',
+                        'smoking_status': 'Курение',
+                        'sex': 'Пол',
+                        'us1_thyroid_volume': 'Объём щитовидной железы US1',
+                        'us1_nodules': 'Узлы US1',
+                        'us1_nodules_cm': 'Размер узлов US1',
+                        'tsh_1': 'Уровень ТТГ 1',
+                        'ft4_1': 'Уровень FT4 1',
+                        'ft3_1': 'Уровень FT3 1',
+                        'ft3_to_ft4_ratio': 'Соотношение FT3/FT4',
+                        'exophthalmos': 'Экзофтальм',
+                        'thyrotoxic_cardiomyopathy': 'Тиреотоксическая кардиомиопатия',
+                        'treatment_type': 'Тип лечения',
+                        'tsh_3': 'Уровень ТТГ 3',
+                        'us3_thyroid_volume': 'Объём щитовидной железы US3',
+                        'us3_nodules': 'Узлы US3',
+                        'us3_nodules_cm': 'Размер узлов US3'
                     };
                     
                     Object.keys(apiData).forEach(key => {
@@ -1800,26 +1800,26 @@
                         let displayValue;
                         let status;
                         let statusColor;
-                        let importanceDisplay = 'N/A';
+                        let importanceDisplay = 'Н/Д';
                         let importanceColor = '#666';
                         
                         if (value === null || value === -1) {
-                            displayValue = '<em style="color: #666;">Unknown</em>';
-                            status = 'Unknown';
+                            displayValue = '<em style="color: #666;">Неизвестно</em>';
+                            status = 'Неизвестно';
                             statusColor = '#666';
                         } else {
                             displayValue = value;
-                            status = 'Provided';
+                            status = 'Указано';
                             statusColor = '#388e3c';
                             
                             // Special formatting for some fields
                             if (key === 'sex') {
-                                displayValue = value === 1 ? 'Male' : 'Female';
+                                displayValue = value === 1 ? 'Мужской' : 'Женский';
                             } else if (key === 'heredity' || key === 'smoking_status' || key === 'us1_nodules' || key === 'us3_nodules' || 
                                       key === 'exophthalmos' || key === 'thyrotoxic_cardiomyopathy') {
-                                displayValue = value === 1 ? 'Yes' : 'No';
+                                displayValue = value === 1 ? 'Да' : 'Нет';
                             } else if (key === 'treatment_type') {
-                                displayValue = `Type ${value}`;
+                                displayValue = `Тип ${value}`;
                             }
                         }
                         
@@ -1833,15 +1833,15 @@
                             
                             // Determine color based on importance magnitude
                             if (scaledImportance > 0.05) {
-                                importanceColor = '#d32f2f'; // Red for high importance
+                                importanceColor = '#d32f2f'; // Красный для высокой важности
                             } else if (scaledImportance > 0.01) {
-                                importanceColor = '#f57c00'; // Orange for medium importance
+                                importanceColor = '#f57c00'; // Оранжевый для средней важности
                             } else {
-                                importanceColor = '#388e3c'; // Green for low importance
+                                importanceColor = '#388e3c'; // Зелёный для низкой важности
                             }
                             
                             // Create tooltip with SHAP effect information
-                            const tooltip = `SHAP effect: ${shapEffect.toFixed(4)}`;
+                            const tooltip = `Эффект SHAP: ${shapEffect.toFixed(4)}`;
                             importanceDisplay = `
                                 <span title="${tooltip}" style="cursor: help; color: ${importanceColor}; font-weight: bold;">
                                     ${importancePercent}%
@@ -1891,10 +1891,10 @@
                         if (sortedFeatures.length > 0) {
                             importanceSummaryHTML = `
                                 <div style="margin-top: 20px; padding: 15px; background-color: #f0f7ff; border-radius: 5px; border-left: 4px solid #3498db;">
-                                    <h5><i class="fas fa-chart-bar"></i> Key Factors Influencing Prediction:</h5>
+                                    <h5><i class="fas fa-chart-bar"></i> Ключевые факторы, влияющие на прогноз:</h5>
                                     <ul style="margin: 10px 0 0 0; padding-left: 20px;">
                                         ${sortedFeatures.map(feature => `
-                                            <li><strong>${feature.name}:</strong> ${(feature.importance * 100).toFixed(2)}% influence</li>
+                                            <li><strong>${feature.name}:</strong> ${(feature.importance * 100).toFixed(2)}% влияние</li>
                                         `).join('')}
                                     </ul>
                                 </div>
@@ -1908,25 +1908,25 @@
                                     padding: 20px; border-radius: 5px; margin: 15px 0;">
                             <div style="font-size: 24px; font-weight: bold; 
                                         color: ${prediction == 1 ? '#d32f2f' : '#388e3c'}; margin-bottom: 10px;">
-                                ${prediction == 1 ? 'HIGH RECURRENCE RISK ⚠️' : 'LOW RECURRENCE RISK ✅'}
+                                ${prediction == 1 ? 'ВЫСОКИЙ РИСК РЕЦИДИВА ⚠️' : 'НИЗКИЙ РИСК РЕЦИДИВА ✅'}
                             </div>
                             <div style="font-size: 18px; margin-bottom: 10px;">
-                                <strong>Probability:</strong> ${probability}%
+                                <strong>Вероятность:</strong> ${probability}%
                             </div>
-                            <div><strong>Model used:</strong> ${availableModels.find(el => el.name === selectedModel)?.info.display_name}</div>
+                            <div><strong>Использованная модель:</strong> ${availableModels.find(el => el.name === selectedModel)?.info.display_name}</div>
                         </div>
                         
                         ${importanceSummaryHTML}
                         
-                        <h4>Summary:</h4>
+                        <h4>Сводка:</h4>
                         <div style="max-height: 300px; overflow-y: auto; margin-top: 10px;">
                             <table border="1" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
                                 <thead>
                                     <tr>
-                                        <th style="padding: 8px; background-color: #f2f2f2;">Feature</th>
-                                        <th style="padding: 8px; background-color: #f2f2f2; text-align: center;">Value</th>
-                                        <th style="padding: 8px; background-color: #f2f2f2; text-align: center;">Status</th>
-                                        <th style="padding: 8px; background-color: #f2f2f2; text-align: center;">Relative Importance</th>
+                                        <th style="padding: 8px; background-color: #f2f2f2;">Признак</th>
+                                        <th style="padding: 8px; background-color: #f2f2f2; text-align: center;">Значение</th>
+                                        <th style="padding: 8px; background-color: #f2f2f2; text-align: center;">Статус</th>
+                                        <th style="padding: 8px; background-color: #f2f2f2; text-align: center;">Относительная важность</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1936,9 +1936,9 @@
                         </div>
                         <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
                             <p style="font-size: 0.9rem; margin-top: 5px;">
-                                <strong>Feature Importance:</strong> Shows how much each feature contributed to the prediction.
-                                Higher percentages indicate greater influence on the model's decision.
-                                Hover over percentages to see SHAP effect values.
+                                <strong>Важность признаков:</strong> Показывает, насколько каждый признак повлиял на прогноз.
+                                Более высокие проценты указывают на большее влияние на решение модели.
+                                Наведите курсор на проценты, чтобы увидеть значения эффекта SHAP.
                             </p>
                         </div>
                     `;
@@ -1946,8 +1946,8 @@
                     resultsDiv.innerHTML = `
                         <div style="color: red; padding: 20px; text-align: center;">
                             <i class="fas fa-exclamation-triangle"></i>
-                            <h4>Error in Prediction</h4>
-                            <p>${result.message || 'Unknown error occurred'}</p>
+                            <h4>Ошибка в прогнозировании</h4>
+                            <p>${result.message || 'Произошла неизвестная ошибка'}</p>
                         </div>
                     `;
                 }
@@ -1956,10 +1956,10 @@
                 resultsDiv.innerHTML = `
                     <div style="color: red; padding: 20px; text-align: center;">
                         <i class="fas fa-exclamation-triangle"></i>
-                        <h4>Network Error</h4>
+                        <h4>Сетевая ошибка</h4>
                         <p>${error.message}</p>
                         <p style="font-size: 0.9rem; margin-top: 10px;">
-                            Please check if the ML backend server is running.
+                            Пожалуйста, проверьте, запущен ли сервер ML backend.
                         </p>
                     </div>
                 `;
@@ -2121,7 +2121,7 @@
             
             // Delete patient button
             deletePatientBtn.addEventListener('click', async () => {
-                if (currentPatientId && confirm('Are you sure you want to delete this patient?')) {
+                if (currentPatientId && confirm('Вы уверены, что хотите удалить этого пациента?')) {
                     await deletePatient(currentPatientId);
                 }
             });
