@@ -11,24 +11,14 @@
       "should_manualy_fill_none": false
     },
     {
-      "id": "random_forest",
-      "display_name": "Случайный лес 2",
-      "description": "Предсказывает риски на основе модели случайного леса, но немного хуже",
-      "model_filename": "random_forest_model",
-      "scaler_filename": "scaler",
-      "is_initial": false,
-      "is_tree": true,
-      "should_manualy_fill_none": true
-    },
-    {
       "id": "xgboost",
       "display_name": "Xgboost",
       "description": "Модель на основе Xgboost с None для пропусков",
-      "model_filename": "xgboost_model",
-      "scaler_filename": "scaler",
+      "model_filename": "filled_xgboost_model",
+      "scaler_filename": "filled_preprocessor",
       "is_initial": false,
       "is_tree": false,
-      "should_manualy_fill_none": true
+      "should_manualy_fill_none": false
     }
   ]
 }
