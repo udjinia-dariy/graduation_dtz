@@ -2,8 +2,8 @@
   "models": [
     {
       "id": "filled_random_forest",
-      "display_name": "Random forest",
-      "description": "Predicts risks based on random forest model",
+      "display_name": "Случайный лес",
+      "description": "Предсказывает риски на основе модели случайного леса",
       "model_filename": "filled_random_forest_model",
       "scaler_filename": "filled_preprocessor",
       "is_initial": false,
@@ -12,8 +12,8 @@
     },
     {
       "id": "random_forest",
-      "display_name": "Random forest 2",
-      "description": "Predicts risks based on random forest model but little worse",
+      "display_name": "Случайный лес 2",
+      "description": "Предсказывает риски на основе модели случайного леса, но немного хуже",
       "model_filename": "random_forest_model",
       "scaler_filename": "scaler",
       "is_initial": false,
@@ -23,7 +23,7 @@
     {
       "id": "xgboost",
       "display_name": "Xgboost",
-      "description": "Xgboost based model with None for misses",
+      "description": "Модель на основе Xgboost с None для пропусков",
       "model_filename": "xgboost_model",
       "scaler_filename": "scaler",
       "is_initial": false,
