@@ -84,8 +84,6 @@ def predict_ml():
     # Should validate data here first
     res = GlobalInfoObj.get_model(data['model_name']).predict(data)
 
-    print("Prediction result:", res['prediction'], res['probability'])
-
     response = dict(res)
     response['status'] = 'success'
     return jsonify(response)

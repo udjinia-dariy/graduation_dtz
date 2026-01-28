@@ -40,9 +40,6 @@ CATEGORICAL_COLS = [
 # Identify numerical columns (all columns not in CATEGORICAL_COLS)
 NUM_COLS = [col for col in ALL_FEATURE_NAMES if col not in CATEGORICAL_COLS]
 
-print(f"Categorical columns: {CATEGORICAL_COLS}")
-print(f"Numerical columns: {NUM_COLS}")
-
 # Helper function to load ML model (for future use)
 def load_ml_model(model_path, scaler_path):
     """
@@ -86,7 +83,6 @@ def prepare_features(features, scaler, features_names_list, fill_none=False):
         if scaler is not None:
             # Scale only numerical columns
             features_df[numerical_cols_names] = scaler.transform(features_df[numerical_cols_names])
-            print(f"Scaled numerical columns: {numerical_cols_names}")
 
         # Convert to numpy array for prediction
         return features_df.values
@@ -115,7 +111,7 @@ class Model:
     def _load(self, is_tree):
         (model_path, scaler_path) = self._gen_paths() 
         self.model, self.scaler = load_ml_model(model_path, scaler_path)
-        self.explainer = shap.TreeExplainer(self.model) if is_tree else None
+        self.explainer = shap.Explainer(self.model)
 
     def get_info(self):
         return {
@@ -136,14 +132,18 @@ class Model:
 
     def _explain(self, features_array):
         shap_values = self.explainer.shap_values(features_array)
-        
-        # shap_values[0, i, 0] = contribution to class 0
-        # shap_values[0, i, 1] = contribution to class 1
+
+        if len(shap_values.shape) == 2:  # Single class format
+            # Already single class - xgboost explainer
+            base_value = self.explainer.expected_value
+            # Convert to probability effects (approximation)
+            shap_values_positive  = shap_values * np.exp(-base_value) / (1 + np.exp(-base_value))**2
+        elif len(shap_values.shape) == 3:  # Multi-class format
+            shap_values_positive = shap_values[:, :, 1]  # Positive class only
         
         explanation = {}
         for i, feature in enumerate(self.all_features_names):
-            # Use positive class contributions (class 1)
-            shap_effect = float(shap_values[0, i, 1])
+            shap_effect = float(shap_values_positive[0, i])
             
             explanation[feature] = {
                 'value': float(features_array[0, i]),
