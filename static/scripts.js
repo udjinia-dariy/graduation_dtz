@@ -830,9 +830,9 @@ async function calculateRecurrenceRisk() {
                 'heredity': 'Наследственная предрасположенность',
                 'smoking_status': 'Курение',
                 'sex': 'Пол',
-                'us1_thyroid_volume': 'Объём щитовидной железы US1',
-                'us1_nodules': 'Узлы US1',
-                'us1_nodules_cm': 'Размер узлов US1',
+                'us1_thyroid_volume': 'Объём щитовидной железы первичный прием',
+                'us1_nodules': 'Узлы первичный прием',
+                'us1_nodules_cm': 'Размер узлов первичный прием',
                 'tsh_1': 'Уровень ТТГ 1',
                 'ft4_1': 'Уровень FT4 1',
                 'ft3_1': 'Уровень FT3 1',
@@ -840,10 +840,10 @@ async function calculateRecurrenceRisk() {
                 'exophthalmos': 'Экзофтальм',
                 'thyrotoxic_cardiomyopathy': 'Тиреотоксическая кардиомиопатия',
                 'treatment_type': 'Тип лечения',
-                'tsh_3': 'Уровень ТТГ 3',
-                'us3_thyroid_volume': 'Объём щитовидной железы US3',
-                'us3_nodules': 'Узлы US3',
-                'us3_nodules_cm': 'Размер узлов US3'
+                'tsh_3': 'Уровень ТТГ потворный прием',
+                'us3_thyroid_volume': 'Объём щитовидной железы повторный прием',
+                'us3_nodules': 'Узлы повторный прием',
+                'us3_nodules_cm': 'Размер узлов повторный прием'
             };
             
             Object.keys(apiData).forEach(key => {
@@ -923,8 +923,8 @@ async function calculateRecurrenceRisk() {
                 result: result
             };
             
-            // Show view raw data button
-            viewRawDataBtn.style.display = 'inline-flex';
+            // Show view raw data button (debug only)
+            // viewRawDataBtn.style.display = 'inline-flex';
             viewRawDataBtn.onclick = () => {
                 alert(JSON.stringify(window.lastPredictionData, null, 2));
             };
@@ -992,7 +992,7 @@ async function calculateRecurrenceRisk() {
                     <p style="font-size: 0.9rem; margin-top: 5px;">
                         <strong>Важность признаков:</strong> Показывает, насколько каждый признак повлиял на прогноз.
                         Более высокие проценты указывают на большее влияние на решение модели.
-                        Наведите курсор на проценты, чтобы увидеть значения эффекта SHAP.
+                        Наведите курсор на проценты, чтобы увидеть значения эффекта SHAP. Положительное значение - в пользу отсутсвия рецидива, отрицательное в пользу наличия рецидива.
                     </p>
                 </div>
             `;

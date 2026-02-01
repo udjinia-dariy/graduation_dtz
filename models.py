@@ -201,6 +201,7 @@ class ModelsStorage:
         try:
             with open(self.config_path, 'r') as f:
                 config = json.load(f)
+                print(config)
             
             for model_config in config.get('models', []):
                 self.add_model(
