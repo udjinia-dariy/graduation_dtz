@@ -171,6 +171,15 @@ function selectModel(modelName) {
     viewRawDataBtn.style.display = 'none';
 }
 
+function hasFollowupData(patient) {
+  return patient.treatment_type !== undefined || 
+          patient.thyrotoxic_cardiomyopathy !== undefined ||
+          patient.tsh_3 !== undefined ||
+          patient.us3_thyroid_volume !== undefined ||
+          patient.us3_nodules !== undefined ||
+          patient.us3_nodules_cm !== undefined;
+}
+
 // Render model selection based on patient status
 function renderModelSelection() {
     if (!currentPatientId) {
@@ -192,10 +201,7 @@ function renderModelSelection() {
         } else if (model.info.type === "follow-up") {
             // Follow-up models require follow-up data
             // Check if patient has follow-up data
-            const hasFollowupData = patient.treatment_type !== null || 
-                                  patient.tsh_3 !== null ||
-                                  patient.us3_thyroid_volume !== null;
-            return hasFollowupData;
+            return hasFollowupData(patient);
         }
         return false;
     });
@@ -215,10 +221,7 @@ function renderModelSelection() {
         modelOption.className = 'model-option';
         
         // Check if model should be disabled
-        const isDisabled = model.info.type === "follow-up" && 
-                          !(patient.treatment_type !== null || 
-                            patient.tsh_3 !== null ||
-                            patient.us3_thyroid_volume !== null);
+        const isDisabled = false;
 
         // Check if this model should be selected by default
         const isSelected = () => {
@@ -232,8 +235,8 @@ function renderModelSelection() {
                     value="${model.name}" 
                     class="model-radio" 
                     ${isSelected() ? 'checked' : ''}
-                    ${isDisabled ? 'disabled' : ''}>
-            <label for="${modelId}" class="model-label ${isDisabled ? 'model-disabled' : ''}">
+                    >
+            <label for="${modelId}" class="model-label">
                 <div class="model-name">${model.info.display_name.replace(/_/g, ' ').toUpperCase()}</div>
                 <div class="model-type ${model.info.type === 'init' ? 'init' : 'follow-up'}">${model.info.type.toUpperCase()} МОДЕЛЬ</div>
                 <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
@@ -247,13 +250,13 @@ function renderModelSelection() {
         // Add event listener
         const radioInput = document.getElementById(modelId);
         radioInput.addEventListener('change', function() {
-            if (this.checked && !isDisabled) {
+            if (this.checked) {
                 selectModel(model.name);
             }
         });
         
         // Set default selection
-        if (isSelected() && !isDisabled) {
+        if (isSelected()) {
             selectedModel = model.name;
         }
     });
@@ -309,12 +312,10 @@ function renderPatientList() {
         patientItem.dataset.id = patient.id;
         
         // Determine patient status
-        const hasFollowupData = patient.treatment_type !== null || 
-                                patient.tsh_3 !== null ||
-                                patient.us3_thyroid_volume !== null;
+        const _hasFollowupData = hasFollowupData(patient);
         
-        let statusText = hasFollowupData ? 'Есть данные наблюдения' : 'Только первичный визит';
-        let statusClass = hasFollowupData ? 'status-followup' : 'status-new';
+        let statusText = _hasFollowupData ? 'Есть данные наблюдения' : 'Только первичный визит';
+        let statusClass = _hasFollowupData ? 'status-followup' : 'status-new';
         
         // Extract name from patient data
         const patientName = patient.patient_name || patient.name || `Пациент ${patient.id}`;
@@ -357,7 +358,6 @@ function renderPatientList() {
     });
 }
 
-
 // Select a patient
 function selectPatient(patientId) {
     currentPatientId = patientId;
@@ -370,12 +370,8 @@ function selectPatient(patientId) {
     const displayName = patient.patient_name || patient.name || `Пациент ${patient.id}`;
     patientName.textContent = displayName;
     
-    // Determine status
-    const hasFollowupData = patient.treatment_type !== null || 
-                            patient.tsh_3 !== null ||
-                            patient.us3_thyroid_volume !== null;
     
-    if (hasFollowupData) {
+    if (hasFollowupData(patient)) {
         patientStatus.textContent = 'Есть данные наблюдения';
         patientStatus.className = 'patient-status status-followup';
         patientActions.style.display = 'none';
