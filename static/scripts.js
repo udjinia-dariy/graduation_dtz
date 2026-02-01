@@ -20,7 +20,6 @@ const viewRawDataBtn = document.getElementById('viewRawDataBtn');
 const deletePatientBtn = document.getElementById('deletePatientBtn');
 const tabs = document.querySelectorAll('.tab');
 const tabContents = document.querySelectorAll('.tab-content');
-const serverStatus = document.getElementById('serverStatus');
 const modelSelectionSection = document.getElementById('modelSelectionSection');
 const modelOptions = document.getElementById('modelOptions');
 
@@ -39,9 +38,6 @@ const PREDICT_ENDPOINT = '/api/predict_ml';
 async function initApp() {
     showMessage('Загрузка приложения...', 'info');
     
-    // Check API connection
-    await checkAPIStatus();
-    
     // Load prediction models
     await loadPredictionModels();
     
@@ -58,27 +54,6 @@ async function initApp() {
     initializeUnknownCheckboxes();
     
     showMessage('Приложение готово', 'success');
-}
-
-// Check API connection status
-async function checkAPIStatus() {
-    try {
-        serverStatus.innerHTML = '<span style="color: #666;">Проверка подключения к серверу...</span>';
-        
-        // Test by fetching models endpoint
-        const response = await fetch(MODELS_ENDPOINT, {
-            method: 'GET'
-        });
-        
-        if (response.ok) {
-            serverStatus.innerHTML = '<span style="color: green;">✅ Серверная часть: Работает</span>';
-        } else {
-            serverStatus.innerHTML = '<span style="color: red;">❌ Серверная часть: Ошибка</span>';
-        }
-    } catch (error) {
-        serverStatus.innerHTML = '<span style="color: orange;">⚠️ Серверная часть: Не в сети</span>';
-        console.error('API connection error:', error);
-    }
 }
 
 // Load available prediction models
@@ -112,8 +87,6 @@ async function loadPatientsFromBackend() {
             patients = data.map(patient => {
                 return {
                     ...patient,
-                    patient_data: patient.patient_data || {},
-                    // Map patient_data to top-level properties for backward compatibility
                     ...patient.patient_data
                 };
             });
@@ -182,6 +155,22 @@ async function deletePatientFromBackend(patientId) {
     }
 }
 
+// Select a patient
+function selectModel(modelName) {
+    selectedModel = modelName;
+
+    // Clear results tab
+    document.getElementById('calculationResults').innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-calculator"></i>
+            <h3>Расчёт ещё не выполнен</h3>
+            <p>Заполните данные пациента и нажмите "Рассчитать риск рецидива" для просмотра результатов.</p>
+        </div>
+    `;
+    
+    viewRawDataBtn.style.display = 'none';
+}
+
 // Render model selection based on patient status
 function renderModelSelection() {
     if (!currentPatientId) {
@@ -248,9 +237,6 @@ function renderModelSelection() {
                 <div class="model-name">${model.info.display_name.replace(/_/g, ' ').toUpperCase()}</div>
                 <div class="model-type ${model.info.type === 'init' ? 'init' : 'follow-up'}">${model.info.type.toUpperCase()} МОДЕЛЬ</div>
                 <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
-                    ${model.info.type === "init" ? "Требуются только первичные данные" : "Требуются данные наблюдения"}
-                </div>
-                <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
                     ${model.info.description}
                 </div>
             </label>
@@ -262,8 +248,7 @@ function renderModelSelection() {
         const radioInput = document.getElementById(modelId);
         radioInput.addEventListener('change', function() {
             if (this.checked && !isDisabled) {
-                selectedModel = model.name;
-                console.log('Selected model:', selectedModel);
+                selectModel(model.name);
             }
         });
         
@@ -372,6 +357,7 @@ function renderPatientList() {
     });
 }
 
+
 // Select a patient
 function selectPatient(patientId) {
     currentPatientId = patientId;
@@ -402,8 +388,9 @@ function selectPatient(patientId) {
     // Show delete button
     deletePatientBtn.style.display = 'inline-flex';
     
-    // Populate initial form
+    // Populate forms
     populateForm(initialForm, patient);
+    populateForm(readmissionForm, patient);
     
     // Update model selection based on patient status
     renderModelSelection();
@@ -426,9 +413,9 @@ function selectPatient(patientId) {
 // Populate form with patient data
 function populateForm(form, patient) {
     const formElements = form.elements;
-    
+
     for (let element of formElements) {
-        if (element.name && patient[element.name] !== undefined && patient[element.name] !== null) {
+        if (element.name) {
             if (element.type === 'checkbox' && element.name.endsWith('_unknown')) {
                 // Handle unknown checkboxes - if value is null, check the unknown box
                 const fieldName = element.name.replace('_unknown', '');
@@ -437,7 +424,7 @@ function populateForm(form, patient) {
                 
                 // Trigger change event to update field state
                 setTimeout(() => element.dispatchEvent(new Event('change')), 0);
-            } else if (element.type !== 'checkbox') {
+            } else {
                 element.value = patient[element.name];
             }
         }
