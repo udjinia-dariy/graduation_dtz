@@ -28,8 +28,7 @@ const initialForm = document.getElementById('initialForm');
 const readmissionForm = document.getElementById('readmissionForm');
 
 // API Configuration
-const API_BASE_URL = window.location.origin;
-const PATIENTS_ENDPOINT = '/api/patients';
+const API_BASE_URL = window.location.origin; const PATIENTS_ENDPOINT = '/api/patients';
 const PATIENT_ENDPOINT = '/api/patient';
 const MODELS_ENDPOINT = '/api/models';
 const PREDICT_ENDPOINT = '/api/predict_ml';
@@ -172,12 +171,12 @@ function selectModel(modelName) {
 }
 
 function hasFollowupData(patient) {
-  return patient.treatment_type !== undefined || 
-          patient.thyrotoxic_cardiomyopathy !== undefined ||
-          patient.tsh_3 !== undefined ||
-          patient.us3_thyroid_volume !== undefined ||
-          patient.us3_nodules !== undefined ||
-          patient.us3_nodules_cm !== undefined;
+  return patient.treatment_type !== null || 
+          patient.thyrotoxic_cardiomyopathy !== null ||
+          patient.tsh_3 !== null ||
+          patient.us3_thyroid_volume !== null ||
+          patient.us3_nodules !== null ||
+          patient.us3_nodules_cm !== null;
 }
 
 // Render model selection based on patient status
@@ -863,11 +862,14 @@ async function calculateRecurrenceRisk() {
                     statusColor = '#388e3c';
                     
                     // Special formatting for some fields
+                    // TODO: add map of varients for each field
                     if (key === 'sex') {
                         displayValue = value === 1 ? 'Мужской' : 'Женский';
-                    } else if (key === 'heredity' || key === 'smoking_status' || key === 'us1_nodules' || key === 'us3_nodules' || 
+                    } else if (key === 'heredity' || key === 'us1_nodules' || key === 'us3_nodules' || 
                               key === 'exophthalmos' || key === 'thyrotoxic_cardiomyopathy') {
                         displayValue = value === 1 ? 'Да' : 'Нет';
+                    } else if (key === 'smoking_status' ) {
+                        displayValue = value === 1 ? 'Да' : (value === 2 ? 'В анамнезе' : 'Нет');
                     } else if (key === 'treatment_type') {
                         displayValue = `Тип ${value}`;
                     }
