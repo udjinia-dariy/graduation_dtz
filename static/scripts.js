@@ -32,6 +32,7 @@ const API_BASE_URL = window.location.origin; const PATIENTS_ENDPOINT = '/api/pat
 const PATIENT_ENDPOINT = '/api/patient';
 const MODELS_ENDPOINT = '/api/models';
 const PREDICT_ENDPOINT = '/api/predict_ml';
+const FINETUNE_ENDPOINT = '/api/fine_tune_ml';
 
 // Initialize the application
 async function initApp() {
@@ -238,6 +239,7 @@ function renderModelSelection() {
             <label for="${modelId}" class="model-label">
                 <div class="model-name">${model.info.display_name.replace(/_/g, ' ').toUpperCase()}</div>
                 <div class="model-type ${model.info.type === 'init' ? 'init' : 'follow-up'}">${model.info.type.toUpperCase()} МОДЕЛЬ</div>
+                <div class="model-name">Количество пациентов для обучения: ${model.info.size_of_training_dataset}</div>
                 <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
                     ${model.info.description}
                 </div>
@@ -807,6 +809,22 @@ async function calculateRecurrenceRisk() {
         });
         
         const tempText = await response.text();
+
+        /// TODO: should have own interface
+        const tune_response = await fetch(FINETUNE_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(apiData)
+        });
+
+        const tune_result = tune_response.text();
+
+        console.log("tune_result:", tune_result);
+        renderModelSelection();
+        /// end of tune
+
         const validJson = tempText
             .replace(/NaN/g, 'null');
         const result = JSON.parse(validJson);

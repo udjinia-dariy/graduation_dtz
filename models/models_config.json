@@ -8,7 +8,8 @@
       "scaler_filename": "filled_preprocessor",
       "is_initial": false,
       "is_tree": true,
-      "should_manualy_fill_none": false
+      "should_manualy_fill_none": false,
+      "size_of_training_dataset": 100
     },
     {
       "id": "xgboost",
@@ -18,7 +19,8 @@
       "scaler_filename": "filled_preprocessor",
       "is_initial": false,
       "is_tree": false,
-      "should_manualy_fill_none": false
+      "should_manualy_fill_none": false,
+      "size_of_training_dataset": 101
     }
   ]
 }

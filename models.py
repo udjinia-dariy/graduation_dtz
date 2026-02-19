@@ -90,9 +90,9 @@ def prepare_features(features, scaler, features_names_list, fill_none=False):
     # if None processing already in processor - do nothing else
     return scaler.transform(features_df)
 
-
+#TODO: params list should be reworked (many places now to repeat)
 class Model:
-    def __init__(self, model_name, scaler_name, is_initial, is_tree, should_manualy_fill_none, display_name="NoName", description="No description"):
+    def __init__(self, model_name, scaler_name, size_of_training_dataset, is_initial, is_tree, should_manualy_fill_none, display_name="NoName", description="No description"):
         self.model_name = model_name
         self.scaler_name = scaler_name
         # If models only for inital_cases - it works withanother set of params
@@ -101,6 +101,7 @@ class Model:
         self.should_manualy_fill_none = should_manualy_fill_none
         self.description = description
         self.display_name = display_name if display_name != "NoName" else model_name
+        self.size_of_training_dataset = size_of_training_dataset
         self._load(is_tree)
 
     def _gen_paths(self, base='models'):
@@ -117,18 +118,9 @@ class Model:
         return {
             'display_name': self.display_name,
             'description': self.description,
+            'size_of_training_dataset': self.size_of_training_dataset,
             'type': 'init' if self.is_initial else 'follow-up',
         }
-
-    def explain_features(self):
-        if hasattr(self.model, 'feature_importances_'):
-            return True, dict(zip(self.all_features_names, self.model.feature_importances_))
-        else:
-            importances = np.mean([
-                est.feature_importances_ 
-                for est in self.model.estimators_
-            ], axis=0)
-            return False, dict(zip(self.all_features_names, importances))
 
     def _explain(self, features_array):
         shap_values = self.explainer.shap_values(features_array)
@@ -191,6 +183,20 @@ class Model:
             'base_value': explanation['base_value'],
         }
 
+    # TODO: Maybe i should add some feature to UNDO fine_tune if result go worse
+    def fine_tune(self, data):
+        features_array = prepare_features(extract_features(data, self.all_features_names), self.scaler, self.all_features_names, self.should_manualy_fill_none)
+
+        # Here will be fine_tune
+        # prediction = self.model.predict(features_array)
+
+        # TODO:should force fornt to rerequest this info (or just send it here) 
+        self.size_of_training_dataset += 1
+
+        return True
+
+#TODO: add save fine_tuned model code
+
 class ModelsStorage:
     def __init__(self, config_path):
         self.config_path = config_path
@@ -211,15 +217,16 @@ class ModelsStorage:
                     should_manualy_fill_none=model_config.get('should_manualy_fill_none', False),
                     display_name=model_config.get('display_name', 'NoName'),
                     description=model_config.get('description', 'No desc'),
+                    size_of_training_dataset=model_config.get('size_of_training_dataset', 0)
                 )
         except FileNotFoundError:
             print(f"Config file {self.config_path} not found")
         except Exception as e:
             print(f"Error loading config: {str(e)}")
     
-    def add_model(self, model_name, scaler_name, is_initial=False, is_tree=True, should_manualy_fill_none=False, display_name=None, description=None):
+    def add_model(self, model_name, scaler_name, size_of_training_dataset, is_initial=False, is_tree=True, should_manualy_fill_none=False, display_name=None, description=None):
         try:
-            model = Model(model_name, scaler_name, is_initial, is_tree, should_manualy_fill_none, display_name, description)
+            model = Model(model_name, scaler_name, size_of_training_dataset, is_initial, is_tree, should_manualy_fill_none, display_name, description)
             if model.model is not None:
                 self.models[model_name] = model
                 return True

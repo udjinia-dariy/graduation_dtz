@@ -88,6 +88,18 @@ def predict_ml():
     response['status'] = 'success'
     return jsonify(response)
 
+@app.route('/api/fine_tune_ml', methods=['POST'])
+def fine_tune_ml():
+    # Get and process data
+    data = request.json
+
+    # Should validate data here first
+    res = GlobalInfoObj.get_model(data['model_name']).fine_tune(data)
+
+    response = dict(res)
+    response['status'] = 'success'
+    return jsonify(response)
+
 if __name__ == '__main__':
     # Create models directory if it doesn't exist
     if not os.path.exists('models'):
