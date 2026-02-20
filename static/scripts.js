@@ -819,9 +819,14 @@ async function calculateRecurrenceRisk() {
             body: JSON.stringify(apiData)
         });
 
-        const tune_result = tune_response.text();
+        const tune_result_raw = await tune_response.text();
+        const tune_result = JSON.parse(tune_result_raw); 
 
         console.log("tune_result:", tune_result);
+        modelIndex = predictionModels.findIndex((el) => el.name === selectedModel)
+        if (modelIndex >= 0)
+          predictionModels.at(modelIndex).info.size_of_training_dataset = tune_result.new_dataset_size;
+
         renderModelSelection();
         /// end of tune
 

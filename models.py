@@ -190,10 +190,12 @@ class Model:
         # Here will be fine_tune
         # prediction = self.model.predict(features_array)
 
-        # TODO:should force fornt to rerequest this info (or just send it here) 
+        # TODO:should force front to rerequest this info (or just send it here) 
         self.size_of_training_dataset += 1
 
-        return True
+        return {
+            'new_dataset_size': self.size_of_training_dataset
+        }
 
 #TODO: add save fine_tuned model code
 
