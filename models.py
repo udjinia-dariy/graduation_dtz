@@ -92,7 +92,9 @@ def prepare_features(features, scaler, features_names_list, fill_none=False):
 
 #TODO: params list should be reworked (many places now to repeat)
 class Model:
-    def __init__(self, model_name, scaler_name, size_of_training_dataset, is_initial, is_tree, should_manualy_fill_none, display_name="NoName", description="No description"):
+    def __init__(self, model_name, scaler_name, size_of_training_dataset,
+                 is_initial, is_tree, should_manualy_fill_none, display_name="NoName",
+                 description="No description", fine_tune_group="NoGroup"):
         self.model_name = model_name
         self.scaler_name = scaler_name
         # If models only for inital_cases - it works withanother set of params
@@ -102,6 +104,7 @@ class Model:
         self.description = description
         self.display_name = display_name if display_name != "NoName" else model_name
         self.size_of_training_dataset = size_of_training_dataset
+        self.fine_tune_group = fine_tune_group
         self._load(is_tree)
 
     def _gen_paths(self, base='models'):
@@ -183,19 +186,12 @@ class Model:
             'base_value': explanation['base_value'],
         }
 
-    # TODO: Maybe i should add some feature to UNDO fine_tune if result go worse
-    def fine_tune(self, data):
-        features_array = prepare_features(extract_features(data, self.all_features_names), self.scaler, self.all_features_names, self.should_manualy_fill_none)
-
-        # Here will be fine_tune
-        # prediction = self.model.predict(features_array)
-
-        # TODO:should force front to rerequest this info (or just send it here) 
-        self.size_of_training_dataset += 1
-
-        return {
-            'new_dataset_size': self.size_of_training_dataset
-        }
+    # patients - only allowed patients with known outcome
+    def fine_tune_batch(self, patients):
+        new_count = len(patients)
+        self.size_of_training_dataset += new_count
+        # TODO: implement actual model retraining here.
+        return {'new_dataset_size': self.size_of_training_dataset, 'added': new_count}
 
 #TODO: add save fine_tuned model code
 
@@ -219,16 +215,19 @@ class ModelsStorage:
                     should_manualy_fill_none=model_config.get('should_manualy_fill_none', False),
                     display_name=model_config.get('display_name', 'NoName'),
                     description=model_config.get('description', 'No desc'),
-                    size_of_training_dataset=model_config.get('size_of_training_dataset', 0)
+                    size_of_training_dataset=model_config.get('size_of_training_dataset', 0),
+                    fine_tune_group=model_config.get('fine_tune_group', 'default')
                 )
         except FileNotFoundError:
             print(f"Config file {self.config_path} not found")
         except Exception as e:
             print(f"Error loading config: {str(e)}")
     
-    def add_model(self, model_name, scaler_name, size_of_training_dataset, is_initial=False, is_tree=True, should_manualy_fill_none=False, display_name=None, description=None):
+    def add_model(self, model_name, scaler_name, size_of_training_dataset, is_initial=False,
+                  is_tree=True, should_manualy_fill_none=False, display_name=None, description=None,
+                  fine_tune_group='NoGroup'):
         try:
-            model = Model(model_name, scaler_name, size_of_training_dataset, is_initial, is_tree, should_manualy_fill_none, display_name, description)
+            model = Model(model_name, scaler_name, size_of_training_dataset, is_initial, is_tree, should_manualy_fill_none, display_name, description, fine_tune_group)
             if model.model is not None:
                 self.models[model_name] = model
                 return True
@@ -245,3 +244,24 @@ class ModelsStorage:
     def get_all_models_info(self):
         return [{'name': name, 'info': model.get_info()} 
                 for name, model in self.models.items()]
+
+    def get_models_by_group(self, group):
+        return [m for m in self.models.values() if m.fine_tune_group == group]
+
+    def fine_tune_group(self, patients, group='NoGroup'):
+        models = self.get_models_by_group(group)
+        results = []
+        for model in models:
+            # Filter patients to only who features match this model type
+            relevant = [
+                p for p in patients
+                if not model.is_initial or not any(
+                    p.patient_data.get(f) is not None
+                    for f in READMISSION_FEATURE_NAMES
+                )
+            ] if model.is_initial else patients
+            
+            if relevant:
+                res = model.fine_tune_batch(relevant)
+                results.append({'name': model.model_name, **res})
+        return results

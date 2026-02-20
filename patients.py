@@ -13,6 +13,7 @@ class Patient:
         self.patient_data = data.get('patient_data', {})
         self.created_at = data.get('created_at', datetime.now().isoformat())
         self.updated_at = data.get('updated_at', datetime.now().isoformat())
+        self.fine_tune_used_by = data.get('fine_tune_used_by', []) # list of group or model names TODO: resolve this
         
     def to_dict(self):
         """Convert patient to dictionary for serialization"""
@@ -20,9 +21,21 @@ class Patient:
             'id': self.id,
             'patient_data': self.patient_data,
             'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'updated_at': self.updated_at,
+            'fine_tune_used_by': self.fine_tune_used_by
         }
-    
+
+    # Group or model name
+    def is_usable_for_fine_tune(self, group):
+        return (
+            self.patient_data.get('actual_outcome') is not None and
+            group not in self.fine_tune_used_by
+        )
+
+    def mark_used_by(self, group):
+        if group not in self.fine_tune_used_by:
+            self.fine_tune_used_by.append(group)
+
     def update(self, data):
         """Update patient data"""
         self.patient_data.update(data.get('patient_data', {}))
@@ -94,4 +107,18 @@ class PatientStorage:
         # Sort by creation date (newest first)
         patients.sort(key=lambda x: x['created_at'], reverse=True)
         return patients
+
+    def get_patients_for_fine_tune(self, group='default'):
+        all_patients_raw = self.get_all_patients()
+        return [
+            Patient(p) for p in all_patients_raw
+            if Patient(p).is_usable_for_fine_tune(group)
+        ]
+
+    def mark_patients_used(self, patient_ids, group):
+        for pid in patient_ids:
+            patient = self.load_patient(pid)
+            if patient:
+                patient.mark_used_by(group)
+                self.save_patient(patient)
 

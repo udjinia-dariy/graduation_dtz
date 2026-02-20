@@ -78,27 +78,42 @@ def delete_patient(patient_id):
 
 @app.route('/api/predict_ml', methods=['POST'])
 def predict_ml():
-    # Get and process data
-    data = request.json
+    try:
+        # Get and process data
+        data = request.json
 
-    # Should validate data here first
-    res = GlobalInfoObj.get_model(data['model_name']).predict(data)
+        # Should validate data here first
+        res = GlobalInfoObj.get_model(data['model_name']).predict(data)
 
-    response = dict(res)
-    response['status'] = 'success'
-    return jsonify(response)
+        response = dict(res)
+        response['status'] = 'success'
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-@app.route('/api/fine_tune_ml', methods=['POST'])
-def fine_tune_ml():
-    # Get and process data
-    data = request.json
+@app.route('/api/fine_tune_all_ml', methods=['POST'])
+def fine_tune_all_ml():
+    data = request.json or {}
+    group = data.get('group', 'default')
 
-    # Should validate data here first
-    res = GlobalInfoObj.get_model(data['model_name']).fine_tune(data)
+    # Get proper patients
+    patients = GlobalInfoObj.patient_storage.get_patients_for_fine_tune(group)
+    if not patients:
+        return jsonify({'status': 'success', 'models': [], 'patients_used': 0})
 
-    response = dict(res)
-    response['status'] = 'success'
-    return jsonify(response)
+    # Fine-tune all models in the group
+    results = GlobalInfoObj.models_storage.fine_tune_group(patients, group)
+
+    # Mark patients as used
+    GlobalInfoObj.patient_storage.mark_patients_used(
+        [p.id for p in patients], group
+    )
+
+    return jsonify({
+        'status': 'success',
+        'models': results,
+        'patients_used': len(patients)
+    })
 
 if __name__ == '__main__':
     # Create models directory if it doesn't exist
