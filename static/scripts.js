@@ -34,6 +34,30 @@ const MODELS_ENDPOINT = '/api/models';
 const PREDICT_ENDPOINT = '/api/predict_ml';
 const FINETUNE_ENDPOINT = '/api/fine_tune_ml';
 
+/// Inner Configuration
+
+/// This for calculating risk, this should not contain "actual_outcome" (we predicting it)
+const fieldMapping = {
+    'age_onset': 'age_onset',
+    'heredity': 'heredity',
+    'smoking_status': 'smoking_status',
+    'sex': 'sex',
+    'us1_thyroid_volume': 'us1_thyroid_volume',
+    'us1_nodules': 'us1_nodules',
+    'us1_nodules_cm': 'us1_nodules_cm',
+    'tsh_1': 'tsh_1',
+    'ft4_1': 'ft4_1',
+    'ft3_1': 'ft3_1',
+    'ft3_to_ft4_ratio': 'ft3_to_ft4_ratio',
+    'exophthalmos': 'exophthalmos',
+    'thyrotoxic_cardiomyopathy': 'thyrotoxic_cardiomyopathy',
+    'treatment_type': 'treatment_type',
+    'tsh_3': 'tsh_3',
+    'us3_thyroid_volume': 'us3_thyroid_volume',
+    'us3_nodules': 'us3_nodules',
+    'us3_nodules_cm': 'us3_nodules_cm',
+};
+
 // Initialize the application
 async function initApp() {
     showMessage('Загрузка приложения...', 'info');
@@ -43,7 +67,9 @@ async function initApp() {
     
     // Load patients from backend
     await loadPatientsFromBackend();
-    
+
+    document.getElementById('debugFinetuneBtn').addEventListener('click', debugFinetuneAllModels);
+        
     setupEventListeners();
     
     // Auto-update ratio when FT3 or FT4 changes
@@ -239,7 +265,7 @@ function renderModelSelection() {
             <label for="${modelId}" class="model-label">
                 <div class="model-name">${model.info.display_name.replace(/_/g, ' ').toUpperCase()}</div>
                 <div class="model-type ${model.info.type === 'init' ? 'init' : 'follow-up'}">${model.info.type.toUpperCase()} МОДЕЛЬ</div>
-                <div class="model-name">Количество пациентов для обучения: ${model.info.size_of_training_dataset}</div>
+                <div class="model-name">Количество пациентов при обучения: ${model.info.size_of_training_dataset}</div>
                 <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
                     ${model.info.description}
                 </div>
@@ -586,7 +612,8 @@ async function saveInitialData() {
             tsh_3: patient.tsh_3,
             us3_thyroid_volume: patient.us3_thyroid_volume,
             us3_nodules: patient.us3_nodules,
-            us3_nodules_cm: patient.us3_nodules_cm
+            us3_nodules_cm: patient.us3_nodules_cm,
+            actual_outcome: patient.actual_outcome
         }
     };
     
@@ -657,7 +684,8 @@ async function saveReadmissionData() {
             tsh_3: patient.tsh_3,
             us3_thyroid_volume: patient.us3_thyroid_volume,
             us3_nodules: patient.us3_nodules,
-            us3_nodules_cm: patient.us3_nodules_cm
+            us3_nodules_cm: patient.us3_nodules_cm,
+            actual_outcome: patient.actual_outcome
         }
     };
     
@@ -750,28 +778,6 @@ async function calculateRecurrenceRisk() {
     // Prepare data for API
     const apiData = {};
     
-    // Map patient data to API expected format
-    const fieldMapping = {
-        'age_onset': 'age_onset',
-        'heredity': 'heredity',
-        'smoking_status': 'smoking_status',
-        'sex': 'sex',
-        'us1_thyroid_volume': 'us1_thyroid_volume',
-        'us1_nodules': 'us1_nodules',
-        'us1_nodules_cm': 'us1_nodules_cm',
-        'tsh_1': 'tsh_1',
-        'ft4_1': 'ft4_1',
-        'ft3_1': 'ft3_1',
-        'ft3_to_ft4_ratio': 'ft3_to_ft4_ratio',
-        'exophthalmos': 'exophthalmos',
-        'thyrotoxic_cardiomyopathy': 'thyrotoxic_cardiomyopathy',
-        'treatment_type': 'treatment_type',
-        'tsh_3': 'tsh_3',
-        'us3_thyroid_volume': 'us3_thyroid_volume',
-        'us3_nodules': 'us3_nodules',
-        'us3_nodules_cm': 'us3_nodules_cm'
-    };
-    
     Object.keys(fieldMapping).forEach(patientField => {
         let value = patient[patientField];
         
@@ -798,7 +804,7 @@ async function calculateRecurrenceRisk() {
             <p style="margin-top: 10px;">Расчёт риска рецидива с помощью ${availableModels.find(el => el.name === selectedModel)?.info.display_name}...</p>
         </div>
     `;
-    
+
     try {
         const response = await fetch(PREDICT_ENDPOINT, {
             method: 'POST',
@@ -809,26 +815,6 @@ async function calculateRecurrenceRisk() {
         });
         
         const tempText = await response.text();
-
-        /// TODO: should have own interface
-        const tune_response = await fetch(FINETUNE_ENDPOINT, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(apiData)
-        });
-
-        const tune_result_raw = await tune_response.text();
-        const tune_result = JSON.parse(tune_result_raw); 
-
-        console.log("tune_result:", tune_result);
-        modelIndex = predictionModels.findIndex((el) => el.name === selectedModel)
-        if (modelIndex >= 0)
-          predictionModels.at(modelIndex).info.size_of_training_dataset = tune_result.new_dataset_size;
-
-        renderModelSelection();
-        /// end of tune
 
         const validJson = tempText
             .replace(/NaN/g, 'null');
@@ -1200,6 +1186,35 @@ function setupEventListeners() {
             await deletePatient(currentPatientId);
         }
     });
+}
+
+// Debug function to fine-tune all models
+async function debugFinetuneAllModels() {
+    showMessage('Обновление всех моделей...', 'info');
+
+    // Fine-tune each model
+    for (const model of predictionModels) {
+        try {
+            apiData.model_name = model.name;
+
+            const response = await fetch(FINETUNE_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: {}
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                model.info.size_of_training_dataset = result.new_dataset_size;
+            }
+        } catch (error) {
+            console.error(`Error fine-tuning ${model.name}:`, error);
+        }
+    }
+
+    renderModelSelection();
+    showMessage('Все модели обновлены!', 'success');
 }
 
 // Initialize the app when DOM is loaded

@@ -304,6 +304,22 @@
                                 </div>
                             </div>
 
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-heartbeat"></i> Итоговый диагноз
+                                </h3>
+                                <div class="form-row">
+                                  <div class="form-col">
+                                    <label for="actual_outcome">Исход (истинный результат)</label>
+                                    <select id="actual_outcome" name="actual_outcome">
+                                      <option value="" selected>Неизвестно</option>
+                                      <option value="0">Рецидива не было</option>
+                                      <option value="1">Был рецидив</option>
+                                    </select>
+                                  </div>
+                                </div>
+                            </div>
+
                             <div class="action-buttons">
                                 <button type="button" class="btn btn-primary" id="saveReadmissionBtn">
                                     <i class="fas fa-save"></i> Сохранить данные наблюдения
@@ -336,7 +352,7 @@
                                     <p>Заполните данные пациента и нажмите "Рассчитать риск рецидива" для просмотра результатов.</p>
                                 </div>
                             </div>
-                            
+
                             <div class="action-buttons">
                                 <button class="btn btn-accent" id="calculateRiskBtn">
                                     <i class="fas fa-calculator"></i> Рассчитать риск рецидива
@@ -345,6 +361,10 @@
                                     <i class="fas fa-code"></i> Просмотреть исходные данные
                                 </button>
                             </div>
+
+                            <button class="btn btn-secondary" id="debugFinetuneBtn" style="position: fixed; bottom: 10px; right: 10px; z-index: 1000;">
+                                <i class="fas fa-bug"></i> Отладка: Обновить все модели
+                            </button>
                         </div>
                     </div>
                 </div>
