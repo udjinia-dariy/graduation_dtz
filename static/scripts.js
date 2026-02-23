@@ -36,7 +36,7 @@ const FINETUNE_ENDPOINT = '/api/fine_tune_ml';
 
 /// Inner Configuration
 
-/// This for calculating risk, this should not contain "actual_outcome" (we predicting it)
+/// This for calculating risk, this should not contain "no_remission" (we predicting it)
 const fieldMapping = {
     'age_onset': 'age_onset',
     'heredity': 'heredity',
@@ -613,7 +613,7 @@ async function saveInitialData() {
             us3_thyroid_volume: patient.us3_thyroid_volume,
             us3_nodules: patient.us3_nodules,
             us3_nodules_cm: patient.us3_nodules_cm,
-            actual_outcome: patient.actual_outcome
+            no_remission: patient.no_remission
         }
     };
     
@@ -685,7 +685,7 @@ async function saveReadmissionData() {
             us3_thyroid_volume: patient.us3_thyroid_volume,
             us3_nodules: patient.us3_nodules,
             us3_nodules_cm: patient.us3_nodules_cm,
-            actual_outcome: patient.actual_outcome
+            no_remission: patient.no_remission
         }
     };
     
@@ -781,7 +781,6 @@ async function calculateRecurrenceRisk() {
     Object.keys(fieldMapping).forEach(patientField => {
         let value = patient[patientField];
         
-        // Convert null/undefined to -1 (as expected by backend)
         if (typeof value === 'string') {
             // Try to parse numeric strings
             const num = parseFloat(value);

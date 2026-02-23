@@ -1,11 +1,24 @@
 from prelude import *
 import shap
+import math
 
 # TODO:  Move it later in utils ===== 
 def filter_array(source_array, reference_array):
     """Фильтрует source_array, оставляя только элементы из reference_array"""
     reference_set = set(reference_array)
     return [item for item in source_array if item in reference_set]
+
+def smart_convert(x):
+    if isinstance(x, (int, float)):
+        try:
+            return int(x) if x == int(x) else x
+        except ValueError:
+            return x
+    if isinstance(x, str) and x.lstrip('-').replace('.', '', 1).isdigit():
+        f = float(x)
+        return int(f) if f == int(f) else f
+    return x
+
 # ========== 
 
 # data prepare part
@@ -22,7 +35,7 @@ READMISSION_FEATURE_NAMES = [
         'treatment_type', 'tsh_3', 'us3_thyroid_volume', 'us3_nodules', 'us3_nodules_cm'
 ]
 
-# thanks to good luck - ALL_FEATURE_NAMES order is same as inital case + readmission case
+# order of names still important
 ALL_FEATURE_NAMES = INITIAL_FEASTURES_NAMES + READMISSION_FEATURE_NAMES
 
 # Define categorical and numerical columns
@@ -74,8 +87,8 @@ def extract_features(data, features_names_list, fill_type=np.nan):
 
 def prepare_features(features, scaler, features_names_list, fill_none=False):
     # Create DataFrame with proper column names
-    features_df = pd.DataFrame([features], columns=features_names_list)
-
+   
+    features_df = pd.DataFrame(features, columns=features_names_list)
     if fill_none:
         # if nesseccary to fill None by hands
         numerical_cols_names = filter_array(NUM_COLS, features_names_list)
@@ -105,6 +118,7 @@ class Model:
         self.display_name = display_name if display_name != "NoName" else model_name
         self.size_of_training_dataset = size_of_training_dataset
         self.fine_tune_group = fine_tune_group
+        self.target_column_name = 'no_remission'
         self._load(is_tree)
 
     def _gen_paths(self, base='models'):
@@ -166,7 +180,9 @@ class Model:
         }
 
     def predict(self, data):
-        features_array = prepare_features(extract_features(data, self.all_features_names), self.scaler, self.all_features_names, self.should_manualy_fill_none)
+        print("DATA FOR EXTRACTION SHOULD LOOK LIKE:", data)
+        print("SHOULD LOOK LIKE:", extract_features(data, self.all_features_names))
+        features_array = prepare_features([extract_features(data, self.all_features_names)], self.scaler, self.all_features_names, self.should_manualy_fill_none)
 
         # Make prediction
         prediction = self.model.predict(features_array)
@@ -186,63 +202,232 @@ class Model:
             'base_value': explanation['base_value'],
         }
 
-    # patients - only allowed patients with known outcome
-    def fine_tune_batch(self, patients):
+    def _fine_tune_batch(self, patients):
         new_count = len(patients)
         self.size_of_training_dataset += new_count
         # TODO: implement actual model retraining here.
         return {'new_dataset_size': self.size_of_training_dataset, 'added': new_count}
 
+    def fine_tune_batch(self, patients, init_df):
+        if not patients:
+            return {'new_dataset_size': self.size_of_training_dataset, 'added': 0}
+
+        X_list = []
+        y_list = []
+        for p in patients:
+            pdata = p.patient_data
+
+            # FIXME: by design this patients must feat requirements of models so this check is redundat
+            #
+            # skip if no label (defensive, though storage should filter them already)
+            if pdata.get(self.target_column_name) is None:
+                continue
+
+            pdata = {k: smart_convert(v) for k, v in pdata.items()}
+
+            print("DATA FOR EXTRACTION FUCKING LOOK LIKE:", pdata)
+            feats = extract_features(pdata, self.all_features_names)
+
+            X_list.append(feats)
+            y_list.append(pdata[self.target_column_name])
+
+        if not X_list:
+            return {'new_dataset_size': self.size_of_training_dataset, 'added': 0}
+
+        # apply preprocessor
+        print("FUCKING LOOK LIKE:", X_list)
+        X_prepared = prepare_features(X_list, self.scaler, self.all_features_names,
+                                    self.should_manualy_fill_none)
+        y = np.array(y_list, dtype=int)
+
+
+        print("SHITT:", y)
+        print("SHITT2:", self.target_column_name in init_df, init_df.columns)
+
+        # can partial_fit
+        if hasattr(self.model, 'partial_fit'):
+            # sklearn workaround
+            classes = np.array([0, 1], dtype=int)
+            try:
+                self.model.partial_fit(X_prepared, y, classes=classes)
+            except TypeError:
+                self.model.partial_fit(X_prepared, y)
+        # must fully refit
+        else:
+            if init_df is None or init_df.empty or not self.target_column_name in init_df:
+                self.model.fit(X_prepared, y)
+            else:
+                pdata_first = init_df[self.all_features_names].values.tolist()
+                pdata = [[smart_convert(item) for item in sublist] for sublist in pdata_first]
+                print("1)X_ORIGINAL FUCKING LOOK LIKE:", pdata_first[0])
+                print("2)X_ORIGINAL FUCKING LOOK LIKE:", pdata[0])
+                print("SUKA TUPAYA", len(pdata), pdata[0])
+                pizd = 0
+                for govno in pdata:
+                    if govno[1] == 42.0:
+                        print("YA EBANULZA", pizd, govno)
+                    if govno[11] == 3.0:
+                        print("YA EBANULZA2", pizd, govno)
+                    pizd = pizd + 1
+
+                X_original = prepare_features(
+                    pdata, self.scaler, self.all_features_names, self.should_manualy_fill_none
+                )
+                y_original = init_df[self.target_column_name].values
+                
+                # combine original and new data
+                X_combined = np.vstack([X_original, X_prepared])
+                y_combined = np.hstack([y_original, y])
+
+                self.model.fit(X_combined, y_combined)
+
+        # rebuild SHAP explainer
+        try:
+            self.explainer = shap.Explainer(self.model)
+        except Exception:
+            self.explainer = None
+
+        added = len(y_list)
+        self.size_of_training_dataset += added
+
+        return {'new_dataset_size': self.size_of_training_dataset, 'added': added}
+
 #TODO: add save fine_tuned model code
 
 class ModelsStorage:
+    BASE_DATAFRAME_PATH = 'models/base_dataframe.pkl'
+
     def __init__(self, config_path):
         self.config_path = config_path
         self.models = {}
+        self.initial_dataframe = None
         self._load_config()
-    
-    def _load_config(self):
+        self._load_initial_dataframe()
+
+    def _read_raw_config(self):
         try:
-            with open(self.config_path, 'r', encoding="utf-8") as f:
-                config = json.load(f)
-            
-            for model_config in config.get('models', []):
-                self.add_model(
-                    model_name=model_config['model_filename'],
-                    scaler_name=model_config['scaler_filename'],
-                    is_initial=model_config.get('is_initial', False),
-                    is_tree=model_config.get('is_tree', True),
-                    should_manualy_fill_none=model_config.get('should_manualy_fill_none', False),
-                    display_name=model_config.get('display_name', 'NoName'),
-                    description=model_config.get('description', 'No desc'),
-                    size_of_training_dataset=model_config.get('size_of_training_dataset', 0),
-                    fine_tune_group=model_config.get('fine_tune_group', 'default')
-                )
+            with open(self.config_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
         except FileNotFoundError:
             print(f"Config file {self.config_path} not found")
         except Exception as e:
-            print(f"Error loading config: {str(e)}")
-    
-    def add_model(self, model_name, scaler_name, size_of_training_dataset, is_initial=False,
-                  is_tree=True, should_manualy_fill_none=False, display_name=None, description=None,
-                  fine_tune_group='NoGroup'):
+            print(f"Error reading config: {e}")
+        return {}
+
+    def _write_raw_config(self, config: dict):
         try:
-            model = Model(model_name, scaler_name, size_of_training_dataset, is_initial, is_tree, should_manualy_fill_none, display_name, description, fine_tune_group)
+            with open(self.config_path, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception as e:
+            print(f"Error writing config: {e}")
+            return False
+
+    def _load_config(self):
+        config = self._read_raw_config()
+        for model_config in config.get('models', []):
+            self.add_model(
+                model_name=model_config['model_filename'],
+                scaler_name=model_config['scaler_filename'],
+                is_initial=model_config.get('is_initial', False),
+                is_tree=model_config.get('is_tree', True),
+                should_manualy_fill_none=model_config.get('should_manualy_fill_none', False),
+                display_name=model_config.get('display_name', 'NoName'),
+                description=model_config.get('description', 'No desc'),
+                size_of_training_dataset=model_config.get('size_of_training_dataset', 0),
+                fine_tune_group=model_config.get('fine_tune_group', 'default'),
+            )
+
+    def _load_initial_dataframe(self):
+        config = self._read_raw_config()
+        history: list = config.get('dataframe_history', [])
+
+        # Try the latest versioned file from history
+        if history:
+            latest = history[-1]
+            filepath = latest['filename']
+            if os.path.exists(filepath):
+                try:
+                    self.initial_dataframe = pd.read_pickle(filepath)
+                    print(f"Loaded dataframe from history: '{filepath}' "
+                          f"({latest.get('rows', '?')} rows, saved {latest.get('timestamp', '?')})")
+                    return
+                except Exception as e:
+                    print(f"Failed to load latest history file '{filepath}': {e}")
+
+        # Fall back to base_dataframe.pkl
+        filepath = self.BASE_DATAFRAME_PATH
+        if os.path.exists(filepath):
+            try:
+                self.initial_dataframe = pd.read_pickle(filepath)
+                print(f"Loaded dataframe from '{filepath}' "
+                      f"({len(self.initial_dataframe)} rows)")
+
+                # Auto-register base file as the first history entry
+                self.upload_dataframe(self.initial_dataframe, 'Initial base dataframe (auto-registered)')
+            except Exception as e:
+                print(f"Failed to load '{self.BASE_DATAFRAME_PATH}': {e}")
+        else:
+            print("No dataframe found. 'initial_dataframe' remains None.")
+
+    def _append_history_entry(self, config: dict, entry: dict):
+        config.setdefault('dataframe_history', []).append(entry)
+        self._write_raw_config(config)
+
+    def upload_dataframe(self, new_dataframe: pd.DataFrame,
+                         description: str = ''):
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        # TODO: move `models` in base_path section
+        filename = f'models/dataframe_{timestamp}.pkl'
+
+        try:
+            new_dataframe.to_pickle(filename)
+        except Exception as e:
+            print(f"Failed to save dataframe to '{filename}': {e}")
+            return None
+
+        prev_rows = len(self.initial_dataframe) if self.initial_dataframe is not None else 0
+        added_rows = len(new_dataframe) - prev_rows
+
+        entry = {
+            'filename': filename,
+            'timestamp': datetime.now().isoformat(timespec='seconds'),
+            'description': description,
+            'rows': len(new_dataframe),
+            'columns': len(new_dataframe.columns),
+            'added_rows': added_rows,
+        }
+
+        config = self._read_raw_config()
+        self._append_history_entry(config, entry)
+
+        self.initial_dataframe = new_dataframe
+        print(f"Dataframe updated: '{filename}' "
+              f"({len(new_dataframe)} rows, +{added_rows} new)")
+        return entry
+
+    def add_model(self, model_name, scaler_name, size_of_training_dataset,
+                  is_initial=False, is_tree=True, should_manualy_fill_none=False,
+                  display_name=None, description=None, fine_tune_group='NoGroup'):
+        try:
+            model = Model(model_name, scaler_name, size_of_training_dataset,
+                          is_initial, is_tree, should_manualy_fill_none,
+                          display_name, description, fine_tune_group)
             if model.model is not None:
                 self.models[model_name] = model
                 return True
         except Exception as e:
-            print(f"Error adding model {model_name}: {str(e)}")
+            print(f"Error adding model {model_name}: {e}")
         return False
-    
+
     def get_model(self, model_name):
         return self.models.get(model_name)
-    
+
     def get_all_models(self):
         return self.models
-    
+
     def get_all_models_info(self):
-        return [{'name': name, 'info': model.get_info()} 
+        return [{'name': name, 'info': model.get_info()}
                 for name, model in self.models.items()]
 
     def get_all_groups(self):
@@ -252,19 +437,12 @@ class ModelsStorage:
         return [m for m in self.models.values() if m.fine_tune_group == group]
 
     def fine_tune_group(self, patients, group='NoGroup'):
+        if not patients:
+            return []
+
         models = self.get_models_by_group(group)
         results = []
         for model in models:
-            # Filter patients to only who features match this model type
-            relevant = [
-                p for p in patients
-                if not model.is_initial or not any(
-                    p.patient_data.get(f) is not None
-                    for f in READMISSION_FEATURE_NAMES
-                )
-            ] if model.is_initial else patients
-            
-            if relevant:
-                res = model.fine_tune_batch(relevant)
-                results.append({'name': model.model_name, **res})
+            res = model.fine_tune_batch(patients, self.initial_dataframe)
+            results.append({'name': model.model_name, **res})
         return results

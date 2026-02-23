@@ -100,9 +100,13 @@ def fine_tune_all_ml():
         all_groups = models_storage.get_all_groups()
         total_patients_used = 0
         all_results = []
+        print("GROUPS:", all_groups)
 
         for group in all_groups:
+            # FIXME: maybe i should make more reliable shitt here (mean i have check's but repeat them inside model module)
             patients = patient_storage.get_patients_for_fine_tune(group)
+
+            print("PATIENTS:", patients)
             if not patients:
                 continue
 
@@ -116,6 +120,8 @@ def fine_tune_all_ml():
             )
             total_patients_used += len(patients)
 
+        # Here should be initial_dataframe update (addition of new used patients and uploading)
+
         return jsonify({
             'status': 'success',
             'models': all_results,
@@ -123,17 +129,13 @@ def fine_tune_all_ml():
             'groups': list(all_groups),
         })
     except Exception as e:
-        return jsonify({'status': 'error', 'error': str(e)}), 500
+        # return jsonify({'status': 'error', 'error': str(e)}), 500
+        raise
 
 if __name__ == '__main__':
     # Create models directory if it doesn't exist
     if not os.path.exists('models'):
         os.makedirs('models')
-
-    # # TODO: separate this info in special file with model description
-    # GlobalInfoObj.add_model('xgboost_model', 'scaler', should_manualy_fill_none=True)
-    # GlobalInfoObj.add_model('random_forest_model', 'scaler', is_tree=True, should_manualy_fill_none=True)
-    # GlobalInfoObj.add_model('filled_random_forest_model', 'filled_preprocessor', is_tree=True)
 
     # Run the server
     app.run(host='0.0.0.0', port=5000, debug=True)

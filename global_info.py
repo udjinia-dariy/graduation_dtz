@@ -8,7 +8,7 @@ class GlobalInfo:
     def __init__(self, config_path='models/models_config.json'):
         self.models_storage = ModelsStorage(config_path)
         self.patient_storage = PatientStorage()
-    
+
     def get_model(self, model_name):
         return self.models_storage.get_model(model_name)
     

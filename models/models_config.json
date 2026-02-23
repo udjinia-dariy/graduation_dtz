@@ -24,5 +24,15 @@
       "should_manualy_fill_none": false,
       "size_of_training_dataset": 101
     }
+  ],
+  "dataframe_history": [
+    {
+      "filename": "models/dataframe_20260223_115126.pkl",
+      "timestamp": "2026-02-23T11:51:26",
+      "description": "Initial base dataframe (auto-registered)",
+      "rows": 185,
+      "columns": 26,
+      "added_rows": 0
+    }
   ]
 }
