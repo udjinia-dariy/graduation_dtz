@@ -25,12 +25,17 @@ class Patient:
             'fine_tune_used_by': self.fine_tune_used_by
         }
 
-    # Group or model name
     def is_usable_for_fine_tune(self, group):
-        return (
-            self.patient_data.get('actual_outcome') is not None and
-            group not in self.fine_tune_used_by
-        )
+        if group in self.fine_tune_used_by:
+            return False
+
+        match group:
+            case "firstRemission":
+                is_eligible = self.patient_data.get('actual_outcome') is not None
+            case _:
+                print(f"Error: Unknown group '{group}'")
+                is_eligible = False
+        return is_eligible
 
     def mark_used_by(self, group):
         if group not in self.fine_tune_used_by:
@@ -90,29 +95,35 @@ class PatientStorage:
             print(f"Error deleting patient {patient_id}: {str(e)}")
         return False
     
-    # TODO: should return only "brief" data for start it can be name and id - data should be saved in a little bit complex way
-    def get_all_patients(self):
-        """Get all patients from storage"""
+    def _get_all_patients_base(self, getter=lambda x: x):
         patients = []
         try:
             for filename in os.listdir(self.storage_dir):
                 if filename.endswith('.json'):
-                    patient_id = filename[:-5]  # Remove .json extension
+                    patient_id = filename[:-5] # Remove .json extension
                     patient = self.load_patient(patient_id)
                     if patient:
-                        patients.append(patient.to_dict())
+                        patients.append(getter(patient))
         except Exception as e:
             print(f"Error loading all patients: {str(e)}")
-        
-        # Sort by creation date (newest first)
+        return patients
+
+    def get_all_patients(self):
+        """Get all patients from storage as dictionary"""
+        patients = self._get_all_patients_base(lambda p: p.to_dict())
+        # Sort by creation date
         patients.sort(key=lambda x: x['created_at'], reverse=True)
         return patients
 
+    def get_all_patients_raw(self):
+        """Get all patients from storage as Patient's array"""
+        return self._get_all_patients_base()
+
     def get_patients_for_fine_tune(self, group='default'):
-        all_patients_raw = self.get_all_patients()
+        all_patients_raw = self.get_all_patients_raw()
         return [
-            Patient(p) for p in all_patients_raw
-            if Patient(p).is_usable_for_fine_tune(group)
+            p for p in all_patients_raw
+            if p.is_usable_for_fine_tune(group)
         ]
 
     def mark_patients_used(self, patient_ids, group):

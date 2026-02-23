@@ -91,29 +91,39 @@ def predict_ml():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/fine_tune_all_ml', methods=['POST'])
+@app.route('/api/fine_tune_ml', methods=['POST'])
 def fine_tune_all_ml():
-    data = request.json or {}
-    group = data.get('group', 'default')
+    try:
+        models_storage = GlobalInfoObj.models_storage
+        patient_storage = GlobalInfoObj.patient_storage
 
-    # Get proper patients
-    patients = GlobalInfoObj.patient_storage.get_patients_for_fine_tune(group)
-    if not patients:
-        return jsonify({'status': 'success', 'models': [], 'patients_used': 0})
+        all_groups = models_storage.get_all_groups()
+        total_patients_used = 0
+        all_results = []
 
-    # Fine-tune all models in the group
-    results = GlobalInfoObj.models_storage.fine_tune_group(patients, group)
+        for group in all_groups:
+            patients = patient_storage.get_patients_for_fine_tune(group)
+            if not patients:
+                continue
 
-    # Mark patients as used
-    GlobalInfoObj.patient_storage.mark_patients_used(
-        [p.id for p in patients], group
-    )
+            results = models_storage.fine_tune_group(patients, group)
+            all_results.extend(
+                {'group': group, **r} for r in results
+            )
 
-    return jsonify({
-        'status': 'success',
-        'models': results,
-        'patients_used': len(patients)
-    })
+            patient_storage.mark_patients_used(
+                [p.id for p in patients], group
+            )
+            total_patients_used += len(patients)
+
+        return jsonify({
+            'status': 'success',
+            'models': all_results,
+            'patients_used': total_patients_used,
+            'groups': list(all_groups),
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)}), 500
 
 if __name__ == '__main__':
     # Create models directory if it doesn't exist

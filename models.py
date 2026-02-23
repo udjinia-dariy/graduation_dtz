@@ -245,6 +245,9 @@ class ModelsStorage:
         return [{'name': name, 'info': model.get_info()} 
                 for name, model in self.models.items()]
 
+    def get_all_groups(self):
+        return {m.fine_tune_group for m in self.models.values() if m.fine_tune_group}
+
     def get_models_by_group(self, group):
         return [m for m in self.models.values() if m.fine_tune_group == group]
 

@@ -1195,19 +1195,19 @@ async function debugFinetuneAllModels() {
     // Fine-tune each model
     for (const model of predictionModels) {
         try {
-            apiData.model_name = model.name;
-
             const response = await fetch(FINETUNE_ENDPOINT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: {}
             });
 
             const result = await response.json();
 
-            if (result.status === 'success') {
-                model.info.size_of_training_dataset = result.new_dataset_size;
-            }
+            result.models?.forEach(m => {
+                const idx = predictionModels.findIndex(mm => mm.name === m.name);
+                if (idx >= 0) {
+                    predictionModels[idx].info.size_of_training_dataset = m.new_dataset_size;
+                }
+            });
         } catch (error) {
             console.error(`Error fine-tuning ${model.name}:`, error);
         }
