@@ -121,7 +121,6 @@ class PatientStorage:
     def get_patients_for_fine_tune(self, group='default'):
         all_patients_raw = self.get_all_patients_raw()
 
-        print("ALL_PATIENTS_RAW:", all_patients_raw)
         return [
             p for p in all_patients_raw
             if p.is_usable_for_fine_tune(group)

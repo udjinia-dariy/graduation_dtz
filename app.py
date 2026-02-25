@@ -100,13 +100,11 @@ def fine_tune_all_ml():
         all_groups = models_storage.get_all_groups()
         total_patients_used = 0
         all_results = []
-        print("GROUPS:", all_groups)
 
         for group in all_groups:
-            # FIXME: maybe i should make more reliable shitt here (mean i have check's but repeat them inside model module)
+            # FIXME: maybe i should make more reliable stuff here (mean i have check's but repeat them inside model module)
             patients = patient_storage.get_patients_for_fine_tune(group)
 
-            print("PATIENTS:", patients)
             if not patients:
                 continue
 

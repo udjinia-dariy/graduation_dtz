@@ -105,89 +105,6 @@ def prepare_features(features, scaler, features_names_list, fill_none=False):
     # if None processing already in processor - do nothing else
     return scaler.transform(features_df)
 
-
-
-
-
-
-def get_encoders_from_transformer(transformer):
-    """Recursively search for Encoders inside Pipelines."""
-    if isinstance(transformer, (OrdinalEncoder, OneHotEncoder)):
-        return [transformer]
-    if isinstance(transformer, Pipeline):
-        encoders = []
-        for _, step in transformer.steps:
-            encoders.extend(get_encoders_from_transformer(step))
-        return encoders
-    return []
-
-def check_init_data_against_scaler(pdata, scaler, feature_names):
-    known_cats_map = {}
-    
-    # 1. Deeply search the ColumnTransformer for any categorical encoders
-    if hasattr(scaler, 'transformers_'):
-        for name, transformer, cols in scaler.transformers_:
-            # Skip 'drop' or 'passthrough' string commands
-            if isinstance(transformer, str):
-                continue
-                
-            encoders = get_encoders_from_transformer(transformer)
-            
-            for enc in encoders:
-                if hasattr(enc, 'categories_'):
-                    for i, col in enumerate(cols):
-                        # Map string column names to list index, or keep int
-                        col_idx = feature_names.index(col) if isinstance(col, str) else col
-                        known_cats_map[col_idx] = enc.categories_[i].tolist()
-
-    if not known_cats_map:
-        print("⚠️ Diagnostic couldn't find any trained Ordinal/OneHot encoders in the scaler.")
-        return
-
-    print(f"\n=== DIAGNOSTIC: CHECKING {len(pdata)} ROWS AGAINST SCALER ===")
-    bad_count = 0
-    
-    for row_idx, row in enumerate(pdata):
-        for col_idx, expected_cats in known_cats_map.items():
-            val = row[col_idx]
-            col_name = feature_names[col_idx]
-            
-            is_nan = isinstance(val, float) and math.isnan(val)
-            
-            # Helper to check if NaN is in expected categories
-            expected_has_nan = any(isinstance(c, float) and math.isnan(c) for c in expected_cats)
-
-            # Scenario A: The value is NaN but the scaler never saw NaN
-            if is_nan:
-                if not expected_has_nan:
-                    print(f"❌ ROW {row_idx} | Col '{col_name}': Found NaN, but scaler never saw NaNs here.")
-                    bad_count += 1
-            
-            # Scenario B: Unseen value
-            elif val not in expected_cats:
-                # Be forgiving if the value is technically the same (e.g., 3 == 3.0)
-                if any(val == c and not (isinstance(c, float) and math.isnan(c)) for c in expected_cats):
-                    # Scenario C: Type mismatch (3 int vs 3.0 float)
-                    expected_types = list(set(type(c).__name__ for c in expected_cats))
-                    if type(val).__name__ not in expected_types:
-                        print(f"⚠️ ROW {row_idx} | Col '{col_name}': TYPE MISMATCH. Value {val} is {type(val).__name__}, "
-                              f"but scaler expects: {expected_types}. (This will crash sklearn!)")
-                        bad_count += 1
-                else:
-                    print(f"❌ ROW {row_idx} | Col '{col_name}': Found UNKNOWN VALUE {repr(val)}. (Expected: {expected_cats[:5]}...)")
-                    bad_count += 1
-
-    if bad_count == 0:
-        print("✅ No issues found! init_df data perfectly matches the scaler's expectations.")
-    else:
-        print(f"🚨 FOUND {bad_count} POTENTIAL CRASHES IN INIT_DF!")
-    print("===============================================================\n")
-
-
-
-
-
-
 REQUIRED_CLASSES = {0, 1}
 
 def fit_with_new_data_alone(model, X_data, y_data, error_message):
@@ -228,6 +145,7 @@ class Model:
         (model_path, scaler_path) = self._gen_paths() 
         self.model, self.scaler = load_ml_model(model_path, scaler_path)
         self.explainer = shap.Explainer(self.model)
+        self.explainer = None
 
     def get_info(self):
         return {
@@ -278,8 +196,6 @@ class Model:
         }
 
     def predict(self, data):
-        print("DATA FOR EXTRACTION SHOULD LOOK LIKE:", data)
-        print("SHOULD LOOK LIKE:", extract_features(data, self.all_features_names))
         features_array = prepare_features([extract_features(data, self.all_features_names)], self.scaler, self.all_features_names, self.should_manualy_fill_none)
 
         # Make prediction
@@ -323,7 +239,6 @@ class Model:
 
             pdata = {k: smart_convert(v) for k, v in pdata.items()}
 
-            print("DATA FOR EXTRACTION FUCKING LOOK LIKE:", pdata)
             feats = extract_features(pdata, self.all_features_names)
 
             X_list.append(feats)
@@ -333,7 +248,6 @@ class Model:
             return {'new_dataset_size': self.size_of_training_dataset, 'added': 0}
 
         # apply preprocessor
-        print("FUCKING LOOK LIKE:", X_list)
         X_prepared = prepare_features(X_list, self.scaler, self.all_features_names,
                                     self.should_manualy_fill_none)
         y = np.array(y_list, dtype=int)
@@ -352,19 +266,13 @@ class Model:
                 y_list = fit_with_new_data_alone(self.model, X_prepared, y, "no data provided!")
             else:
                 try:
-                    print("============================================================")
-                    print("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
                     pdata_first = init_df[self.all_features_names].values.tolist()
                     pdata = [[smart_convert(item) for item in sublist] for sublist in pdata_first]
-                    check_init_data_against_scaler(pdata, self.scaler, self.all_features_names)
-                    print("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
-                    print("============================================================")
-
                     X_original = prepare_features(
                         pdata, self.scaler, self.all_features_names, self.should_manualy_fill_none
                     )
                     y_original = init_df[self.target_column_name].values
-                    
+
                     # combine original and new data
                     X_combined = np.vstack([X_original, X_prepared])
                     y_combined = np.hstack([y_original, y])
