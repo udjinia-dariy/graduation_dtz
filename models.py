@@ -296,14 +296,15 @@ class Model:
 #TODO: add save fine_tuned model code
 
 class ModelsStorage:
-    BASE_DATAFRAME_PATH = 'models/base_dataframe.pkl'
+    BASE_DATAFRAME_PATH = 'models'
+    BASE_DATAFRAME_NAME = 'base_dataframe.pkl'
 
     def __init__(self, config_path):
         self.config_path = config_path
         self.models = {}
-        self.initial_dataframe = None
+        self.initial_dataframe = {}
         self._load_config()
-        self._load_initial_dataframe()
+        self._load_initial_dataframes()
 
     def _read_raw_config(self):
         try:
@@ -339,55 +340,71 @@ class ModelsStorage:
                 fine_tune_group=model_config.get('fine_tune_group', 'default'),
             )
 
-    def _load_initial_dataframe(self):
+    def _load_initial_dataframes(self):
+        all_groups = self.get_all_groups()
+        for group in all_groups:
+            self._load_initial_dataframe(group)
+
+    def _load_initial_dataframe(self, group=""):
         config = self._read_raw_config()
         history: list = config.get('dataframe_history', [])
 
         # Try the latest versioned file from history
         if history:
-            latest = history[-1]
-            filepath = latest['filename']
-            if os.path.exists(filepath):
-                try:
-                    self.initial_dataframe = pd.read_pickle(filepath)
-                    print(f"Loaded dataframe from history: '{filepath}' "
-                          f"({latest.get('rows', '?')} rows, saved {latest.get('timestamp', '?')})")
-                    return
-                except Exception as e:
-                    print(f"Failed to load latest history file '{filepath}': {e}")
+            # TODO: fix this gross
+            for el in range(len(history)):
+                latest = history[-1 * (el + 1)]
+                filename = latest['filename']
+                if not group in filename:
+                    continue
+                filepath = f"{self.BASE_DATAFRAME_PATH}/{filename}"
+                if os.path.exists(filepath):
+                    try:
+                        self.initial_dataframe[group] = pd.read_pickle(filepath)
+                        print(f"Loaded dataframe from history: '{filepath}' "
+                            f"({latest.get('rows', '?')} rows, saved {latest.get('timestamp', '?')})")
+                        return
+                    except Exception as e:
+                        print(f"Failed to load latest history file '{filepath}': {e}")
+            print(f"Failed to load any history file for '{group}'")
 
         # Fall back to base_dataframe.pkl
-        filepath = self.BASE_DATAFRAME_PATH
+        filepath = f"{self.BASE_DATAFRAME_PATH}/{group}_{self.BASE_DATAFRAME_NAME}"
         if os.path.exists(filepath):
             try:
-                self.initial_dataframe = pd.read_pickle(filepath)
+                self.initial_dataframe[group] = pd.read_pickle(filepath)
                 print(f"Loaded dataframe from '{filepath}' "
-                      f"({len(self.initial_dataframe)} rows)")
+                      f"({len(self.initial_dataframe[group])} rows)")
 
                 # Auto-register base file as the first history entry
-                self.upload_dataframe(self.initial_dataframe, 'Initial base dataframe (auto-registered)')
+                self._upload_dataframe(self.initial_dataframe[group], group, 'Initial base dataframe (auto-registered)')
             except Exception as e:
-                print(f"Failed to load '{self.BASE_DATAFRAME_PATH}': {e}")
+                print(f"Failed to load '{filepath}': {e}")
         else:
-            print("No dataframe found. 'initial_dataframe' remains None.")
+            print(f"No dataframe found. 'initial_dataframe' for {group} remains None.")
 
     def _append_history_entry(self, config: dict, entry: dict):
         config.setdefault('dataframe_history', []).append(entry)
         self._write_raw_config(config)
 
-    def upload_dataframe(self, new_dataframe: pd.DataFrame,
+    def append_patients(self, patients, group):
+        pdata = [p.patient_data for p in patients]
+        df = pd.concat([self.initial_dataframe[group], pdata], ignore_index=True)
+
+    def _upload_dataframe(self, new_dataframe: pd.DataFrame, group: str,
                          description: str = ''):
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         # TODO: move `models` in base_path section
-        filename = f'models/dataframe_{timestamp}.pkl'
+        filename = f'{group}_dataframe_{timestamp}.pkl'
+        filepath = f"{self.BASE_DATAFRAME_PATH}/{filename}"
 
         try:
-            new_dataframe.to_pickle(filename)
+            new_dataframe.to_pickle(filepath)
         except Exception as e:
-            print(f"Failed to save dataframe to '{filename}': {e}")
+            print(f"Failed to save dataframe to '{filepath}': {e}")
             return None
 
-        prev_rows = len(self.initial_dataframe) if self.initial_dataframe is not None else 0
+        prev_rows = len(self.initial_dataframe[group]) if self.initial_dataframe[group] is not None else 0
         added_rows = len(new_dataframe) - prev_rows
 
         entry = {
@@ -402,7 +419,7 @@ class ModelsStorage:
         config = self._read_raw_config()
         self._append_history_entry(config, entry)
 
-        self.initial_dataframe = new_dataframe
+        self.initial_dataframe[group] = new_dataframe
         print(f"Dataframe updated: '{filename}' "
               f"({len(new_dataframe)} rows, +{added_rows} new)")
         return entry
@@ -444,6 +461,6 @@ class ModelsStorage:
         models = self.get_models_by_group(group)
         results = []
         for model in models:
-            res = model.fine_tune_batch(patients, self.initial_dataframe)
+            res = model.fine_tune_batch(patients, self.initial_dataframe[group])
             results.append({'name': model.model_name, **res})
         return results

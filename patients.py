@@ -82,7 +82,7 @@ class PatientStorage:
         except Exception as e:
             print(f"Error loading patient {patient_id}: {str(e)}")
         return None
-    
+
     def delete_patient(self, patient_id):
         """Delete patient file"""
         file_path = self._get_patient_path(patient_id)
@@ -93,7 +93,7 @@ class PatientStorage:
         except Exception as e:
             print(f"Error deleting patient {patient_id}: {str(e)}")
         return False
-    
+
     def _get_all_patients_base(self, getter=lambda x: x):
         patients = []
         try:

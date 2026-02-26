@@ -23,12 +23,52 @@
       "is_tree": false,
       "should_manualy_fill_none": false,
       "size_of_training_dataset": 101
+    },
+    {
+      "id": "random_forest_2_model",
+      "display_name": "Случайный лес",
+      "description": "Модель случайного леса, для предсказания рецидива после операции",
+      "model_filename": "random_forest_2_model",
+      "scaler_filename": "preprocessor2",
+      "fine_tune_group": "postOperationRecurrence",
+      "is_initial": false,
+      "is_tree": true,
+      "should_manualy_fill_none": false,
+      "size_of_training_dataset": 100
+    },
+    {
+      "id": "xgboost_2",
+      "display_name": "Xgboost",
+      "description": "Модель на основе Xgboost для предсказания рецидива после операции",
+      "model_filename": "xgboost_2_model",
+      "scaler_filename": "preprocessor2",
+      "fine_tune_group": "postOperationRecurrence",
+      "is_initial": false,
+      "is_tree": false,
+      "should_manualy_fill_none": false,
+      "size_of_training_dataset": 101
     }
   ],
   "dataframe_history": [
     {
       "filename": "models/dataframe_20260225_162825.pkl",
       "timestamp": "2026-02-25T16:28:25",
+      "description": "Initial base dataframe (auto-registered)",
+      "rows": 168,
+      "columns": 19,
+      "added_rows": 0
+    },
+    {
+      "filename": "firstRemission_dataframe_20260226_155522.pkl",
+      "timestamp": "2026-02-26T15:55:22",
+      "description": "Initial base dataframe (auto-registered)",
+      "rows": 168,
+      "columns": 19,
+      "added_rows": 0
+    },
+    {
+      "filename": "firstRemission_dataframe_20260226_155614.pkl",
+      "timestamp": "2026-02-26T15:56:14",
       "description": "Initial base dataframe (auto-registered)",
       "rows": 168,
       "columns": 19,
