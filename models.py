@@ -424,6 +424,40 @@ class ModelsStorage:
               f"({len(new_dataframe)} rows, +{added_rows} new)")
         return entry
 
+
+    def upload_model(self, model):
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        new_model_name = f"{model.model_name}_{timestamp}"
+        filepath = f"{self.BASE_DATAFRAME_PATH}/{new_model_name}.pkl"
+
+        try:
+            # Assuming joblib is imported via prelude
+            joblib.dump(model.model, filepath)
+        except Exception as e:
+            print(f"Failed to save model to '{filepath}': {e}")
+            return None
+
+        config = self._read_raw_config()
+        
+        # Add to history
+        entry = {
+            'filename': new_model_name + '.pkl',
+            'timestamp': datetime.now().isoformat(timespec='seconds'),
+            'dataset_size': model.size_of_training_dataset
+        }
+        config.setdefault('model_history', []).append(entry)
+
+        # Update the main config so the new version loads on restart
+        for m_cfg in config.get('models', []):
+            if m_cfg.get('model_filename') == model.model_name:
+                m_cfg['model_filename'] = new_model_name
+                m_cfg['size_of_training_dataset'] = model.size_of_training_dataset
+        
+        self._write_raw_config(config)
+        model.model_name = new_model_name  # Update name in memory
+        print(f"Model updated: '{new_model_name}.pkl'")
+        return entry
+
     def add_model(self, model_name, scaler_name, size_of_training_dataset,
                   is_initial=False, is_tree=True, should_manualy_fill_none=False,
                   display_name=None, description=None, fine_tune_group='NoGroup'):
@@ -462,5 +496,14 @@ class ModelsStorage:
         results = []
         for model in models:
             res = model.fine_tune_batch(patients, self.initial_dataframe[group])
+            self.upload_model(model)
             results.append({'name': model.model_name, **res})
+
+        if patients:
+            pdata = pd.DataFrame([p.patient_data for p in patients])
+            if self.initial_dataframe.get(group) is not None:
+                updated_df = pd.concat([self.initial_dataframe[group], pdata], ignore_index=True)
+            else:
+                updated_df = pdata
+            self._upload_dataframe(updated_df, group, f"Fine-tuned with {len(patients)} new patients")
         return results
