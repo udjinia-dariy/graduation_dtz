@@ -4,25 +4,25 @@
       "id": "random_forest_1_model",
       "display_name": "Случайный лес",
       "description": "Предсказывает риски на основе модели случайного леса",
-      "model_filename": "random_forest_1_model_20260227_155458",
+      "model_filename": "random_forest_1_model",
       "scaler_filename": "preprocessor1",
       "fine_tune_group": "firstRemission",
       "is_initial": false,
       "is_tree": true,
       "should_manualy_fill_none": false,
-      "size_of_training_dataset": 102
+      "size_of_training_dataset": 104
     },
     {
       "id": "xgboost",
       "display_name": "Xgboost",
       "description": "Модель на основе Xgboost с None для пропусков",
-      "model_filename": "xgboost_1_model_20260227_155459",
+      "model_filename": "xgboost_1_model",
       "scaler_filename": "preprocessor1",
       "fine_tune_group": "firstRemission",
       "is_initial": false,
       "is_tree": false,
       "should_manualy_fill_none": false,
-      "size_of_training_dataset": 103
+      "size_of_training_dataset": 105
     },
     {
       "id": "random_forest_2_model",
@@ -47,36 +47,6 @@
       "is_tree": false,
       "should_manualy_fill_none": false,
       "size_of_training_dataset": 101
-    }
-  ],
-  "dataframe_history": [
-    {
-      "filename": "firstRemission_dataframe_20260226_155614.pkl",
-      "timestamp": "2026-02-26T15:56:14",
-      "description": "Initial base dataframe (auto-registered)",
-      "rows": 168,
-      "columns": 19,
-      "added_rows": 0
-    },
-    {
-      "filename": "firstRemission_dataframe_20260227_155459.pkl",
-      "timestamp": "2026-02-27T15:54:59",
-      "description": "Fine-tuned with 2 new patients",
-      "rows": 170,
-      "columns": 22,
-      "added_rows": 2
-    }
-  ],
-  "model_history": [
-    {
-      "filename": "random_forest_1_model_20260227_155458.pkl",
-      "timestamp": "2026-02-27T15:54:58",
-      "dataset_size": 102
-    },
-    {
-      "filename": "xgboost_1_model_20260227_155459.pkl",
-      "timestamp": "2026-02-27T15:54:59",
-      "dataset_size": 103
     }
   ]
 }

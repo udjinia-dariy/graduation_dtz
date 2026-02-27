@@ -145,7 +145,6 @@ class Model:
         (model_path, scaler_path) = self._gen_paths() 
         self.model, self.scaler = load_ml_model(model_path, scaler_path)
         self.explainer = shap.Explainer(self.model)
-        self.explainer = None
 
     def get_info(self):
         return {
@@ -285,7 +284,8 @@ class Model:
         # rebuild SHAP explainer
         try:
             self.explainer = shap.Explainer(self.model)
-        except Exception:
+        except Exception as e:
+            print(f"Failed to adapt explainer for new model {self.model_name}")
             self.explainer = None
 
         added = len(y_list)
