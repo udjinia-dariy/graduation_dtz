@@ -25,10 +25,10 @@
       "size_of_training_dataset": 105
     },
     {
-      "id": "random_forest_2_model",
+      "id": "extra_trees_2_model",
       "display_name": "Случайный лес",
-      "description": "Модель случайного леса, для предсказания рецидива после операции",
-      "model_filename": "random_forest_2_model",
+      "description": "Модель extra tree, для предсказания рецидива после операции",
+      "model_filename": "extra_trees_2_model",
       "scaler_filename": "preprocessor2",
       "fine_tune_group": "postOperationRecurrence",
       "is_initial": false,
@@ -37,16 +37,34 @@
       "size_of_training_dataset": 100
     },
     {
-      "id": "xgboost_2",
-      "display_name": "Xgboost",
-      "description": "Модель на основе Xgboost для предсказания рецидива после операции",
-      "model_filename": "xgboost_2_model",
+      "id": "knn_2_model",
+      "display_name": "K ближайших соседей",
+      "description": "Модель на основе knn для предсказания рецидива после операции",
+      "model_filename": "knn_2_model",
       "scaler_filename": "preprocessor2",
       "fine_tune_group": "postOperationRecurrence",
       "is_initial": false,
       "is_tree": false,
       "should_manualy_fill_none": false,
       "size_of_training_dataset": 101
+    }
+  ],
+  "dataframe_history": [
+    {
+      "filename": "firstRemission_dataframe_20260228_060852.pkl",
+      "timestamp": "2026-02-28T06:08:52",
+      "description": "Initial base dataframe (auto-registered)",
+      "rows": 168,
+      "columns": 19,
+      "added_rows": 0
+    },
+    {
+      "filename": "postOperationRecurrence_dataframe_20260228_061831.pkl",
+      "timestamp": "2026-02-28T06:18:31",
+      "description": "Initial base dataframe (auto-registered)",
+      "rows": 97,
+      "columns": 26,
+      "added_rows": 0
     }
   ]
 }

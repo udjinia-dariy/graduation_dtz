@@ -144,7 +144,11 @@ class Model:
     def _load(self, is_tree):
         (model_path, scaler_path) = self._gen_paths() 
         self.model, self.scaler = load_ml_model(model_path, scaler_path)
-        self.explainer = shap.Explainer(self.model)
+        try:
+            self.explainer = shap.Explainer(self.model)
+        except Exception as e:
+            print(f"Failed to adapt explainer for model {self.model_name}")
+            self.explainer = None
 
     def get_info(self):
         return {
