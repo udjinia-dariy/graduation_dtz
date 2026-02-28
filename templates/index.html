@@ -47,6 +47,9 @@
                         <button class="btn btn-primary" id="addReadmissionBtn">
                             <i class="fas fa-calendar-plus"></i> Добавить данные наблюдения (1.5 года)
                         </button>
+                        <button class="btn btn-secondary" id="addOperationBtn" style="margin-left: 10px;">
+                            <i class="fas fa-procedures"></i> Добавить данные об операции
+                        </button>
                     </div>
                 </div>
 
@@ -54,6 +57,7 @@
                     <div class="tabs">
                         <div class="tab active" data-tab="initial">Первичный приём</div>
                         <div class="tab" data-tab="readmission">Данные наблюдения</div>
+                        <div class="tab" data-tab="operation">Данные об операции</div>
                         <div class="tab" data-tab="results">Риск рецидива</div>
                     </div>
 
@@ -323,6 +327,97 @@
                             <div class="action-buttons">
                                 <button type="button" class="btn btn-primary" id="saveReadmissionBtn">
                                     <i class="fas fa-save"></i> Сохранить данные наблюдения
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Вкладка операции -->
+                    <div class="tab-content" id="operation-tab">
+                        <form id="operationForm">
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-procedures"></i> Послеоперационные признаки
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="surgery_type">Тип операции</label>
+                                        <select id="surgery_type" name="surgery_type">
+                                            <option value="" disabled selected hidden>Выберите вариант</option>
+                                            <option value="0">По методу Драчинской</option>
+                                            <option value="1">По методу Николаева</option>
+                                            <option value="3">Субтотальная резекция</option>
+                                            <option value="4">Удаление обеих долей с оставлением перешейка</option>
+                                        </select>
+                                        <div class="unknown-checkbox">
+                                            <label for="surgery_type_unknown">Неизвестно</label>
+                                            <input type="checkbox" id="surgery_type_unknown" name="surgery_type_unknown">
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="disease_duration_before_surgery_years">Длительность заболевания до операции (лет)</label>
+                                        <input type="number" id="disease_duration_before_surgery_years" name="disease_duration_before_surgery_years" step="0.1" min="0">
+                                        <div class="unknown-checkbox">
+                                            <label for="disease_duration_before_surgery_years_unknown">Неизвестно</label>
+                                            <input type="checkbox" id="disease_duration_before_surgery_years_unknown" name="disease_duration_before_surgery_years_unknown">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="age_at_surgery">Возраст на момент операции</label>
+                                        <input type="number" id="age_at_surgery" name="age_at_surgery" min="0" max="120">
+                                        <div class="unknown-checkbox">
+                                            <label for="age_at_surgery_unknown">Неизвестно</label>
+                                            <input type="checkbox" id="age_at_surgery_unknown" name="age_at_surgery_unknown">
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="preop_thyroid_volume">Объем щитовидной ж-зы перед операцией</label>
+                                        <input type="number" id="preop_thyroid_volume" name="preop_thyroid_volume" step="0.1" min="0">
+                                        <div class="unknown-checkbox">
+                                            <label for="preop_thyroid_volume_unknown">Неизвестно</label>
+                                            <input type="checkbox" id="preop_thyroid_volume_unknown" name="preop_thyroid_volume_unknown">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="preop_tsh">ТТГ перед операцией</label>
+                                        <input type="number" id="preop_tsh" name="preop_tsh" step="0.01" min="0">
+                                        <div class="unknown-checkbox">
+                                            <label for="preop_tsh_unknown">Неизвестно</label>
+                                            <input type="checkbox" id="preop_tsh_unknown" name="preop_tsh_unknown">
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <label for="postop_complications">Послеоперационные осложнения</label>
+                                        <select id="postop_complications" name="postop_complications">
+                                            <option value="" disabled selected hidden>Выберите вариант</option>
+                                            <option value="0">Нет осложнений</option>
+                                            <option value="1">Повреждение возвратного гортанного нерва</option>
+                                            <option value="2">Повреждение паращитовидных желез</option>
+                                        </select>
+                                        <div class="unknown-checkbox">
+                                            <label for="postop_complications_unknown">Неизвестно</label>
+                                            <input type="checkbox" id="postop_complications_unknown" name="postop_complications_unknown">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <label for="postop_recurrence">Рецидив после операции (Исход)</label>
+                                        <select id="postop_recurrence" name="postop_recurrence">
+                                            <option value="" selected>Неизвестно</option>
+                                            <option value="0">Ремиссия</option>
+                                            <option value="1">Нет ремиссии</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="action-buttons">
+                                <button type="button" class="btn btn-primary" id="saveOperationBtn">
+                                    <i class="fas fa-save"></i> Сохранить данные об операции
                                 </button>
                             </div>
                         </form>

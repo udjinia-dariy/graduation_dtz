@@ -22,6 +22,9 @@ const tabs = document.querySelectorAll('.tab');
 const tabContents = document.querySelectorAll('.tab-content');
 const modelSelectionSection = document.getElementById('modelSelectionSection');
 const modelOptions = document.getElementById('modelOptions');
+const addOperationBtn = document.getElementById('addOperationBtn');
+const saveOperationBtn = document.getElementById('saveOperationBtn');
+const operationForm = document.getElementById('operationForm');
 
 // Form elements
 const initialForm = document.getElementById('initialForm');
@@ -56,6 +59,14 @@ const fieldMapping = {
     'us3_thyroid_volume': 'us3_thyroid_volume',
     'us3_nodules': 'us3_nodules',
     'us3_nodules_cm': 'us3_nodules_cm',
+
+    // TODO: not sure about this changes
+    'surgery_type': 'surgery_type',
+    'disease_duration_before_surgery_years': 'disease_duration_before_surgery_years',
+    'age_at_surgery': 'age_at_surgery',
+    'preop_thyroid_volume': 'preop_thyroid_volume',
+    'preop_tsh': 'preop_tsh',
+    'postop_complications': 'postop_complications',
 };
 
 // Initialize the application
@@ -206,6 +217,12 @@ function hasFollowupData(patient) {
           patient.us3_nodules_cm !== null;
 }
 
+function hasOperationData(patient) {
+  return patient.surgery_type !== null ||
+          patient.postop_complications !== null || 
+          patient.age_at_surgery !== null;
+}
+
 // Render model selection based on patient status
 function renderModelSelection() {
     if (!currentPatientId) {
@@ -224,10 +241,15 @@ function renderModelSelection() {
         if (model.info.type === "init") {
             // Initial models require only initial data
             return true;
-        } else if (model.info.type === "follow-up") {
+        } else if (model.info.type === "firstRemission") {
             // Follow-up models require follow-up data
-            // Check if patient has follow-up data
+            // Check if patient has this data
             return hasFollowupData(patient);
+        }
+        else if (model.info.type === "postOperationRecurrence") {
+            // postOperation models require postOperation data
+            // Check if patient has this data
+            return hasOperationData(patient);
         }
         return false;
     });
@@ -239,6 +261,15 @@ function renderModelSelection() {
     
     // Clear previous options
     modelOptions.innerHTML = '';
+
+    const modelTypeToStyleName = (type) => {
+        const convertDict = {
+            'firstRemission': 'follow-up',
+            'postOperationRecurrence': 'post-op',
+            'init': 'init'
+        }
+        return convertDict[type];
+    };
     
     // Create radio buttons for each model
     availableModels.forEach((model, index) => {
@@ -264,7 +295,7 @@ function renderModelSelection() {
                     >
             <label for="${modelId}" class="model-label">
                 <div class="model-name">${model.info.display_name.replace(/_/g, ' ').toUpperCase()}</div>
-                <div class="model-type ${model.info.type === 'init' ? 'init' : 'follow-up'}">${model.info.type.toUpperCase()} МОДЕЛЬ</div>
+                <div class="model-type ${modelTypeToStyleName(model.info.type)}">${model.info.type.toUpperCase()} МОДЕЛЬ</div>
                 <div class="model-name">Количество пациентов при обучения: ${model.info.size_of_training_dataset}</div>
                 <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
                     ${model.info.description}
@@ -389,38 +420,43 @@ function renderPatientList() {
 function selectPatient(patientId) {
     currentPatientId = patientId;
     isNewPatient = false;
-    
+
     const patient = patients.find(p => p.id === patientId);
     if (!patient) return;
-    
+
     // Update patient header
     const displayName = patient.patient_name || patient.name || `Пациент ${patient.id}`;
     patientName.textContent = displayName;
-    
-    
-    if (hasFollowupData(patient)) {
-        patientStatus.textContent = 'Есть данные наблюдения';
+
+    const hasFw = hasFollowupData(patient);
+    const hasOp = hasOperationData(patient);
+
+    addReadmissionBtn.style.display = hasFw ? 'none' : 'inline-block';
+    addOperationBtn.style.display = hasOp ? 'none' : 'inline-block';
+
+    patientActions.style.display = (hasFw && hasOp) ? 'none' : 'block';
+
+    if (hasFw || hasOp) {
+        patientStatus.textContent = 'Есть данные наблюдения/операции';
         patientStatus.className = 'patient-status status-followup';
-        patientActions.style.display = 'none';
     } else {
         patientStatus.textContent = 'Только первичный визит';
         patientStatus.className = 'patient-status status-new';
-        patientActions.style.display = 'block';
     }
-    
+
     // Show delete button
     deletePatientBtn.style.display = 'inline-flex';
-    
-    // Populate forms
+
     populateForm(initialForm, patient);
     populateForm(readmissionForm, patient);
-    
+    populateForm(operationForm, patient);
+
     // Update model selection based on patient status
     renderModelSelection();
-    
+
     // Update patient list UI
     renderPatientList();
-    
+
     // Clear results tab
     document.getElementById('calculationResults').innerHTML = `
         <div class="empty-state">
@@ -613,7 +649,16 @@ async function saveInitialData() {
             us3_thyroid_volume: patient.us3_thyroid_volume,
             us3_nodules: patient.us3_nodules,
             us3_nodules_cm: patient.us3_nodules_cm,
-            no_remission: patient.no_remission
+            no_remission: patient.no_remission,
+
+            // TODO: not sure about this stuff
+            surgery_type: patient.surgery_type ?? null,
+            disease_duration_before_surgery_years: patient.disease_duration_before_surgery_years ?? null,
+            age_at_surgery: patient.age_at_surgery ?? null,
+            preop_thyroid_volume: patient.preop_thyroid_volume ?? null,
+            preop_tsh: patient.preop_tsh ?? null,
+            postop_complications: patient.postop_complications ?? null,
+            postop_recurrence: patient.postop_recurrence ?? null
         }
     };
     
@@ -685,7 +730,16 @@ async function saveReadmissionData() {
             us3_thyroid_volume: patient.us3_thyroid_volume,
             us3_nodules: patient.us3_nodules,
             us3_nodules_cm: patient.us3_nodules_cm,
-            no_remission: patient.no_remission
+            no_remission: patient.no_remission,
+
+            // TODO: not sure about this stuff
+            surgery_type: patient.surgery_type ?? null,
+            disease_duration_before_surgery_years: patient.disease_duration_before_surgery_years ?? null,
+            age_at_surgery: patient.age_at_surgery ?? null,
+            preop_thyroid_volume: patient.preop_thyroid_volume ?? null,
+            preop_tsh: patient.preop_tsh ?? null,
+            postop_complications: patient.postop_complications ?? null,
+            postop_recurrence: patient.postop_recurrence ?? null
         }
     };
     
@@ -846,7 +900,16 @@ async function calculateRecurrenceRisk() {
                 'tsh_3': 'Уровень ТТГ потворный прием',
                 'us3_thyroid_volume': 'Объём щитовидной железы повторный прием',
                 'us3_nodules': 'Узлы повторный прием',
-                'us3_nodules_cm': 'Размер узлов повторный прием'
+                'us3_nodules_cm': 'Размер узлов повторный прием',
+
+
+                // TODO: not sure
+                'surgery_type': 'Тип операции',
+                'disease_duration_before_surgery_years': 'Длительность до операции (лет)',
+                'age_at_surgery': 'Возраст на момент операции',
+                'preop_thyroid_volume': 'Объем щитовидной ж-зы перед операцией',
+                'preop_tsh': 'ТТГ перед операцией',
+                'postop_complications': 'Послеоперационные осложнения'
             };
             
             Object.keys(apiData).forEach(key => {
@@ -877,9 +940,16 @@ async function calculateRecurrenceRisk() {
                               key === 'exophthalmos' || key === 'thyrotoxic_cardiomyopathy') {
                         displayValue = value === 1 ? 'Да' : 'Нет';
                     } else if (key === 'smoking_status' ) {
-                        displayValue = value === 1 ? 'Да' : (value === 2 ? 'В анамнезе' : 'Нет');
+                        const types = {0: 'Нет', 1: 'Да', 2: 'В анамнезе'};
+                        displayValue = types[value] || value;
                     } else if (key === 'treatment_type') {
                         displayValue = `Тип ${value}`;
+                    } else if (key === 'surgery_type') {
+                        const types = {0: 'По методу Драчинской', 1: 'По методу Николаева', 3: 'Субтотальная резекция', 4: 'Удаление обеих долей'};
+                        displayValue = types[value] || value;
+                    } else if (key === 'postop_complications') {
+                        const comps = {0: 'Нет осложнений', 1: 'Повреждение возвратного гортанного нерва', 2: 'Повреждение паращитовидных желез'};
+                        displayValue = comps[value] || value;
                     }
                 }
                 
@@ -1169,16 +1239,22 @@ function setupEventListeners() {
     addReadmissionBtn.addEventListener('click', () => {
         switchTab('readmission');
     });
-    
+
+    /// Add operation button
+    addOperationBtn.addEventListener('click', () => switchTab('operation'));
+
     // Save initial data button
     saveInitialBtn.addEventListener('click', saveInitialData);
-    
+
     // Save follow-up data button
     saveReadmissionBtn.addEventListener('click', saveReadmissionData);
-    
+ 
+    /// Save opoeration button
+    saveOperationBtn.addEventListener('click', saveOperationData);
+
     // Calculate risk button
     calculateRiskBtn.addEventListener('click', calculateRecurrenceRisk);
-    
+
     // Delete patient button
     deletePatientBtn.addEventListener('click', async () => {
         if (currentPatientId && confirm('Вы уверены, что хотите удалить этого пациента?')) {
@@ -1214,6 +1290,36 @@ async function debugFinetuneAllModels() {
 
     renderModelSelection();
     showMessage('Все модели обновлены!', 'success');
+}
+
+async function saveOperationData() {
+    if (!currentPatientId) return;
+    const patientIndex = patients.findIndex(p => p.id === currentPatientId);
+    if (patientIndex === -1) return;
+    
+    const formData = getFormData(operationForm);
+    const patient = patients[patientIndex];
+    
+    Object.keys(formData).forEach(key => {
+        if (!key.endsWith('_unknown')) patient[key] = formData[key] === '' ? null : formData[key];
+    });
+    
+    // Build patient data object using the existing patient values
+    const patientData = { id: patient.id, patient_data: { ...patient } };
+    
+    try {
+        const result = await savePatientToBackend(patientData, false);
+        if (result) {
+            patient.updated_at = new Date().toISOString();
+            renderModelSelection();
+            showMessage('Данные об операции успешно сохранены!', 'success');
+            renderPatientList();
+            selectPatient(patient.id);
+            switchTab('operation');
+        }
+    } catch (error) {
+        showMessage(`Ошибка: ${error.message}`, 'error');
+    }
 }
 
 // Initialize the app when DOM is loaded

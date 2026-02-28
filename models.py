@@ -27,32 +27,58 @@ def smart_convert(x):
 
 # order of names is important
 INITIAL_FEASTURES_NAMES = [
-        'age_onset', 'heredity', 'smoking_status', 'sex',
-        'us1_thyroid_volume', 'us1_nodules', 'us1_nodules_cm',
-        'tsh_1', 'ft4_1', 'ft3_1', 'ft3_to_ft4_ratio',
-        'exophthalmos', 'thyrotoxic_cardiomyopathy'
+        'age_onset',
+        'heredity',
+        'smoking_status',
+        'sex',
+        'us1_thyroid_volume',
+        'us1_nodules',
+        'us1_nodules_cm',
+        'tsh_1',
+        'ft4_1',
+        'ft3_1',
+        'ft3_to_ft4_ratio',
+        'exophthalmos',
+        'thyrotoxic_cardiomyopathy'
 ]
 
 READMISSION_FEATURE_NAMES = [
-        'treatment_type', 'tsh_3', 'us3_thyroid_volume', 'us3_nodules', 'us3_nodules_cm'
+        'treatment_type',
+        'tsh_3',
+        'us3_thyroid_volume',
+        'us3_nodules',
+        'us3_nodules_cm'
 ]
 
-# order of names still important
-ALL_FEATURE_NAMES = INITIAL_FEASTURES_NAMES + READMISSION_FEATURE_NAMES
+OPERATION_FEATURE_NAMES = [
+        'no_remission',
+        'surgery_type',
+        'disease_duration_before_surgery_years',
+        'age_at_surgery',
+        'preop_thyroid_volume',
+        'preop_tsh',
+        'postop_complications'
+]
 
-# Define categorical and numerical columns
+# Specific combos for the models
+FOLLOW_UP_FEATURE_NAMES = INITIAL_FEASTURES_NAMES + READMISSION_FEATURE_NAMES
+POST_OP_FEATURE_NAMES = FOLLOW_UP_FEATURE_NAMES + OPERATION_FEATURE_NAMES
+
+ALL_FEATURE_NAMES = POST_OP_FEATURE_NAMES
+
 CATEGORICAL_COLS = [
     "heredity",
-    "smoking_status", 
+    "smoking_status",
     "sex",
     "us1_nodules",
     "exophthalmos",
     "thyrotoxic_cardiomyopathy",
-    "treatment_type", 
-    "us3_nodules"
+    "treatment_type",
+    "us3_nodules",
+    "surgery_type",
+    "postop_complications"
 ]
 
-# Identify numerical columns (all columns not in CATEGORICAL_COLS)
 NUM_COLS = [col for col in ALL_FEATURE_NAMES if col not in CATEGORICAL_COLS]
 
 # Helper function to load ML model (for future use)
@@ -121,18 +147,24 @@ def fit_with_new_data_alone(model, X_data, y_data, error_message):
 #TODO: params list should be reworked (many places now to repeat)
 class Model:
     def __init__(self, model_name, scaler_name, size_of_training_dataset,
-                 is_initial, is_tree, should_manualy_fill_none, display_name="NoName",
+                 is_tree, should_manualy_fill_none, display_name="NoName",
                  description="No description", fine_tune_group="NoGroup"):
         self.model_name = model_name
         self.scaler_name = scaler_name
         # If models only for inital_cases - it works withanother set of params
-        self.is_initial = is_initial
-        self.all_features_names = INITIAL_FEASTURES_NAMES if is_initial else ALL_FEATURE_NAMES
+
+        self.fine_tune_group = fine_tune_group
+        if self.fine_tune_group == 'firstRemission':
+            self.all_features_names = FOLLOW_UP_FEATURE_NAMES
+        elif self.fine_tune_group == 'postOperationRecurrence':
+            self.all_features_names = POST_OP_FEATURE_NAMES
+        else: # 'initial'
+            self.all_features_names = INITIAL_FEASTURES_NAMES
+
         self.should_manualy_fill_none = should_manualy_fill_none
         self.description = description
         self.display_name = display_name if display_name != "NoName" else model_name
         self.size_of_training_dataset = size_of_training_dataset
-        self.fine_tune_group = fine_tune_group
         self.target_column_name = 'no_remission'
         self._load(is_tree)
 
@@ -155,7 +187,8 @@ class Model:
             'display_name': self.display_name,
             'description': self.description,
             'size_of_training_dataset': self.size_of_training_dataset,
-            'type': 'init' if self.is_initial else 'follow-up',
+            # TODO: or maybe converter should be implemented and used here
+            'type': self.fine_tune_group,
         }
 
     def _explain(self, features_array):
@@ -335,7 +368,6 @@ class ModelsStorage:
             self.add_model(
                 model_name=model_config['model_filename'],
                 scaler_name=model_config['scaler_filename'],
-                is_initial=model_config.get('is_initial', False),
                 is_tree=model_config.get('is_tree', True),
                 should_manualy_fill_none=model_config.get('should_manualy_fill_none', False),
                 display_name=model_config.get('display_name', 'NoName'),
@@ -463,11 +495,11 @@ class ModelsStorage:
         return entry
 
     def add_model(self, model_name, scaler_name, size_of_training_dataset,
-                  is_initial=False, is_tree=True, should_manualy_fill_none=False,
+                  is_tree=True, should_manualy_fill_none=False,
                   display_name=None, description=None, fine_tune_group='NoGroup'):
         try:
             model = Model(model_name, scaler_name, size_of_training_dataset,
-                          is_initial, is_tree, should_manualy_fill_none,
+                          is_tree, should_manualy_fill_none,
                           display_name, description, fine_tune_group)
             if model.model is not None:
                 self.models[model_name] = model

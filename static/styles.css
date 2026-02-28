@@ -473,6 +473,11 @@ input:focus, select:focus {
           color: #3498db;
       }
 
+      .model-type.post-op {
+          background-color: #f8e4fc;
+          color: #f498db;
+      }
+
       .model-disabled {
           opacity: 0.5;
           cursor: not-allowed;

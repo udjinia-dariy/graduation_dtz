@@ -7,7 +7,7 @@
       "model_filename": "random_forest_1_model",
       "scaler_filename": "preprocessor1",
       "fine_tune_group": "firstRemission",
-      "is_initial": false,
+      "model_group": "follow_up",
       "is_tree": true,
       "should_manualy_fill_none": false,
       "size_of_training_dataset": 104
@@ -19,19 +19,19 @@
       "model_filename": "xgboost_1_model",
       "scaler_filename": "preprocessor1",
       "fine_tune_group": "firstRemission",
-      "is_initial": false,
+      "model_group": "follow_up",
       "is_tree": false,
       "should_manualy_fill_none": false,
       "size_of_training_dataset": 105
     },
     {
       "id": "extra_trees_2_model",
-      "display_name": "Случайный лес",
+      "display_name": "Extra tees",
       "description": "Модель extra tree, для предсказания рецидива после операции",
       "model_filename": "extra_trees_2_model",
       "scaler_filename": "preprocessor2",
       "fine_tune_group": "postOperationRecurrence",
-      "is_initial": false,
+      "model_group": "post_operation",
       "is_tree": true,
       "should_manualy_fill_none": false,
       "size_of_training_dataset": 100
@@ -43,7 +43,7 @@
       "model_filename": "knn_2_model",
       "scaler_filename": "preprocessor2",
       "fine_tune_group": "postOperationRecurrence",
-      "is_initial": false,
+      "model_group": "post_operation",
       "is_tree": false,
       "should_manualy_fill_none": false,
       "size_of_training_dataset": 101
