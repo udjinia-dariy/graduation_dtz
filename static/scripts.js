@@ -59,8 +59,6 @@ const fieldMapping = {
     'us3_thyroid_volume': 'us3_thyroid_volume',
     'us3_nodules': 'us3_nodules',
     'us3_nodules_cm': 'us3_nodules_cm',
-
-    // TODO: not sure about this changes
     'surgery_type': 'surgery_type',
     'disease_duration_before_surgery_years': 'disease_duration_before_surgery_years',
     'age_at_surgery': 'age_at_surgery',
@@ -209,18 +207,23 @@ function selectModel(modelName) {
 }
 
 function hasFollowupData(patient) {
-  return patient.treatment_type !== null || 
-          patient.thyrotoxic_cardiomyopathy !== null ||
-          patient.tsh_3 !== null ||
-          patient.us3_thyroid_volume !== null ||
-          patient.us3_nodules !== null ||
-          patient.us3_nodules_cm !== null;
+  return patient.treatment_type != null || 
+          patient.thyrotoxic_cardiomyopathy != null ||
+          patient.tsh_3 != null ||
+          patient.us3_thyroid_volume != null ||
+          patient.us3_nodules != null ||
+          patient.us3_nodules_cm != null;
 }
 
 function hasOperationData(patient) {
-  return patient.surgery_type !== null ||
-          patient.postop_complications !== null || 
-          patient.age_at_surgery !== null;
+  return (patient.surgery_type != null ||
+          patient.disease_duration_before_surgery_years != null ||
+          patient.age_at_surgery != null ||
+          patient.preop_thyroid_volume != null ||
+          patient.preop_tsh != null ||
+          patient.postop_complications != null) && patient.no_remission != null;
+    // TODO: вариант с предсказыванием постоперационных последствий до операции на рассмотрении
+  // return patient.no_remission != null;
 }
 
 // Render model selection based on patient status
@@ -244,33 +247,34 @@ function renderModelSelection() {
         } else if (model.info.type === "firstRemission") {
             // Follow-up models require follow-up data
             // Check if patient has this data
-            return hasFollowupData(patient);
-        }
-        else if (model.info.type === "postOperationRecurrence") {
+            return hasFollowupData(patient) && !hasOperationData(patient);
+        } else if (model.info.type === "postOperationRecurrence") {
             // postOperation models require postOperation data
             // Check if patient has this data
             return hasOperationData(patient);
         }
         return false;
     });
-    
+
     if (availableModels.length === 0) {
         modelSelectionSection.style.display = 'none';
         return;
     }
-    
+
     // Clear previous options
     modelOptions.innerHTML = '';
 
-    const modelTypeToStyleName = (type) => {
-        const convertDict = {
-            'firstRemission': 'follow-up',
-            'postOperationRecurrence': 'post-op',
-            'init': 'init'
-        }
-        return convertDict[type];
-    };
-    
+    const modelTypeToStyleName = type => ({
+        'firstRemission': 'follow-up',
+        'postOperationRecurrence': 'post-op'
+    }[type] ?? type);
+
+
+    const modelTypeToNormalName = type => ({
+        'firstRemission': 'Follow-up',
+        'postOperationRecurrence': 'Post operation'
+    }[type] ?? type);
+ 
     // Create radio buttons for each model
     availableModels.forEach((model, index) => {
         const modelId = `model-${index}`;
@@ -295,7 +299,7 @@ function renderModelSelection() {
                     >
             <label for="${modelId}" class="model-label">
                 <div class="model-name">${model.info.display_name.replace(/_/g, ' ').toUpperCase()}</div>
-                <div class="model-type ${modelTypeToStyleName(model.info.type)}">${model.info.type.toUpperCase()} МОДЕЛЬ</div>
+                <div class="model-type ${modelTypeToStyleName(model.info.type)}">${modelTypeToNormalName(model.info.type).toUpperCase()} МОДЕЛЬ</div>
                 <div class="model-name">Количество пациентов при обучения: ${model.info.size_of_training_dataset}</div>
                 <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
                     ${model.info.description}
@@ -436,8 +440,11 @@ function selectPatient(patientId) {
 
     patientActions.style.display = (hasFw && hasOp) ? 'none' : 'block';
 
-    if (hasFw || hasOp) {
-        patientStatus.textContent = 'Есть данные наблюдения/операции';
+    if (hasOp) {
+        patientStatus.textContent = 'Есть данные операции';
+        patientStatus.className = 'patient-status status-followup';
+    } else if (hasFw) {
+        patientStatus.textContent = 'Есть данные наблюдения';
         patientStatus.className = 'patient-status status-followup';
     } else {
         patientStatus.textContent = 'Только первичный визит';
@@ -650,8 +657,6 @@ async function saveInitialData() {
             us3_nodules: patient.us3_nodules,
             us3_nodules_cm: patient.us3_nodules_cm,
             no_remission: patient.no_remission,
-
-            // TODO: not sure about this stuff
             surgery_type: patient.surgery_type ?? null,
             disease_duration_before_surgery_years: patient.disease_duration_before_surgery_years ?? null,
             age_at_surgery: patient.age_at_surgery ?? null,
@@ -731,8 +736,6 @@ async function saveReadmissionData() {
             us3_nodules: patient.us3_nodules,
             us3_nodules_cm: patient.us3_nodules_cm,
             no_remission: patient.no_remission,
-
-            // TODO: not sure about this stuff
             surgery_type: patient.surgery_type ?? null,
             disease_duration_before_surgery_years: patient.disease_duration_before_surgery_years ?? null,
             age_at_surgery: patient.age_at_surgery ?? null,
@@ -846,9 +849,7 @@ async function calculateRecurrenceRisk() {
     
     // Add selected model to API request
     apiData.model_name = selectedModel;
-    
-    console.log('Sending data to API:', apiData);
-    
+
     // Show loading state
     const resultsDiv = document.getElementById('calculationResults');
     resultsDiv.innerHTML = `
@@ -901,9 +902,6 @@ async function calculateRecurrenceRisk() {
                 'us3_thyroid_volume': 'Объём щитовидной железы повторный прием',
                 'us3_nodules': 'Узлы повторный прием',
                 'us3_nodules_cm': 'Размер узлов повторный прием',
-
-
-                // TODO: not sure
                 'surgery_type': 'Тип операции',
                 'disease_duration_before_surgery_years': 'Длительность до операции (лет)',
                 'age_at_surgery': 'Возраст на момент операции',
@@ -933,7 +931,6 @@ async function calculateRecurrenceRisk() {
                     statusColor = '#388e3c';
                     
                     // Special formatting for some fields
-                    // TODO: add map of varients for each field
                     if (key === 'sex') {
                         displayValue = value === 1 ? 'Мужской' : 'Женский';
                     } else if (key === 'heredity' || key === 'us1_nodules' || key === 'us3_nodules' || 

@@ -10,7 +10,7 @@
       "model_group": "follow_up",
       "is_tree": true,
       "should_manualy_fill_none": false,
-      "size_of_training_dataset": 104
+      "size_of_training_dataset": 101
     },
     {
       "id": "xgboost",
@@ -22,7 +22,7 @@
       "model_group": "follow_up",
       "is_tree": false,
       "should_manualy_fill_none": false,
-      "size_of_training_dataset": 105
+      "size_of_training_dataset": 102
     },
     {
       "id": "extra_trees_2_model",
@@ -34,7 +34,7 @@
       "model_group": "post_operation",
       "is_tree": true,
       "should_manualy_fill_none": false,
-      "size_of_training_dataset": 100
+      "size_of_training_dataset": 103
     },
     {
       "id": "knn_2_model",
@@ -46,21 +46,21 @@
       "model_group": "post_operation",
       "is_tree": false,
       "should_manualy_fill_none": false,
-      "size_of_training_dataset": 101
+      "size_of_training_dataset": 104
     }
   ],
   "dataframe_history": [
     {
-      "filename": "firstRemission_dataframe_20260228_060852.pkl",
-      "timestamp": "2026-02-28T06:08:52",
+      "filename": "firstRemission_dataframe_20260301_153815.pkl",
+      "timestamp": "2026-03-01T15:38:15",
       "description": "Initial base dataframe (auto-registered)",
       "rows": 168,
       "columns": 19,
       "added_rows": 0
     },
     {
-      "filename": "postOperationRecurrence_dataframe_20260228_061831.pkl",
-      "timestamp": "2026-02-28T06:18:31",
+      "filename": "postOperationRecurrence_dataframe_20260301_153815.pkl",
+      "timestamp": "2026-03-01T15:38:15",
       "description": "Initial base dataframe (auto-registered)",
       "rows": 97,
       "columns": 26,
