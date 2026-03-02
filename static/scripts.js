@@ -193,17 +193,18 @@ async function deletePatientFromBackend(patientId) {
 // Select a patient
 function selectModel(modelName) {
     selectedModel = modelName;
+    const model = predictionModels.find(m => m.name === modelName);
 
-    // Clear results tab
-    document.getElementById('calculationResults').innerHTML = `
-        <div class="empty-state">
-            <i class="fas fa-calculator"></i>
-            <h3>Расчёт ещё не выполнен</h3>
-            <p>Заполните данные пациента и нажмите "Рассчитать риск рецидива" для просмотра результатов.</p>
-        </div>
-    `;
-    
-    viewRawDataBtn.style.display = 'none';
+    // Update the button text based on the model type
+    if (model) {
+        if (model.info.type === 'firstRemission') {
+            calculateRiskBtn.innerHTML = '<i class="fas fa-calculator"></i> Рассчитать вероятность отсутствия ремиссии';
+        } else if (model.info.type === 'postOperationRecurrence') {
+            calculateRiskBtn.innerHTML = '<i class="fas fa-calculator"></i> Рассчитать риск послеоперационного рецидива';
+        } else {
+            console.err("unsupported model type, model: ", model.info);
+        }
+    }
 }
 
 function hasFollowupData(patient) {
@@ -223,7 +224,7 @@ function hasOperationData(patient) {
           patient.preop_tsh != null ||
           patient.postop_complications != null) && patient.no_remission != null;
     // TODO: вариант с предсказыванием постоперационных последствий до операции на рассмотрении
-  // return patient.no_remission != null;
+    // return patient.no_remission != null;
 }
 
 // Render model selection based on patient status
@@ -232,13 +233,13 @@ function renderModelSelection() {
         modelSelectionSection.style.display = 'none';
         return;
     }
-    
+ 
     const patient = patients.find(p => p.id === currentPatientId);
     if (!patient) {
         modelSelectionSection.style.display = 'none';
         return;
     }
-    
+
     // Filter models based on patient status
     availableModels = predictionModels.filter(model => {
         if (model.info.type === "init") {
@@ -1029,14 +1030,30 @@ async function calculateRecurrenceRisk() {
                 }
             }
 
+            // Determine dynamic text based on model type
+            const selectedModelObj = availableModels.find(el => el.name === selectedModel);
+            let riskHighText = 'ВЫСОКИЙ РИСК РЕЦИДИВА ⚠️';
+            let riskLowText = 'НИЗКИЙ РИСК РЕЦИДИВА ✅';
+            
+            if (selectedModelObj) {
+                if (selectedModelObj.info.type === 'firstRemission') {
+                    riskHighText = 'ВЫСОКАЯ ВЕРОЯТНОСТЬ ОТСУТСТВИЯ РЕМИССИИ ⚠️';
+                    riskLowText = 'ВЫСОКАЯ ВЕРОЯТНОСТЬ РЕМИССИИ ✅';
+                } else if (selectedModelObj.info.type === 'postOperationRecurrence') {
+                    riskHighText = 'ВЫСОКИЙ РИСК ПОСЛЕОПЕРАЦИОННОГО РЕЦИДИВА ⚠️';
+                    riskLowText = 'НИЗКИЙ РИСК ПОСЛЕОПЕРАЦИОННОГО РЕЦИДИВА ✅';
+                }
+            }
+
             // Display results
             resultsDiv.innerHTML = `
                 <div style="background-color: ${prediction == 1 ? '#ffebee' : '#e8f5e9'}; 
                             padding: 20px; border-radius: 5px; margin: 15px 0;">
                     <div style="font-size: 24px; font-weight: bold; 
                                 color: ${prediction == 1 ? '#d32f2f' : '#388e3c'}; margin-bottom: 10px;">
-                        ${prediction == 1 ? 'ВЫСОКИЙ РИСК РЕЦИДИВА ⚠️' : 'НИЗКИЙ РИСК РЕЦИДИВА ✅'}
+                        ${prediction == 1 ? riskHighText : riskLowText}
                     </div>
+
                     <div style="font-size: 18px; margin-bottom: 10px;">
                         <strong>Вероятность:</strong> ${probability}%
                     </div>
@@ -1065,7 +1082,7 @@ async function calculateRecurrenceRisk() {
                     <p style="font-size: 0.9rem; margin-top: 5px;">
                         <strong>Важность признаков:</strong> Показывает, насколько каждый признак повлиял на прогноз.
                         Более высокие проценты указывают на большее влияние на решение модели.
-                        Наведите курсор на проценты, чтобы увидеть значения эффекта SHAP. Положительное значение - в пользу отсутсвия рецидива, отрицательное в пользу наличия рецидива.
+                        Наведите курсор на проценты, чтобы увидеть значения эффекта SHAP. Отрицательное значение SHAP снижает вероятность неблагоприятного исхода (рецидив / отсутствие ремиссии), а положительное — повышает её.
                     </p>
                 </div>
             `;
