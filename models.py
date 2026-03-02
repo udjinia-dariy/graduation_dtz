@@ -165,7 +165,12 @@ class Model:
         self.description = description
         self.display_name = display_name if display_name != "NoName" else model_name
         self.size_of_training_dataset = size_of_training_dataset
-        self.target_column_name = 'no_remission'
+        if self.fine_tune_group == 'firstRemission':
+            self.target_column_name  = 'no_remission'
+        elif self.fine_tune_group == 'postOperationRecurrence':
+            self.target_column_name  = 'postop_recurrence'
+        else: # 'initial'
+            self.target_column_name  = 'not_chosen'
         self._load(is_tree)
 
     def _gen_paths(self, base='models'):
@@ -259,7 +264,7 @@ class Model:
         return {'new_dataset_size': self.size_of_training_dataset, 'added': new_count}
 
     def fine_tune_batch(self, patients, init_df):
-        if not patients:
+        if patients is None or len(patients) == 0:
             return {'new_dataset_size': self.size_of_training_dataset, 'added': 0}
 
         X_list = []
@@ -311,7 +316,7 @@ class Model:
 
                     # combine original and new data
                     X_combined = np.vstack([X_original, X_prepared])
-                    y_combined = np.hstack([y_original, y])
+                    y_combined = np.hstack([y_original, y]).astype(int)
 
                     self.model.fit(X_combined, y_combined)
                 except Exception as e:
@@ -525,7 +530,7 @@ class ModelsStorage:
         return [m for m in self.models.values() if m.fine_tune_group == group]
 
     def fine_tune_group(self, patients, group='NoGroup'):
-        if not patients:
+        if patients is None or len(patients) == 0:
             return []
 
         models = self.get_models_by_group(group)

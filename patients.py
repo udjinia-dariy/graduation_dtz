@@ -31,6 +31,8 @@ class Patient:
         match group:
             case "firstRemission":
                 is_eligible = self.patient_data.get('no_remission') is not None
+            case "postOperationRecurrence":
+                is_eligible = self.patient_data.get('postop_recurrence') is not None
             case _:
                 print(f"Error: Unknown group '{group}'")
                 is_eligible = False
@@ -130,7 +132,6 @@ class PatientStorage:
         for pid in patient_ids:
             patient = self.load_patient(pid)
             if patient:
-                # TODO: remove this later it's just for tests
-                # patient.mark_used_by(group)
+                patient.mark_used_by(group)
                 self.save_patient(patient)
 

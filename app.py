@@ -105,7 +105,7 @@ def fine_tune_all_ml():
             # FIXME: maybe i should make more reliable stuff here (mean i have check's but repeat them inside model module)
             patients = patient_storage.get_patients_for_fine_tune(group)
 
-            if not patients:
+            if patients is None or len(patients) == 0:
                 continue
 
             results = models_storage.fine_tune_group(patients, group)
