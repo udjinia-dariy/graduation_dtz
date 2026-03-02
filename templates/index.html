@@ -58,7 +58,7 @@
                         <div class="tab active" data-tab="initial">Первичный приём</div>
                         <div class="tab" data-tab="readmission">Данные наблюдения</div>
                         <div class="tab" data-tab="operation">Данные об операции</div>
-                        <div class="tab" data-tab="results">Риск рецидива</div>
+                        <div class="tab" data-tab="results">Прогноз</div>
                     </div>
 
                     <!-- Вкладка первичного приёма -->
@@ -427,14 +427,14 @@
                     <div class="tab-content" id="results-tab">
                         <div class="results-container">
                             <h3 class="section-title">
-                                <i class="fas fa-chart-line"></i> Оценка риска рецидива
+                                <i class="fas fa-chart-line"></i> Результаты прогнозирования
                             </h3>
-                            <p>Эта оценка рассчитывает риск рецидива заболевания на основе данных пациента, собранных во время первичного и последующих визитов.</p>
+                            <p>Эта оценка рассчитывает риск рецидива, риск отсутствия ремиссии или риск послеоперационного рецидива на основе выбранной модели и доступных данных пациента.</p>
                             
                             <!-- Раздел выбора модели -->
                             <div class="model-selection" id="modelSelectionSection" style="display: none;">
                                 <h4>Выберите модель прогнозирования</h4>
-                                <p>Выберите подходящую модель на основе доступных данных пациента:</p>
+                                <p>Выберите подходящую модель:</p>
                                 <div class="model-options" id="modelOptions">
                                     <!-- Варианты моделей будут заполнены JavaScript -->
                                 </div>
@@ -450,7 +450,7 @@
 
                             <div class="action-buttons">
                                 <button class="btn btn-accent" id="calculateRiskBtn">
-                                    <i class="fas fa-calculator"></i> Рассчитать риск рецидива
+                                    <i class="fas fa-calculator"></i>Прогноз
                                 </button>
                                 <button class="btn btn-primary" id="viewRawDataBtn" style="display: none;">
                                     <i class="fas fa-code"></i> Просмотреть исходные данные

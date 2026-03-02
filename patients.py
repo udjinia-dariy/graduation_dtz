@@ -130,6 +130,7 @@ class PatientStorage:
         for pid in patient_ids:
             patient = self.load_patient(pid)
             if patient:
-                patient.mark_used_by(group)
+                # TODO: remove this later it's just for tests
+                # patient.mark_used_by(group)
                 self.save_patient(patient)
 

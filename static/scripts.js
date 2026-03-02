@@ -470,7 +470,7 @@ function selectPatient(patientId) {
         <div class="empty-state">
             <i class="fas fa-calculator"></i>
             <h3>Расчёт ещё не выполнен</h3>
-            <p>Заполните данные пациента и нажмите "Рассчитать риск рецидива" для просмотра результатов.</p>
+            <p>Заполните данные пациента и нажмите кнопку расчёта для просмотра результатов.</p>
         </div>
     `;
     
@@ -1038,7 +1038,7 @@ async function calculateRecurrenceRisk() {
             if (selectedModelObj) {
                 if (selectedModelObj.info.type === 'firstRemission') {
                     riskHighText = 'ВЫСОКАЯ ВЕРОЯТНОСТЬ ОТСУТСТВИЯ РЕМИССИИ ⚠️';
-                    riskLowText = 'ВЫСОКАЯ ВЕРОЯТНОСТЬ РЕМИССИИ ✅';
+                    riskLowText = 'РЕМИССИИ ВОЗМОЖНА ✅';
                 } else if (selectedModelObj.info.type === 'postOperationRecurrence') {
                     riskHighText = 'ВЫСОКИЙ РИСК ПОСЛЕОПЕРАЦИОННОГО РЕЦИДИВА ⚠️';
                     riskLowText = 'НИЗКИЙ РИСК ПОСЛЕОПЕРАЦИОННОГО РЕЦИДИВА ✅';
