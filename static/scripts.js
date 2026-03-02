@@ -594,6 +594,39 @@ async function createNewPatient() {
     }
 }
 
+const buildPatientData = (patient) => ({
+    id: patient.id,
+    patient_data: {
+        patient_name: patient.patient_name,
+        age_onset: patient.age_onset,
+        sex: patient.sex,
+        heredity: patient.heredity,
+        smoking_status: patient.smoking_status,
+        us1_thyroid_volume: patient.us1_thyroid_volume,
+        us1_nodules: patient.us1_nodules,
+        us1_nodules_cm: patient.us1_nodules_cm,
+        tsh_1: patient.tsh_1,
+        ft4_1: patient.ft4_1,
+        ft3_1: patient.ft3_1,
+        ft3_to_ft4_ratio: patient.ft3_to_ft4_ratio,
+        exophthalmos: patient.exophthalmos,
+        thyrotoxic_cardiomyopathy: patient.thyrotoxic_cardiomyopathy,
+        treatment_type: patient.treatment_type,
+        tsh_3: patient.tsh_3,
+        us3_thyroid_volume: patient.us3_thyroid_volume,
+        us3_nodules: patient.us3_nodules,
+        us3_nodules_cm: patient.us3_nodules_cm,
+        no_remission: patient.no_remission,
+        surgery_type: patient.surgery_type ?? null,
+        disease_duration_before_surgery_years: patient.disease_duration_before_surgery_years ?? null,
+        age_at_surgery: patient.age_at_surgery ?? null,
+        preop_thyroid_volume: patient.preop_thyroid_volume ?? null,
+        preop_tsh: patient.preop_tsh ?? null,
+        postop_complications: patient.postop_complications ?? null,
+        postop_recurrence: patient.postop_recurrence ?? null
+    }
+})
+
 // Save initial patient data
 async function saveInitialData() {
     if (!currentPatientId) {
@@ -634,39 +667,7 @@ async function saveInitialData() {
     }
     
     // Prepare data for backend
-    const patientData = {
-        // redundancy
-        id: patient.id,
-        patient_data: {
-            patient_name: patient.patient_name,
-            age_onset: patient.age_onset,
-            sex: patient.sex,
-            heredity: patient.heredity,
-            smoking_status: patient.smoking_status,
-            us1_thyroid_volume: patient.us1_thyroid_volume,
-            us1_nodules: patient.us1_nodules,
-            us1_nodules_cm: patient.us1_nodules_cm,
-            tsh_1: patient.tsh_1,
-            ft4_1: patient.ft4_1,
-            ft3_1: patient.ft3_1,
-            ft3_to_ft4_ratio: patient.ft3_to_ft4_ratio,
-            exophthalmos: patient.exophthalmos,
-            thyrotoxic_cardiomyopathy: patient.thyrotoxic_cardiomyopathy,
-            treatment_type: patient.treatment_type,
-            tsh_3: patient.tsh_3,
-            us3_thyroid_volume: patient.us3_thyroid_volume,
-            us3_nodules: patient.us3_nodules,
-            us3_nodules_cm: patient.us3_nodules_cm,
-            no_remission: patient.no_remission,
-            surgery_type: patient.surgery_type ?? null,
-            disease_duration_before_surgery_years: patient.disease_duration_before_surgery_years ?? null,
-            age_at_surgery: patient.age_at_surgery ?? null,
-            preop_thyroid_volume: patient.preop_thyroid_volume ?? null,
-            preop_tsh: patient.preop_tsh ?? null,
-            postop_complications: patient.postop_complications ?? null,
-            postop_recurrence: patient.postop_recurrence ?? null
-        }
-    };
+    const patientData = buildPatientData(patient);
     
     try {
         const result = await savePatientToBackend(patientData, false);
@@ -714,38 +715,7 @@ async function saveReadmissionData() {
     });
     
     // Prepare data for backend
-    const patientData = {
-        id: patient.id,
-        patient_data: {
-            patient_name: patient.patient_name,
-            age_onset: patient.age_onset,
-            sex: patient.sex,
-            heredity: patient.heredity,
-            smoking_status: patient.smoking_status,
-            us1_thyroid_volume: patient.us1_thyroid_volume,
-            us1_nodules: patient.us1_nodules,
-            us1_nodules_cm: patient.us1_nodules_cm,
-            tsh_1: patient.tsh_1,
-            ft4_1: patient.ft4_1,
-            ft3_1: patient.ft3_1,
-            ft3_to_ft4_ratio: patient.ft3_to_ft4_ratio,
-            exophthalmos: patient.exophthalmos,
-            thyrotoxic_cardiomyopathy: patient.thyrotoxic_cardiomyopathy,
-            treatment_type: patient.treatment_type,
-            tsh_3: patient.tsh_3,
-            us3_thyroid_volume: patient.us3_thyroid_volume,
-            us3_nodules: patient.us3_nodules,
-            us3_nodules_cm: patient.us3_nodules_cm,
-            no_remission: patient.no_remission,
-            surgery_type: patient.surgery_type ?? null,
-            disease_duration_before_surgery_years: patient.disease_duration_before_surgery_years ?? null,
-            age_at_surgery: patient.age_at_surgery ?? null,
-            preop_thyroid_volume: patient.preop_thyroid_volume ?? null,
-            preop_tsh: patient.preop_tsh ?? null,
-            postop_complications: patient.postop_complications ?? null,
-            postop_recurrence: patient.postop_recurrence ?? null
-        }
-    };
+    const patientData = buildPatientData(patient);
     
     try {
         const result = await savePatientToBackend(patientData, false);
@@ -1304,19 +1274,28 @@ async function debugFinetuneAllModels() {
 }
 
 async function saveOperationData() {
-    if (!currentPatientId) return;
+    if (!currentPatientId) {
+        showMessage('Пожалуйста, сначала выберите пациента', 'error');
+        return;
+    }
     const patientIndex = patients.findIndex(p => p.id === currentPatientId);
     if (patientIndex === -1) return;
     
-    const formData = getFormData(operationForm);
+    const formData = getFormData(readmissionForm);
     const patient = patients[patientIndex];
     
+    // Update patient data from form
     Object.keys(formData).forEach(key => {
-        if (!key.endsWith('_unknown')) patient[key] = formData[key] === '' ? null : formData[key];
+        if (key.endsWith('_unknown')) {
+            // This is handled in getFormData
+        } else {
+            // Convert empty strings to null for consistency with backend
+            patient[key] = formData[key] === '' ? null : formData[key];
+        }
     });
-    
+
     // Build patient data object using the existing patient values
-    const patientData = { id: patient.id, patient_data: { ...patient } };
+    const patientData = buildPatientData(patient);
     
     try {
         const result = await savePatientToBackend(patientData, false);
