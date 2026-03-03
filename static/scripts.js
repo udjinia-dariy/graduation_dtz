@@ -301,7 +301,7 @@ function renderModelSelection() {
             <label for="${modelId}" class="model-label">
                 <div class="model-name">${model.info.display_name.replace(/_/g, ' ').toUpperCase()}</div>
                 <div class="model-type ${modelTypeToStyleName(model.info.type)}">${modelTypeToNormalName(model.info.type).toUpperCase()} МОДЕЛЬ</div>
-                <div class="model-name">Количество пациентов при обучения: ${model.info.size_of_training_dataset}</div>
+                <div class="model-name">Количество пациентов при обучении: ${model.info.size_of_training_dataset}</div>
                 <div style="font-size: 0.85rem; margin-top: 5px; color: #666;">
                     ${model.info.description}
                 </div>
