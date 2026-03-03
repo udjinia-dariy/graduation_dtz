@@ -1262,10 +1262,11 @@ async function debugFinetuneAllModels() {
         result.models?.forEach(model => {
             const idx = predictionModels.findIndex(mm => mm.name === model.name);
             if (idx >= 0) {
-                predictionModels[idx].info.size_of_training_dataset = m.new_dataset_size;
+                predictionModels[idx].info.size_of_training_dataset = model.new_dataset_size;
             }
         });
     } catch (error) {
+        console.err("Error in fine-tune result:", error);
         showMessage(`Ошибка: ${error.message}`, 'error');
     }
 

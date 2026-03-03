@@ -21,6 +21,16 @@ def smart_convert(x):
         return int(f) if f == int(f) else f
     return x
 
+def remove_timestamp_from_name(name):
+    parts = name.split('_')
+    if len(parts) >= 2:
+        try:
+            datetime.strptime(parts[-2], '%Y%m%d')
+            datetime.strptime(parts[-1], '%H%M%S')
+            return '_'.join(parts[:-2])
+        except ValueError:
+            return name
+    return name
 # ========== 
 
 # data prepare part
@@ -468,7 +478,7 @@ class ModelsStorage:
 
     def upload_model(self, model):
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        new_model_name = f"{model.model_name}_{timestamp}"
+        new_model_name = f"{remove_timestamp_from_name(model.model_name)}_{timestamp}"
         filepath = f"{self.BASE_DATAFRAME_PATH}/{new_model_name}.pkl"
 
         try:
@@ -520,7 +530,7 @@ class ModelsStorage:
         return self.models
 
     def get_all_models_info(self):
-        return [{'name': name, 'info': model.get_info()}
+        return [{'name': remove_timestamp_from_name(name), 'info': model.get_info()}
                 for name, model in self.models.items()]
 
     def get_all_groups(self):
@@ -538,7 +548,7 @@ class ModelsStorage:
         for model in models:
             res = model.fine_tune_batch(patients, self.initial_dataframe[group])
             self.upload_model(model)
-            results.append({'name': model.model_name, **res})
+            results.append({'name': remove_timestamp_from_name(model.model_name), **res})
 
         if patients:
             pdata = pd.DataFrame([p.patient_data for p in patients])

@@ -10,7 +10,7 @@
       "model_group": "follow_up",
       "is_tree": true,
       "should_manualy_fill_none": false,
-      "size_of_training_dataset": 101
+      "size_of_training_dataset": 168
     },
     {
       "id": "xgboost",
@@ -22,7 +22,7 @@
       "model_group": "follow_up",
       "is_tree": false,
       "should_manualy_fill_none": false,
-      "size_of_training_dataset": 102
+      "size_of_training_dataset": 168
     },
     {
       "id": "extra_trees_2_model",
@@ -34,7 +34,7 @@
       "model_group": "post_operation",
       "is_tree": true,
       "should_manualy_fill_none": false,
-      "size_of_training_dataset": 103
+      "size_of_training_dataset": 97
     },
     {
       "id": "knn_2_model",
@@ -46,7 +46,7 @@
       "model_group": "post_operation",
       "is_tree": false,
       "should_manualy_fill_none": false,
-      "size_of_training_dataset": 104
+      "size_of_training_dataset": 97
     }
   ],
   "dataframe_history": [

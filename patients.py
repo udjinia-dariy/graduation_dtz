@@ -72,7 +72,7 @@ class PatientStorage:
         except Exception as e:
             print(f"Error saving patient {patient.id}: {str(e)}")
             return False
-    
+
     def load_patient(self, patient_id):
         """Load patient from JSON file"""
         file_path = self._get_patient_path(patient_id)
