@@ -3,7 +3,7 @@
     {
       "id": "random_forest_1_model",
       "display_name": "Случайный лес",
-      "description": "Предсказывает риски на основе модели случайного леса",
+      "description": "Предсказывает риск на основе модели случайного леса",
       "model_filename": "random_forest_1_model",
       "scaler_filename": "preprocessor1",
       "fine_tune_group": "firstRemission",
@@ -15,7 +15,7 @@
     {
       "id": "xgboost",
       "display_name": "Xgboost",
-      "description": "Модель на основе Xgboost с None для пропусков",
+      "description": "Модель на основе Xgboost",
       "model_filename": "xgboost_1_model",
       "scaler_filename": "preprocessor1",
       "fine_tune_group": "firstRemission",
@@ -26,8 +26,8 @@
     },
     {
       "id": "extra_trees_2_model",
-      "display_name": "Extra tees",
-      "description": "Модель extra tree, для предсказания рецидива после операции",
+      "display_name": "Extra trees",
+      "description": "Модель extra trees, для предсказания рецидива после операции",
       "model_filename": "extra_trees_2_model",
       "scaler_filename": "preprocessor2",
       "fine_tune_group": "postOperationRecurrence",

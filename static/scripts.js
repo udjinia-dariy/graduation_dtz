@@ -1008,7 +1008,7 @@ async function calculateRecurrenceRisk() {
             if (selectedModelObj) {
                 if (selectedModelObj.info.type === 'firstRemission') {
                     riskHighText = 'ВЫСОКАЯ ВЕРОЯТНОСТЬ ОТСУТСТВИЯ РЕМИССИИ ⚠️';
-                    riskLowText = 'РЕМИССИИ ВОЗМОЖНА ✅';
+                    riskLowText = 'РЕМИССИЯ ВОЗМОЖНА ✅';
                 } else if (selectedModelObj.info.type === 'postOperationRecurrence') {
                     riskHighText = 'ВЫСОКИЙ РИСК ПОСЛЕОПЕРАЦИОННОГО РЕЦИДИВА ⚠️';
                     riskLowText = 'НИЗКИЙ РИСК ПОСЛЕОПЕРАЦИОННОГО РЕЦИДИВА ✅';
@@ -1282,7 +1282,7 @@ async function saveOperationData() {
     const patientIndex = patients.findIndex(p => p.id === currentPatientId);
     if (patientIndex === -1) return;
     
-    const formData = getFormData(readmissionForm);
+    const formData = getFormData(operationForm);
     const patient = patients[patientIndex];
     
     // Update patient data from form
