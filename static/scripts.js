@@ -204,6 +204,16 @@ function selectModel(modelName) {
         } else {
             console.err("unsupported model type, model: ", model.info);
         }
+
+        // Clear results tab
+        document.getElementById('calculationResults').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calculator"></i>
+                <h3>Расчёт ещё не выполнен</h3>
+                <p>Заполните данные пациента и нажмите кнопку расчёта для просмотра результатов.</p>
+            </div>
+        `;
+    
     }
 }
 
