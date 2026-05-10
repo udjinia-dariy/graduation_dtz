@@ -19,4 +19,4 @@ README.md
 *.sqlite
 __pycache__/
 models/*.joblib
-models/*.pkl
+draft_shitt
