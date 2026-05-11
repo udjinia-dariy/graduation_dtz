@@ -6,6 +6,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
-EXPOSE 5000
+RUN pip install gunicorn
 
-CMD ["python", "app.py"]
+EXPOSE 8020
+
+CMD ["gunicorn", "-b", "0.0.0.0:8020", "app:app"]
